@@ -1,16 +1,28 @@
+import 'dart:js_interop';
+import 'dart:math';
+
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:to_do/data/firestore.dart';
 
 abstract class AuthenticationDataSource {
   Future<void> register(String email, String password, String passwordConfirm);
   Future<void> login(String email, String password);
+  final _auth = FirebaseAuth.instance;
 }
 
 class AuthenticateRemote extends AuthenticationDataSource {
   @override
-  Future<void> login(String email, String password) async {
-    await FirebaseAuth.instance.signInWithEmailAndPassword(
-        email: email.trim(), password: password.trim());
+  Future<User?> login(String email, String password) async {
+    try {
+      UserCredential credential = await _auth.signInWithEmailAndPassword(
+          email: email.trim(), password: password.trim());
+      return credential.user;
+    } on FirebaseAuthException catch (error) {
+      Fluttertoast.showToast(
+          msg: error.message! + error.toString(), gravity: ToastGravity.TOP);
+    }
+    return null;
   }
 
   @override

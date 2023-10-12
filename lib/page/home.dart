@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:to_do/page/account_page.dart';
 
 import 'package:to_do/page/add_task_with_plus.dart';
 import 'package:to_do/page/calendar_page.dart';
 import 'package:to_do/page/task_page.dart';
+import 'package:to_do/widgets/add_task.dart';
 
 class MyHomePage extends StatefulWidget {
   const MyHomePage({super.key});
@@ -24,20 +26,20 @@ class _MyHomePageState extends State<MyHomePage> {
 
   @override
   Widget build(BuildContext context) {
+    double height = MediaQuery.of(context).size.height * 0.17;
     return Scaffold(
       body: PageView(
         controller: pageController,
-        children: const [
-          TaskPage(),
-          CalendarPage(),
-        ],
+        children: const [TaskPage(), CalendarPage(), AccountPage()],
       ),
       bottomNavigationBar: BottomNavigationBar(
         items: const <BottomNavigationBarItem>[
           BottomNavigationBarItem(
               icon: Icon(Icons.format_list_bulleted_add), label: "Tasks"),
           BottomNavigationBarItem(
-              icon: Icon(Icons.calendar_month_outlined), label: 'Calendar')
+              icon: Icon(Icons.calendar_month_outlined), label: 'Calendar'),
+          BottomNavigationBarItem(
+              icon: Icon(Icons.account_circle_outlined), label: 'Account')
         ],
         selectedItemColor: Colors.blue.shade900,
         currentIndex: _selectedIndex,
@@ -46,13 +48,18 @@ class _MyHomePageState extends State<MyHomePage> {
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
-          Navigator.of(context).push(MaterialPageRoute(
-            builder: (context) => AddTask(),
-          ));
+          _displayBottomSheet(context, height);
         },
         backgroundColor: Colors.blue,
         child: Icon(Icons.add, size: 30),
       ),
     );
+  }
+
+  Future _displayBottomSheet(BuildContext context, double height) {
+    return showModalBottomSheet(
+        context: context,
+        builder: (context) =>
+            Container(height: height, color: Colors.white, child: AddTask()));
   }
 }

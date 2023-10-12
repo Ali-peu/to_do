@@ -53,3 +53,23 @@ String getFirstWordsFast(String sentence, String wordSeparator, int findCount) {
   }
   return finalString;
 }
+
+String showCorrectTextInTaskContainer(String taskText) {
+  if (taskText.length <= 10) {
+    return taskText;
+  } else {
+    int startIndex = 0;
+    late int indexOfSpace;
+
+    for (int i = 0; i < 6; i++) {
+      indexOfSpace = taskText.indexOf(' ', startIndex);
+      if (indexOfSpace == -1) {
+        //-1 is when character is not found
+        return taskText;
+      }
+      startIndex = indexOfSpace + 1;
+    }
+
+    return '${taskText.substring(0, indexOfSpace)}...';
+  }
+}

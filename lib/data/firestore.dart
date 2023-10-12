@@ -21,6 +21,9 @@ class FirebaseDatasource {
   }
 
   Future<bool> AddNote(String description) async {
+    if (description.length == 0) {
+      return true;
+    }
     try {
       DateTime data = DateTime.now();
       var uuid = Uuid().v4();
@@ -109,5 +112,9 @@ class FirebaseDatasource {
       print(e);
       return true;
     }
+  }
+
+  Future<void> logOut() async {
+    FirebaseAuth.instance.signOut();
   }
 }

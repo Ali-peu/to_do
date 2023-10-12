@@ -1,4 +1,9 @@
+import 'dart:js_interop';
+
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:to_do/data/auth_data.dart';
 import 'package:to_do/global/validador_text.dart';
 
@@ -13,7 +18,6 @@ class AuthPage extends StatefulWidget {
 class _AuthPageState extends State<AuthPage> {
   FocusNode _focusNodeEmail = FocusNode();
   FocusNode _focusNodePassword = FocusNode();
-  final _formKey = GlobalKey<FormState>();
 
   final email = TextEditingController();
   final password = TextEditingController();
@@ -37,7 +41,6 @@ class _AuthPageState extends State<AuthPage> {
       body: SafeArea(
           child: SingleChildScrollView(
         child: Form(
-          key: _formKey,
           child: Column(children: [
             const SizedBox(height: 20),
             image(),
@@ -86,10 +89,9 @@ class _AuthPageState extends State<AuthPage> {
 
   Widget loginButton() {
     return ElevatedButton(
-        onPressed: () {
-          if (_formKey.currentState!.validate()) {
-            AuthenticateRemote().login(email.text, password.text);
-          }
+        onPressed: () async {
+          AuthenticateRemote().login(email.text, password.text);
+          setState(() {});
         },
         style: ElevatedButton.styleFrom(
             padding: const EdgeInsets.symmetric(vertical: 15, horizontal: 100),
@@ -103,45 +105,11 @@ class _AuthPageState extends State<AuthPage> {
         ));
   }
 
-  Widget logicButton() {
-    return Padding(
-      padding: EdgeInsets.symmetric(horizontal: 15),
-      child: GestureDetector(
-        onTap: () {
-          AuthenticateRemote().login(email.text, password.text);
-        },
-        child: Container(
-          alignment: Alignment.center,
-          width: double.infinity,
-          height: 50,
-          decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(40), color: Colors.blue),
-          child: const Text(
-            'Login',
-            style: TextStyle(
-                color: Colors.white, fontSize: 23, fontWeight: FontWeight.bold),
-          ),
-        ),
-      ),
-    );
-  }
-
   Widget textFormField(TextEditingController _controller, FocusNode _focusNode,
       String typeName, IconData iconData) {
-    return TextFormField(
+    return TextField(
       controller: _controller,
       focusNode: _focusNode,
-      validator: (value) {
-        switch (typeName) {
-          case 'Email':
-            return emailCheck(value);
-
-          case "Password":
-            return passwordCheck(value);
-          default:
-            return null;
-        }
-      },
       style: TextStyle(fontSize: 18, color: Colors.black),
       decoration: InputDecoration(
         focusedErrorBorder:

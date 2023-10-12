@@ -94,10 +94,8 @@ class _SignUpState extends State<SignUp> {
   Widget signButton() {
     return ElevatedButton(
       onPressed: () {
-        if (_formKey.currentState!.validate()) {
-          AuthenticateRemote()
-              .register(email.text, password.text, passwordConfirm.text);
-        }
+        AuthenticateRemote()
+            .register(email.text, password.text, passwordConfirm.text);
       },
       style: ElevatedButton.styleFrom(
           padding: const EdgeInsets.symmetric(vertical: 15, horizontal: 100),
@@ -111,46 +109,11 @@ class _SignUpState extends State<SignUp> {
     );
   }
 
-  Widget signButtom() {
-    return Padding(
-      padding: EdgeInsets.symmetric(horizontal: 15),
-      child: GestureDetector(
-        onTap: () {
-          AuthenticateRemote()
-              .register(email.text, password.text, passwordConfirm.text);
-        },
-        child: Container(
-          alignment: Alignment.center,
-          width: double.infinity,
-          height: 50,
-          decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(40), color: Colors.blue),
-          child: const Text(
-            'Sign UP',
-            style: TextStyle(
-                color: Colors.white, fontSize: 23, fontWeight: FontWeight.bold),
-          ),
-        ),
-      ),
-    );
-  }
-
   Widget textFormField(TextEditingController _controller, FocusNode _focusNode,
       String typeName, IconData iconData) {
-    return TextFormField(
+    return TextField(
       controller: _controller,
       focusNode: _focusNode,
-      validator: (value) {
-        switch (typeName) {
-          case 'Email':
-            return emailCheck(value);
-
-          case "Password":
-            return passwordCheck(value);
-          default:
-            return null;
-        }
-      },
       style: TextStyle(fontSize: 18, color: Colors.black),
       decoration: InputDecoration(
         focusedErrorBorder:
