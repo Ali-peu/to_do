@@ -73,3 +73,10 @@ String showCorrectTextInTaskContainer(String taskText) {
     return '${taskText.substring(0, indexOfSpace)}...';
   }
 }
+
+String dateTimeDeleteSeconds(String date) {
+  int lenght = date.length;
+  String onlyData = date.substring(0, lenght - 12);
+
+  return '${onlyData.substring(0, 4)}/${onlyData.substring(5, 7)}/${onlyData.substring(8, 11)}';
+}

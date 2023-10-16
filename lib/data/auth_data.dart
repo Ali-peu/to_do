@@ -1,6 +1,3 @@
-import 'dart:js_interop';
-import 'dart:math';
-
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:to_do/data/firestore.dart';

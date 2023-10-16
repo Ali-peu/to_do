@@ -4,7 +4,6 @@ import 'package:to_do/page/account_page.dart';
 import 'package:to_do/page/add_task_with_plus.dart';
 import 'package:to_do/page/calendar_page.dart';
 import 'package:to_do/page/task_page.dart';
-import 'package:to_do/widgets/add_task.dart';
 
 class MyHomePage extends StatefulWidget {
   const MyHomePage({super.key});
@@ -26,7 +25,7 @@ class _MyHomePageState extends State<MyHomePage> {
 
   @override
   Widget build(BuildContext context) {
-    double height = MediaQuery.of(context).size.height * 0.17;
+    double height = MediaQuery.of(context).size.height * 0.23;
     return Scaffold(
       body: PageView(
         controller: pageController,
@@ -59,7 +58,13 @@ class _MyHomePageState extends State<MyHomePage> {
   Future _displayBottomSheet(BuildContext context, double height) {
     return showModalBottomSheet(
         context: context,
-        builder: (context) =>
-            Container(height: height, color: Colors.white, child: AddTask()));
+        shape: const RoundedRectangleBorder(
+          borderRadius: BorderRadius.vertical(top: Radius.circular(25)),
+        ),
+        builder: (context) => Container(
+            height: height,
+            decoration: const BoxDecoration(
+                borderRadius: BorderRadius.vertical(top: Radius.circular(25))),
+            child: const AddTask()));
   }
 }

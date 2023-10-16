@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:to_do/model/note.dart';
 import 'package:uuid/uuid.dart';
 
@@ -20,12 +21,12 @@ class FirebaseDatasource {
     }
   }
 
-  Future<bool> AddNote(String description) async {
+  Future<bool> AddNote(
+      String description, DateTime dateTime, String category) async {
     if (description.length == 0) {
       return true;
     }
     try {
-      DateTime data = DateTime.now();
       var uuid = Uuid().v4();
       await _firestore
           .collection('users')
@@ -36,30 +37,72 @@ class FirebaseDatasource {
         'id': uuid,
         'description': description,
         'isDone': false,
+        'time': DateUtils.dateOnly(dateTime),
+        'category': category,
       });
       return true;
     } catch (e) {
-      // print(e);
+      print('AddNote error: $e');
       return true;
     }
   }
 
-  List<dynamic> getNotes(AsyncSnapshot snapshot) {
+  List getNotes(AsyncSnapshot snapshot) {
     try {
-      final notesList = snapshot.data!.docs.map((doc) {
-        final data = doc.data() as Map<String, dynamic>;
-        return Note(
-          data['description'],
-          data['id'],
-          data['isDone'],
-        );
-      }).toList();
+      final notesList = _extractNotesFromSnapshot(snapshot);
       return notesList;
     } catch (e) {
-      print(e);
+      print('getNotes errors: $e');
       return [];
     }
   }
+
+  List _extractNotesFromSnapshot(AsyncSnapshot snapshot) {
+    return snapshot.data!.docs.map((doc) {
+      final data = doc.data() as Map<String, dynamic>;
+      return Note.fromJson(data);
+    }).toList();
+  }
+
+  List getWorkNotes(AsyncSnapshot snapshot) {
+    try {
+      final allNotes = _extractNotesFromSnapshot(snapshot);
+      final workNotes =
+          allNotes.where((note) => note.category == "Work").toList();
+      return workNotes;
+    } catch (e) {
+      print('getWorkNotes errors: $e');
+      return [];
+    }
+  }
+
+  List getCategoryNotes(AsyncSnapshot snapshot,String category) {
+    try {
+      final allNotes = _extractNotesFromSnapshot(snapshot);
+      final workNotes =
+          allNotes.where((note) => note.category == category).toList();
+      return workNotes;
+    } catch (e) {
+      print('getCategoryNotes errors: $e');
+      return [];
+    }
+  }
+
+  List geStudyNotes(AsyncSnapshot snapshot) {
+    try {
+      final allNotes = _extractNotesFromSnapshot(snapshot);
+      final workNotes =
+          allNotes.where((note) => note.category == "Study").toList();
+      return workNotes;
+    } catch (e) {
+      print('getStudyNotes errors: $e');
+      return [];
+    }
+  }
+
+  // AsyncSnapshot snapshot{
+  //   return snapshot().
+  // }
 
   Stream<QuerySnapshot> stream() {
     return _firestore
@@ -79,12 +122,12 @@ class FirebaseDatasource {
           .update({'isDone': isDone});
       return true;
     } catch (e) {
-      print(e);
+      print('isDone errors: $e');
       return true;
     }
   }
 
-  Future<bool> updataTask(String uuid, String description) async {
+  Future<bool> updateTask(String uuid, String description) async {
     try {
       await _firestore
           .collection('users')
@@ -94,7 +137,24 @@ class FirebaseDatasource {
           .update({'description': description});
       return true;
     } catch (e) {
-      print(e);
+      Fluttertoast.showToast(msg: e.toString(), gravity: ToastGravity.SNACKBAR);
+      print('updateTask errors: $e');
+      return true;
+    }
+  }
+
+  Future<bool> updateDeadline(String uuid, Timestamp time) async {
+    try {
+      await _firestore
+          .collection('users')
+          .doc(_auth.currentUser!.uid)
+          .collection('notes')
+          .doc(uuid)
+          .update({'time': time});
+      return true;
+    } catch (e) {
+      print('updateDeadline error :$e');
+
       return true;
     }
   }
@@ -109,7 +169,7 @@ class FirebaseDatasource {
           .delete();
       return true;
     } catch (e) {
-      print(e);
+      print('DeleteTask error: $e');
       return true;
     }
   }

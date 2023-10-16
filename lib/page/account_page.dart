@@ -22,7 +22,8 @@ class _AccountPageState extends State<AccountPage> {
       ),
       body: Container(
         alignment: Alignment.center,
-        child: Center(
+        child: Align(
+          alignment: Alignment.center,
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [

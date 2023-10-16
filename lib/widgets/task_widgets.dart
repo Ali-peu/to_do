@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:to_do/data/firestore.dart';
-import 'package:to_do/global/deskription_task.dart';
+import 'package:to_do/global/edit_task.dart';
 import 'package:to_do/global/validador_text.dart';
 import 'package:to_do/model/note.dart';
 
@@ -50,7 +50,11 @@ class _TaskWidgetState extends State<TaskWidget> {
               child: Text(
                 showCorrectTextInTaskContainer(widget._note.description),
                 maxLines: 1,
-                style: TextStyle(fontSize: 25),
+                style: TextStyle(
+                    fontSize: 25,
+                    decoration: widget._note.isDone
+                        ? TextDecoration.lineThrough
+                        : TextDecoration.none),
               ),
             ),
             Align(

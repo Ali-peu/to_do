@@ -36,7 +36,9 @@ dependencies:
   uuid: ^4.1.0
   table_calendar: ^3.0.9
   fluttertoast: ^8.2.2
-  getwidget: ^4.0.0
+  hive: ^2.2.3
+  hive_flutter: ^1.1.0
+  
 
 
   # The following adds the Cupertino Icons font to your application.
