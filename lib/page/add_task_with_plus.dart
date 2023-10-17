@@ -90,16 +90,17 @@ class _AddTaskState extends State<AddTask> {
     );
   }
 
-  DropdownMenuItem<int> dropdownButtonForCategory(int value, String category) {
+  DropdownMenuItem<int> dropdownButtonForCategory(
+      int value, String dropDownitemcategory) {
     return DropdownMenuItem(
       value: value,
       child: Text(
-        category,
+        dropDownitemcategory,
         style: const TextStyle(decoration: TextDecoration.none),
       ),
       onTap: () {
         setState(() {
-          category = this.category;
+          category = dropDownitemcategory;
         });
       },
     );
@@ -108,7 +109,7 @@ class _AddTaskState extends State<AddTask> {
   Widget button() {
     return ElevatedButton(
         onPressed: () {
-          FirebaseDatasource().AddNote(subtitle.text, dateTime, category);
+          FirebaseDatasource().addNote(subtitle.text, dateTime, category);
           Navigator.pop(context);
         },
         style: ElevatedButton.styleFrom(

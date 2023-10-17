@@ -2,14 +2,14 @@ import 'package:flutter/widgets.dart';
 import 'package:to_do/page/login.dart';
 import 'package:to_do/page/sign_up.dart';
 
-class Auth_Page extends StatefulWidget {
-  Auth_Page({super.key});
+class AuthPageForDetermine extends StatefulWidget {
+  const AuthPageForDetermine({super.key});
 
   @override
-  State<Auth_Page> createState() => _Auth_PageState();
+  State<AuthPageForDetermine> createState() => _AuthPageForDetermineState();
 }
 
-class _Auth_PageState extends State<Auth_Page> {
+class _AuthPageForDetermineState extends State<AuthPageForDetermine> {
   bool a = true;
 
   void to() {

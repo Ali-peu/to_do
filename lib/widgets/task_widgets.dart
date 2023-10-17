@@ -5,8 +5,8 @@ import 'package:to_do/global/validador_text.dart';
 import 'package:to_do/model/note.dart';
 
 class TaskWidget extends StatefulWidget {
-  Note _note;
-  TaskWidget(this._note, {super.key});
+  final Note _note;
+  const TaskWidget(this._note, {super.key});
 
   @override
   State<TaskWidget> createState() => _TaskWidgetState();
@@ -54,7 +54,8 @@ class _TaskWidgetState extends State<TaskWidget> {
                     fontSize: 25,
                     decoration: widget._note.isDone
                         ? TextDecoration.lineThrough
-                        : TextDecoration.none),
+                        : TextDecoration.none,
+                    color: widget._note.isDone ? Colors.grey : Colors.black),
               ),
             ),
             Align(

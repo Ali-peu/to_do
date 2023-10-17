@@ -37,7 +37,7 @@ class _TaskPageState extends State<TaskPage> {
 
   Widget elevatedCategoryButtonInAppBar(String category) {
     return Padding(
-      padding: EdgeInsets.all(5.0),
+      padding: const EdgeInsets.all(5.0),
       child: ElevatedButton(
         onPressed: () {
           setState(() {
@@ -47,7 +47,7 @@ class _TaskPageState extends State<TaskPage> {
         style: ElevatedButton.styleFrom(
             backgroundColor: Colors.blue[100],
             disabledBackgroundColor: Colors.red,
-            padding: EdgeInsets.symmetric(vertical: 15, horizontal: 40)),
+            padding: const EdgeInsets.symmetric(vertical: 15, horizontal: 40)),
         child: Text(
           category,
           style: const TextStyle(color: Colors.white),
@@ -82,15 +82,6 @@ class _TaskPageState extends State<TaskPage> {
                               color: Colors.white,
                             ),
                           ),
-                          secondaryBackground: Container(
-                            color: Colors.amber[700],
-                            padding: const EdgeInsets.symmetric(horizontal: 20),
-                            alignment: AlignmentDirectional.centerEnd,
-                            child: const Icon(
-                              Icons.archive,
-                              color: Colors.white,
-                            ),
-                          ),
                           onDismissed: (direction) {
                             FirebaseDatasource().deleteTask(note.id);
                           },
@@ -115,15 +106,6 @@ class _TaskPageState extends State<TaskPage> {
                               color: Colors.white,
                             ),
                           ),
-                          secondaryBackground: Container(
-                            color: Colors.amber[700],
-                            padding: const EdgeInsets.symmetric(horizontal: 20),
-                            alignment: AlignmentDirectional.centerEnd,
-                            child: const Icon(
-                              Icons.archive,
-                              color: Colors.white,
-                            ),
-                          ),
                           onDismissed: (direction) {
                             FirebaseDatasource().deleteTask(note.id);
                           },
@@ -145,15 +127,6 @@ class _TaskPageState extends State<TaskPage> {
                             alignment: AlignmentDirectional.centerStart,
                             child: const Icon(
                               Icons.delete,
-                              color: Colors.white,
-                            ),
-                          ),
-                          secondaryBackground: Container(
-                            color: Colors.amber[700],
-                            padding: const EdgeInsets.symmetric(horizontal: 20),
-                            alignment: AlignmentDirectional.centerEnd,
-                            child: const Icon(
-                              Icons.archive,
                               color: Colors.white,
                             ),
                           ),

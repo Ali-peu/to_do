@@ -5,8 +5,8 @@ import 'package:to_do/global/validador_text.dart';
 import 'package:to_do/model/note.dart';
 
 class EditTask extends StatefulWidget {
-  Note _note;
-  EditTask(this._note, {Key? key});
+  final Note _note;
+  const EditTask(this._note, {super.key});
 
   @override
   State<EditTask> createState() => _EditTaskState();
@@ -53,23 +53,22 @@ class _EditTaskState extends State<EditTask> {
       ),
       body: SafeArea(
           child: Padding(
-              padding: EdgeInsets.all(8),
-              child: Container(
-                  child: Column(children: [
+              padding: const EdgeInsets.all(8),
+              child: Column(children: [
                 taskTextforEdit(),
                 editDate(),
                 rington(),
                 someThing()
-              ])))),
+              ]))),
     );
   }
 
   InkWell someThing() {
     return InkWell(
       onTap: () {},
-      child: Container(
+      child: const SizedBox(
         height: 60,
-        child: const Row(
+        child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             Icon(Icons.repeat, size: 24, color: Colors.grey),
@@ -90,7 +89,7 @@ class _EditTaskState extends State<EditTask> {
   InkWell rington() {
     return InkWell(
       onTap: () {},
-      child: Container(
+      child: SizedBox(
         height: 60,
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -116,7 +115,7 @@ class _EditTaskState extends State<EditTask> {
       onTap: () {
         _showDatePicker();
       },
-      child: Container(
+      child: SizedBox(
         height: 60,
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,

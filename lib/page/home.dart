@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:to_do/model/note.dart';
 import 'package:to_do/page/account_page.dart';
 
 import 'package:to_do/page/add_task_with_plus.dart';

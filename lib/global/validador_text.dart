@@ -25,35 +25,6 @@ String? passwordCheck(String? password) {
   return null;
 }
 
-extension Truncate on String {
-  String truncate({required int max, String suffix = ''}) {
-    return length < max
-        ? this
-        : '${substring(0, substring(0, max - suffix.length).lastIndexOf(" "))}$suffix';
-  }
-}
-
-String getFirstWordsFast(String sentence, String wordSeparator, int findCount) {
-  if (findCount < 1) {
-    return '';
-  }
-
-  Runes spaceRunes = Runes(wordSeparator);
-  Runes sentenceRunes = Runes(sentence);
-  String finalString = "";
-
-  for (int letter in sentenceRunes) {
-    if (letter == spaceRunes.single) {
-      findCount -= 1;
-      if (findCount < 1) {
-        return finalString;
-      }
-    }
-    finalString += String.fromCharCode(letter);
-  }
-  return finalString;
-}
-
 String showCorrectTextInTaskContainer(String taskText) {
   if (taskText.length <= 10) {
     return taskText;

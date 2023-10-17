@@ -1,7 +1,7 @@
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:firebase_core/firebase_core.dart';
+
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
+
 import 'package:to_do/data/firestore.dart';
 
 class AccountPage extends StatefulWidget {
@@ -18,7 +18,12 @@ class _AccountPageState extends State<AccountPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        leading: Text('asf'),
+        title: const Center(
+          child: Text(
+            'LOGIN PAGE',
+            style: TextStyle(fontSize: 35),
+          ),
+        ),
       ),
       body: Container(
         alignment: Alignment.center,
@@ -35,11 +40,11 @@ class _AccountPageState extends State<AccountPage> {
                 onPressed: () {
                   FirebaseDatasource().logOut();
                 },
-                child: Text("Log Out"),
                 style: ElevatedButton.styleFrom(
                     padding: const EdgeInsets.symmetric(
                         horizontal: 100, vertical: 15),
                     backgroundColor: Colors.amber),
+                child: const Text("Log Out"),
               )
             ],
           ),

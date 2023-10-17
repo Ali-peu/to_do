@@ -21,9 +21,9 @@ class FirebaseDatasource {
     }
   }
 
-  Future<bool> AddNote(
+  Future<bool> addNote(
       String description, DateTime dateTime, String category) async {
-    if (description.length == 0) {
+    if (description.isEmpty) {
       return true;
     }
     try {
@@ -41,7 +41,8 @@ class FirebaseDatasource {
         'category': category,
       });
       return true;
-    } catch (e) {
+    } on FirebaseException catch (e) {
+      Fluttertoast.showToast(msg: e.code, gravity: ToastGravity.SNACKBAR);
       print('AddNote error: $e');
       return true;
     }
@@ -51,8 +52,8 @@ class FirebaseDatasource {
     try {
       final notesList = _extractNotesFromSnapshot(snapshot);
       return notesList;
-    } catch (e) {
-      print('getNotes errors: $e');
+    } on FirebaseException catch (e) {
+      Fluttertoast.showToast(msg: e.code, gravity: ToastGravity.SNACKBAR);
       return [];
     }
   }
@@ -64,37 +65,29 @@ class FirebaseDatasource {
     }).toList();
   }
 
-  List getWorkNotes(AsyncSnapshot snapshot) {
+  List getCategoryNotes(AsyncSnapshot snapshot, String category) {
     try {
       final allNotes = _extractNotesFromSnapshot(snapshot);
-      final workNotes =
-          allNotes.where((note) => note.category == "Work").toList();
-      return workNotes;
-    } catch (e) {
-      print('getWorkNotes errors: $e');
-      return [];
-    }
-  }
-
-  List getCategoryNotes(AsyncSnapshot snapshot,String category) {
-    try {
-      final allNotes = _extractNotesFromSnapshot(snapshot);
-      final workNotes =
+      final categoryNotes =
           allNotes.where((note) => note.category == category).toList();
-      return workNotes;
-    } catch (e) {
+      return categoryNotes;
+    } on FirebaseException catch (e) {
+      Fluttertoast.showToast(msg: e.code, gravity: ToastGravity.SNACKBAR);
       print('getCategoryNotes errors: $e');
       return [];
     }
   }
 
-  List geStudyNotes(AsyncSnapshot snapshot) {
+  List geSelectedTimeNotes(AsyncSnapshot snapshot, DateTime selectedDate) {
     try {
       final allNotes = _extractNotesFromSnapshot(snapshot);
-      final workNotes =
-          allNotes.where((note) => note.category == "Study").toList();
-      return workNotes;
-    } catch (e) {
+      final selectedTimeNotes = allNotes
+          .where((note) =>
+              note.time == Timestamp.fromDate(DateUtils.dateOnly(selectedDate)))
+          .toList();
+      return selectedTimeNotes;
+    } on FirebaseException catch (e) {
+      Fluttertoast.showToast(msg: e.code, gravity: ToastGravity.SNACKBAR);
       print('getStudyNotes errors: $e');
       return [];
     }
@@ -121,8 +114,8 @@ class FirebaseDatasource {
           .doc(uuid)
           .update({'isDone': isDone});
       return true;
-    } catch (e) {
-      print('isDone errors: $e');
+    } on FirebaseException catch (e) {
+      Fluttertoast.showToast(msg: e.code, gravity: ToastGravity.SNACKBAR);
       return true;
     }
   }
@@ -152,7 +145,8 @@ class FirebaseDatasource {
           .doc(uuid)
           .update({'time': time});
       return true;
-    } catch (e) {
+    } on FirebaseException catch (e) {
+      Fluttertoast.showToast(msg: e.code, gravity: ToastGravity.SNACKBAR);
       print('updateDeadline error :$e');
 
       return true;
@@ -168,7 +162,8 @@ class FirebaseDatasource {
           .doc(uuid)
           .delete();
       return true;
-    } catch (e) {
+    } on FirebaseException catch (e) {
+      Fluttertoast.showToast(msg: e.code, gravity: ToastGravity.SNACKBAR);
       print('DeleteTask error: $e');
       return true;
     }
