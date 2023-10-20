@@ -18,7 +18,7 @@ class Note {
     return Note(
         description: json['description'],
         id: json['id'],
-        time: json['time'],
+        time: json['time'] as Timestamp,
         isDone: json['isDone'],
         category: json['category']);
   }

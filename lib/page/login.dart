@@ -1,23 +1,21 @@
-import 'dart:js_interop';
-
-import 'package:firebase_auth/firebase_auth.dart';
-import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
-import 'package:fluttertoast/fluttertoast.dart';
 import 'package:to_do/data/auth_data.dart';
-import 'package:to_do/global/validador_text.dart';
+import 'package:to_do/data/google_auth.dart';
+import 'package:to_do/global/app_colors.dart';
+import 'package:to_do/widgets/universal_text_field.dart';
 
 class AuthPage extends StatefulWidget {
   final VoidCallback show;
-  AuthPage(this.show, {super.key});
+  const AuthPage(this.show, {super.key});
 
   @override
   State<AuthPage> createState() => _AuthPageState();
 }
 
 class _AuthPageState extends State<AuthPage> {
-  FocusNode _focusNodeEmail = FocusNode();
-  FocusNode _focusNodePassword = FocusNode();
+  final FocusNode _focusNodeEmail = FocusNode();
+  final FocusNode _focusNodePassword = FocusNode();
+  final _formKey = GlobalKey<FormState>();
 
   final email = TextEditingController();
   final password = TextEditingController();
@@ -37,24 +35,42 @@ class _AuthPageState extends State<AuthPage> {
   @override
   Widget build(BuildContext build) {
     return Scaffold(
-      backgroundColor: Colors.grey.shade100,
+      backgroundColor: StyleApp().appColor,
       body: SafeArea(
           child: SingleChildScrollView(
         child: Form(
+          key: _formKey,
           child: Column(children: [
             const SizedBox(height: 20),
             image(),
             const SizedBox(height: 20),
-            textFormField(email, _focusNodeEmail, 'Email', Icons.email),
+            universalTextFormField(
+                email, _focusNodeEmail, 'Email', Icons.email, null),
             const SizedBox(height: 20),
-            textFormField(
-                password, _focusNodePassword, 'Password', Icons.password),
+            universalTextFormField(
+                password, _focusNodePassword, 'Password', Icons.password, null),
             const SizedBox(height: 8),
             account(),
-            const SizedBox(
-              height: 20,
+            const SizedBox(height: 20),
+            loginButton(),
+            const SizedBox(height: 22),
+            ElevatedButton(
+              onPressed: () => AuthServise().signInWithGoogle(),
+              style: ElevatedButton.styleFrom(
+                  padding:
+                      const EdgeInsets.symmetric(vertical: 15, horizontal: 70),
+                  shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(5)),
+                  backgroundColor: Colors.green),
+              child: const Text(
+                'GoogLe Auth',
+                style: TextStyle(
+                    color: Colors.white,
+                    fontSize: 23,
+                    fontWeight: FontWeight.bold),
+              ),
             ),
-            loginButton()
+            const SizedBox(height: 20),
           ]),
         ),
       )),
@@ -90,8 +106,10 @@ class _AuthPageState extends State<AuthPage> {
   Widget loginButton() {
     return ElevatedButton(
         onPressed: () async {
-          AuthenticateRemote().login(email.text, password.text);
-          setState(() {});
+          if (_formKey.currentState!.validate()) {
+            AuthenticateRemote().login(email.text, password.text);
+            setState(() {});
+          }
         },
         style: ElevatedButton.styleFrom(
             padding: const EdgeInsets.symmetric(vertical: 15, horizontal: 100),
@@ -103,34 +121,6 @@ class _AuthPageState extends State<AuthPage> {
           style: TextStyle(
               color: Colors.white, fontSize: 23, fontWeight: FontWeight.bold),
         ));
-  }
-
-  Widget textFormField(TextEditingController _controller, FocusNode _focusNode,
-      String typeName, IconData iconData) {
-    return TextField(
-      controller: _controller,
-      focusNode: _focusNode,
-      style: TextStyle(fontSize: 18, color: Colors.black),
-      decoration: InputDecoration(
-        focusedErrorBorder:
-            const OutlineInputBorder(borderSide: BorderSide(color: Colors.red)),
-        prefixIcon: Icon(
-          Icons.email,
-          color: _focusNode.hasFocus
-              ? Color.fromRGBO(112, 243, 114, 1)
-              : Color(0xffc5c5c5),
-        ),
-        contentPadding: EdgeInsets.symmetric(horizontal: 15, vertical: 15),
-        hintText: typeName,
-        enabledBorder: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(10),
-            borderSide: const BorderSide(color: Color(0xffc5c5c5), width: 2.0)),
-        focusedBorder: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(10),
-            borderSide: const BorderSide(
-                color: Color.fromRGBO(112, 243, 114, 1), width: 2.0)),
-      ),
-    );
   }
 
   Widget image() {

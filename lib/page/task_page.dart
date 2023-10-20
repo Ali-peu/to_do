@@ -67,27 +67,7 @@ class _TaskPageState extends State<TaskPage> {
             } else {
               if (chooseCategory == 'All') {
                 final noteLists = FirebaseDatasource().getNotes(snapshot);
-                return ListView.builder(
-                    itemBuilder: (context, index) {
-                      final note = noteLists[index];
-
-                      return Dismissible(
-                          key: UniqueKey(),
-                          background: Container(
-                            color: Colors.red,
-                            padding: const EdgeInsets.symmetric(horizontal: 20),
-                            alignment: AlignmentDirectional.centerStart,
-                            child: const Icon(
-                              Icons.delete,
-                              color: Colors.white,
-                            ),
-                          ),
-                          onDismissed: (direction) {
-                            FirebaseDatasource().deleteTask(note.id);
-                          },
-                          child: TaskWidget(note));
-                    },
-                    itemCount: noteLists.length);
+                return listOfTasks(noteLists);
               } else if (chooseCategory == 'Work') {
                 final noteLists =
                     FirebaseDatasource().getCategoryNotes(snapshot, 'Work');
@@ -140,5 +120,29 @@ class _TaskPageState extends State<TaskPage> {
             }
           }),
     );
+  }
+
+  ListView listOfTasks(List<dynamic> noteLists) {
+    return ListView.builder(
+        itemBuilder: (context, index) {
+          final note = noteLists[index];
+
+          return Dismissible(
+              key: UniqueKey(),
+              background: Container(
+                color: Colors.red,
+                padding: const EdgeInsets.symmetric(horizontal: 20),
+                alignment: AlignmentDirectional.centerStart,
+                child: const Icon(
+                  Icons.delete,
+                  color: Colors.white,
+                ),
+              ),
+              onDismissed: (direction) {
+                FirebaseDatasource().deleteTask(note.id);
+              },
+              child: TaskWidget(note));
+        },
+        itemCount: noteLists.length);
   }
 }

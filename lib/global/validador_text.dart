@@ -5,11 +5,8 @@ String? emailCheck(String? email) {
   final RegExp emailRegExp =
       RegExp(r'^[\w-]+(\.[\w-]+)*@([\w-]+\.)+[a-zA-Z]{2,7}$');
   if (!emailRegExp.hasMatch(email)) {
-    return 'You email doesn\'t meet the requirements';
-  } else if (email.length > 20) {
-    return "The length of the email exceeds 30 characters";
+    return 'Проверьте ваш эмейл';
   }
-
   return null;
 }
 
@@ -21,6 +18,13 @@ String? passwordCheck(String? password) {
       RegExp(r'^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9]).{8,}$');
   if (!passwordRegExp.hasMatch(password)) {
     return 'Пароль не подходить';
+  }
+  return null;
+}
+
+passwordConfirmCheck(String? password, String? passwordConfirm) {
+  if (password != passwordConfirm) {
+    return 'Passwords don\'t match';
   }
   return null;
 }

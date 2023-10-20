@@ -4,8 +4,6 @@ import 'package:table_calendar/table_calendar.dart';
 import 'package:to_do/data/firestore.dart';
 import 'package:to_do/widgets/task_widget_for_calendar_page.dart';
 
-import 'package:to_do/widgets/task_widgets.dart';
-
 class CalendarPage extends StatefulWidget {
   const CalendarPage({super.key});
 
@@ -38,7 +36,7 @@ class _CalendarPageState extends State<CalendarPage> {
               stream: FirebaseDatasource().stream(),
               builder: (context, snapshot) {
                 if (!snapshot.hasData) {
-                  return Center(child: CircularProgressIndicator());
+                  return const Center(child: CircularProgressIndicator());
                 } else {
                   final noteLists = FirebaseDatasource()
                       .geSelectedTimeNotes(snapshot, _focusedDay);

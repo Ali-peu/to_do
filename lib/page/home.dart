@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:to_do/model/note.dart';
+
 import 'package:to_do/page/account_page.dart';
 
 import 'package:to_do/page/add_task_with_plus.dart';
@@ -51,7 +51,7 @@ class _MyHomePageState extends State<MyHomePage> {
           _displayBottomSheet(context, height);
         },
         backgroundColor: Colors.blue,
-        child: Icon(Icons.add, size: 30),
+        child: const Icon(Icons.add, size: 30),
       ),
     );
   }

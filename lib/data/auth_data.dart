@@ -16,6 +16,11 @@ class AuthenticateRemote extends AuthenticationDataSource {
           email: email.trim(), password: password.trim());
       return credential.user;
     } on FirebaseAuthException catch (error) {
+      if (error.code == 'user-not-found') {
+        print(error.code);
+        Fluttertoast.showToast(msg: error.code, gravity: ToastGravity.CENTER);
+      }
+      print(error.code);
       Fluttertoast.showToast(
           msg: error.message! + error.toString(), gravity: ToastGravity.TOP);
     }
