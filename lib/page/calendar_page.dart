@@ -18,6 +18,8 @@ class _CalendarPageState extends State<CalendarPage> {
 
   List<Note> selectedDataNotes = [];
 
+  Future<Box<Note>> listTask = Hive.openBox<Note>('box');
+
   void getSelectedDateNotes() async {
     final box = Hive.box<Note>('box');
     selectedDataNotes = box.values.where((task) {
@@ -37,6 +39,9 @@ class _CalendarPageState extends State<CalendarPage> {
   @override
   void initState() {
     super.initState();
+
+    listTask;
+
     getSelectedDateNotes();
     final box = Hive.box<Note>('box');
     box.watch().listen((event) {
@@ -47,6 +52,8 @@ class _CalendarPageState extends State<CalendarPage> {
   @override
   Widget build(BuildContext context) {
     return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      mainAxisSize: MainAxisSize.min,
       children: [
         TableCalendar(
           focusedDay: _focusedDay,
@@ -61,24 +68,35 @@ class _CalendarPageState extends State<CalendarPage> {
           },
           selectedDayPredicate: (day) => isSameDay(day, _selectedDay),
         ),
-        Flexible(
-          child: selectedDataNotes.isEmpty
-              ? const Center(
+        FutureBuilder(
+            future: listTask,
+            builder: (BuildContext context, AsyncSnapshot<Box<Note>> response) {
+              if (response.data == null || response.data!.isEmpty) {
+                return const Center(
                   child: Text(
                     'У вас нет задач на этот день',
                     style: TextStyle(color: Colors.teal),
                   ),
-                )
-              : ListView.builder(
+                );
+              } else {
+                List<Note> dateNotes = response.data!.values
+                    .where((element) =>
+                        DateUtils.dateOnly(element.time) ==
+                        DateUtils.dateOnly(_focusedDay))
+                    .toList();
+                return ListView.builder(
+                  scrollDirection: Axis.vertical,
+                  shrinkWrap: true,
                   itemBuilder: (context, index) {
                     return Padding(
                       padding: const EdgeInsets.all(10.0),
-                      child: TaskWidgetForCalendar(selectedDataNotes[index]),
+                      child: TaskWidgetForCalendar(dateNotes[index]),
                     );
                   },
-                  itemCount: selectedDataNotes.length,
-                ),
-        ),
+                  itemCount: dateNotes.length,
+                );
+              }
+            }),
       ],
     );
   }

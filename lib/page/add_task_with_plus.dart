@@ -48,62 +48,56 @@ class _AddTaskState extends State<AddTask> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      resizeToAvoidBottomInset: true,
-      body: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 8),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
+    return Column(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        Flexible(
+            child: Container(
+                decoration: BoxDecoration(
+                    color: Colors.grey.withOpacity(0.15),
+                    borderRadius: BorderRadius.circular(5)),
+                child: Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: subtiteWidget(),
+                ))),
+        Row(
           children: [
-            Flexible(
-                child: Container(
-                    decoration: BoxDecoration(
-                        color: Colors.grey.withOpacity(0.15),
-                        borderRadius: BorderRadius.circular(5)),
-                    child: Padding(
-                      padding: const EdgeInsets.all(8.0),
-                      child: subtiteWidget(),
-                    ))),
-            Row(
-              children: [
-                Expanded(
-                    child: Row(children: [
-                  Container(
-                    height: 30,
-                    width: 140,
-                    decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(10),
-                        color: Colors.grey.withOpacity(0.19)),
-                    child: DropdownButton(
-                      icon: const Visibility(
-                          visible: false, child: Icon(Icons.arrow_downward)),
-                      value: _dropDownButtonValue,
-                      items: [
-                        dropdownButtonForCategory(3, 'Study'),
-                        dropdownButtonForCategory(2, 'Work'),
-                        dropdownButtonForCategory(1, 'No category'),
-                      ],
-                      onChanged: (value) {
-                        setState(() {
-                          _dropDownButtonValue = value!;
-                          category;
-                        });
-                      },
-                    ),
-                  ),
-                  IconButton(
-                    icon: const Icon(Icons.edit_calendar_outlined),
-                    onPressed: () {
-                      _showDatePicker();
-                    },
-                  ),
-                ])),
-                button(),
-              ],
-            )
+            Expanded(
+                child: Row(children: [
+              Container(
+                height: 30,
+                width: 140,
+                decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(10),
+                    color: Colors.grey.withOpacity(0.19)),
+                child: DropdownButton(
+                  icon: const Visibility(
+                      visible: false, child: Icon(Icons.arrow_downward)),
+                  value: _dropDownButtonValue,
+                  items: [
+                    dropdownButtonForCategory(3, 'Study'),
+                    dropdownButtonForCategory(2, 'Work'),
+                    dropdownButtonForCategory(1, 'No category'),
+                  ],
+                  onChanged: (value) {
+                    setState(() {
+                      _dropDownButtonValue = value!;
+                      category;
+                    });
+                  },
+                ),
+              ),
+              IconButton(
+                icon: const Icon(Icons.edit_calendar_outlined),
+                onPressed: () {
+                  _showDatePicker();
+                },
+              ),
+            ])),
+            button(),
           ],
-        ),
-      ),
+        )
+      ],
     );
   }
 
@@ -151,6 +145,9 @@ class _AddTaskState extends State<AddTask> {
       maxLines: 1,
       autofocus: true,
       controller: subtitle,
+      onEditingComplete: () {
+        saveTask();
+      },
       focusNode: _focusNode2,
       style: const TextStyle(fontSize: 18, color: Colors.black),
       decoration: const InputDecoration(

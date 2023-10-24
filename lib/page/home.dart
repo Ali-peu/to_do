@@ -68,6 +68,8 @@ class _MyHomePageState extends State<MyHomePage> {
           borderRadius: BorderRadius.vertical(top: Radius.circular(25)),
         ),
         builder: (context) => Container(
+            padding: EdgeInsets.only(
+                bottom: MediaQuery.of(context).viewInsets.bottom),
             height: height,
             decoration: const BoxDecoration(
                 borderRadius: BorderRadius.vertical(top: Radius.circular(25))),

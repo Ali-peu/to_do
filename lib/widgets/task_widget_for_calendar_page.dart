@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:to_do/global/app_colors.dart';
 
 import 'package:to_do/global/validador_text.dart';
 import 'package:to_do/model/note.dart';
@@ -18,15 +19,17 @@ class _TaskWidgetForCalendarState extends State<TaskWidgetForCalendar> {
   Widget build(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.all(8.0),
-      child: ListTile(
-        title: Flexible(
-            child: Text(
-          showCorrectTextInTaskContainer(widget._note.description),
-          style: const TextStyle(fontSize: 25, color: Colors.black),
-        )),
-        trailing: IconButton(
-          icon: const Icon(Icons.flag_outlined),
-          onPressed: () {},
+      child: ColoredBox(
+        color: StyleApp().taskColoR,
+        child: ListTile(
+          title: Text(
+            showCorrectTextInTaskContainer(widget._note.description),
+            style: const TextStyle(fontSize: 25, color: Colors.black),
+          ),
+          trailing: IconButton(
+            icon: const Icon(Icons.flag_outlined),
+            onPressed: () {},
+          ),
         ),
       ),
     );

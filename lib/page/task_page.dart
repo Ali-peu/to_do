@@ -44,6 +44,7 @@ class _TaskPageState extends State<TaskPage> {
     });
   }
 
+  int _currIndex = 0;
   TextEditingController taskText = TextEditingController();
   ExpansionTileController controller = ExpansionTileController();
 
@@ -101,13 +102,46 @@ class _TaskPageState extends State<TaskPage> {
                 Visibility(
                   visible: today.isEmpty ? false : true,
                   child: ExpansionTile(
+                      controller: ExpansionTileController(),
                       // shape: null,
                       initiallyExpanded: true,
-                      title: const Row(
-                        children: [Text("Today"), Icon(Icons.arrow_downward)],
+                      onExpansionChanged: (bool value) {
+                        setState(() {
+                          _currIndex = _currIndex == 0 ? 1 : 0;
+                        });
+                      },
+                      title: Row(
+                        children: [
+                          const Text("Today"),
+                          AbsorbPointer(
+                            child: IconButton(
+                              icon: AnimatedSwitcher(
+                                  duration: const Duration(milliseconds: 300),
+                                  transitionBuilder: (child, anim) =>
+                                      RotationTransition(
+                                        turns: child.key ==
+                                                const ValueKey('icon1')
+                                            ? Tween<double>(begin: 0, end: 1)
+                                                .animate(anim)
+                                            : Tween<double>(begin: 1, end: 0)
+                                                .animate(anim),
+                                        child: FadeTransition(
+                                            opacity: anim, child: child),
+                                      ),
+                                  child: _currIndex == 0
+                                      ? const Icon(Icons.arrow_drop_down_sharp,
+                                          key: ValueKey('icon1'))
+                                      : const Icon(
+                                          Icons.arrow_drop_up_sharp,
+                                          key: ValueKey('icon2'),
+                                        )),
+                              onPressed: () {},
+                            ),
+                          ),
+                        ],
                       ),
-                      trailing: const Visibility(
-                          visible: false, child: Icon(Icons.h_mobiledata)),
+                      trailing:
+                          const Visibility(visible: false, child: Text('')),
                       children: today.map<Widget>((Note note) {
                         return TaskWidget(note);
                       }).toList()),
@@ -137,19 +171,6 @@ class _TaskPageState extends State<TaskPage> {
       ),
     );
   }
-
-  // Padding normalTasksWithoutExpresionTile() {
-  //   return Padding(
-  //       padding: const EdgeInsets.all(8.0),
-  //       child: ListView.builder(
-  //         itemBuilder: ((context, index) {
-  //           return TaskWidget(noteList[index]);
-
-  //           // return TaskWidget(noteList[index]);
-  //         }),
-  //         itemCount: noteList.length,
-  //       ));
-  // }
 
   Widget elevatedCategoryButtonInAppBar(String category) {
     return Padding(
