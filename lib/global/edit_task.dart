@@ -1,6 +1,8 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-import 'package:to_do/data/firestore.dart';
+import 'package:fluttertoast/fluttertoast.dart';
+
+import 'package:to_do/data/hive_data.dart';
+
 import 'package:to_do/global/validador_text.dart';
 import 'package:to_do/model/note.dart';
 
@@ -15,20 +17,25 @@ class EditTask extends StatefulWidget {
 class _EditTaskState extends State<EditTask> {
   TextEditingController? taskText;
   FocusNode focusNode = FocusNode();
+  void _showSnackbar() {
+    Fluttertoast.showToast(
+        msg: 'Обновление не может быть пустым', gravity: ToastGravity.SNACKBAR);
+  }
 
-  late String time =
-      dateTimeDeleteSeconds(widget._note.time.toDate().toString());
+  late String time = dateTimeDeleteSeconds(widget._note.time.toString());
 
   void _showDatePicker() {
     showDatePicker(
       context: context,
-      initialDate: widget._note.time.toDate(),
+      initialDate: widget._note.time,
       firstDate: DateTime(2023, 01, 01),
       lastDate: DateTime(2025),
     ).then((value) {
       setState(() {
-        FirebaseDatasource()
-            .updateDeadline(widget._note.id, Timestamp.fromDate(value!));
+        if (value != null) {
+          HiveDataBase().updateDatetime(widget._note, value);
+        }
+
         time = dateTimeDeleteSeconds(value.toString());
       });
     });
@@ -43,12 +50,7 @@ class _EditTaskState extends State<EditTask> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
       appBar: AppBar(
-        backgroundColor: Colors.white,
-        bottomOpacity: 0.0,
-        elevation: 0.0,
-        scrolledUnderElevation: 0,
         leading: iconButtonToBack(context),
       ),
       body: SafeArea(
@@ -146,20 +148,16 @@ class _EditTaskState extends State<EditTask> {
     );
   }
 
-  Container taskTextforEdit() {
-    return Container(
-      decoration: BoxDecoration(
-          color: Colors.white, borderRadius: BorderRadius.circular(15)),
-      child: TextField(
-        autofocus: true,
-        maxLines: 6,
-        decoration: const InputDecoration(
-          contentPadding: EdgeInsets.symmetric(horizontal: 15, vertical: 15),
-          border: InputBorder.none,
-        ),
-        controller: taskText,
-        focusNode: focusNode,
+  Widget taskTextforEdit() {
+    return TextField(
+      autofocus: true,
+      maxLines: 6,
+      decoration: const InputDecoration(
+        contentPadding: EdgeInsets.symmetric(horizontal: 15, vertical: 15),
+        border: InputBorder.none,
       ),
+      controller: taskText,
+      focusNode: focusNode,
     );
   }
 
@@ -169,7 +167,10 @@ class _EditTaskState extends State<EditTask> {
       iconSize: 30,
       color: Colors.black,
       onPressed: () {
-        FirebaseDatasource().updateTask(widget._note.id, taskText!.text);
+        if (taskText!.text.isEmpty) {
+          return _showSnackbar();
+        }
+        HiveDataBase().update(widget._note, taskText!.text);
         Navigator.of(context).pop(context);
       },
     );

@@ -1,3 +1,7 @@
+// ignore_for_file: avoid_print
+
+import 'dart:async';
+
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:to_do/data/firestore.dart';
@@ -14,6 +18,10 @@ class AuthenticateRemote extends AuthenticationDataSource {
     try {
       UserCredential credential = await _auth.signInWithEmailAndPassword(
           email: email.trim(), password: password.trim());
+
+      Fluttertoast.showToast(
+          msg: credential.additionalUserInfo.toString(),
+          gravity: ToastGravity.BOTTOM_LEFT);
       return credential.user;
     } on FirebaseAuthException catch (error) {
       if (error.code == 'user-not-found') {

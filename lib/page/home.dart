@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
-
-import 'package:to_do/page/account_page.dart';
+import 'package:hive/hive.dart';
+import 'package:hive_flutter/adapters.dart';
+import 'package:to_do/auth/auth_page.dart';
+import 'package:to_do/model/note.dart';
 
 import 'package:to_do/page/add_task_with_plus.dart';
 import 'package:to_do/page/calendar_page.dart';
@@ -14,6 +16,12 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
+  @override
+  void initState() {
+    super.initState();
+    Hive.box<Note>('box');
+  }
+
   int _selectedIndex = 0;
   PageController pageController = PageController();
 
@@ -30,7 +38,7 @@ class _MyHomePageState extends State<MyHomePage> {
     return Scaffold(
       body: PageView(
         controller: pageController,
-        children: const [TaskPage(), CalendarPage(), AccountPage()],
+        children: const [TaskPage(), CalendarPage(), AuthPageForDetermine()],
       ),
       bottomNavigationBar: BottomNavigationBar(
         items: const <BottomNavigationBarItem>[
@@ -39,18 +47,15 @@ class _MyHomePageState extends State<MyHomePage> {
           BottomNavigationBarItem(
               icon: Icon(Icons.calendar_month_outlined), label: 'Calendar'),
           BottomNavigationBarItem(
-              icon: Icon(Icons.account_circle_outlined), label: 'Account')
+              icon: Icon(Icons.calendar_month_outlined), label: 'Login'),
         ],
-        selectedItemColor: Colors.blue.shade900,
         currentIndex: _selectedIndex,
-        unselectedItemColor: Colors.grey.shade700,
         onTap: onTappedBottomnavigator,
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
           _displayBottomSheet(context, height);
         },
-        backgroundColor: Colors.blue,
         child: const Icon(Icons.add, size: 30),
       ),
     );

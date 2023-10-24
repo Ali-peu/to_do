@@ -1,20 +1,49 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:hive/hive.dart';
 import 'package:table_calendar/table_calendar.dart';
-import 'package:to_do/data/firestore.dart';
+
+import 'package:to_do/model/note.dart';
 import 'package:to_do/widgets/task_widget_for_calendar_page.dart';
 
 class CalendarPage extends StatefulWidget {
-  const CalendarPage({super.key});
+  const CalendarPage({Key? key}) : super(key: key);
 
   @override
   State<CalendarPage> createState() => _CalendarPageState();
 }
 
-// MediaQuery.of(context).size.height * .60,
 class _CalendarPageState extends State<CalendarPage> {
-  DateTime _selectedDay = DateTime(2023, 10, 19);
+  late DateTime _selectedDay = DateTime.now();
   DateTime _focusedDay = DateTime.now();
+
+  List<Note> selectedDataNotes = [];
+
+  void getSelectedDateNotes() async {
+    final box = Hive.box<Note>('box');
+    selectedDataNotes = box.values.where((task) {
+      // Фильтрация задач, соответствующих выбранной дате
+      return task.time.year == _selectedDay.year &&
+          task.time.month == _selectedDay.month &&
+          task.time.day == _selectedDay.day;
+    }).toList();
+
+    if (mounted) {
+      setState(() {
+        selectedDataNotes;
+      });
+    }
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    getSelectedDateNotes();
+    final box = Hive.box<Note>('box');
+    box.watch().listen((event) {
+      getSelectedDateNotes();
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Column(
@@ -27,42 +56,28 @@ class _CalendarPageState extends State<CalendarPage> {
             setState(() {
               _selectedDay = selectedDay;
               _focusedDay = focusedDay;
+              getSelectedDateNotes(); // Обновляем список задач при выборе дня
             });
           },
           selectedDayPredicate: (day) => isSameDay(day, _selectedDay),
         ),
         Flexible(
-          child: StreamBuilder<QuerySnapshot>(
-              stream: FirebaseDatasource().stream(),
-              builder: (context, snapshot) {
-                if (!snapshot.hasData) {
-                  return const Center(child: CircularProgressIndicator());
-                } else {
-                  final noteLists = FirebaseDatasource()
-                      .geSelectedTimeNotes(snapshot, _focusedDay);
-
-                  if (noteLists.isEmpty) {
-                    return Center(
-                      child: Text(
-                        'У вас нету задания на эту дату',
-                        style: TextStyle(color: Colors.blue[200], fontSize: 30),
-                      ),
+          child: selectedDataNotes.isEmpty
+              ? const Center(
+                  child: Text(
+                    'У вас нет задач на этот день',
+                    style: TextStyle(color: Colors.teal),
+                  ),
+                )
+              : ListView.builder(
+                  itemBuilder: (context, index) {
+                    return Padding(
+                      padding: const EdgeInsets.all(10.0),
+                      child: TaskWidgetForCalendar(selectedDataNotes[index]),
                     );
-                  } else {
-                    return ListView.builder(
-                      itemBuilder: (context, index) {
-                        final note = noteLists[index];
-
-                        return Padding(
-                          padding: const EdgeInsets.all(10.0),
-                          child: TaskWidgetForCalendar(note),
-                        );
-                      },
-                      itemCount: noteLists.length,
-                    );
-                  }
-                }
-              }),
+                  },
+                  itemCount: selectedDataNotes.length,
+                ),
         ),
       ],
     );

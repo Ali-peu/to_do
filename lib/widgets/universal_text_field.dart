@@ -30,16 +30,16 @@ Widget universalTextFormField(
           const OutlineInputBorder(borderSide: BorderSide(color: Colors.red)),
       prefixIcon: Icon(Icons.email,
           color: focusNode.hasFocus
-              ? StyleApp().focusedColor
+              ? StyleApp().taskColoR
               : StyleApp().inActiveWidgetsColor),
       contentPadding: const EdgeInsets.symmetric(horizontal: 15, vertical: 15),
       hintText: typeName,
       enabledBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(10),
-          borderSide: BorderSide(color: StyleApp().focusedColor, width: 2.0)),
+          borderSide: BorderSide(color: StyleApp().taskColoR, width: 2.0)),
       focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(10),
-          borderSide: BorderSide(color: StyleApp().mainTheme, width: 2.0)),
+          borderSide: BorderSide(color: StyleApp().appColor, width: 2.0)),
     ),
   );
 }

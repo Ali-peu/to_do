@@ -1,3 +1,5 @@
+import 'package:flutter/material.dart';
+
 String? emailCheck(String? email) {
   if (email == null || email.isEmpty) {
     return "Email can't be empty";
@@ -54,4 +56,48 @@ String dateTimeDeleteSeconds(String date) {
   String onlyData = date.substring(0, lenght - 12);
 
   return '${onlyData.substring(0, 4)}/${onlyData.substring(5, 7)}/${onlyData.substring(8, 11)}';
+}
+
+String deadlineTask(String deadline) {
+  return '${deadline.substring(5, 7)}-${deadline.substring(8, 11)}';
+}
+
+bool isThatDeadlineAsGone(DateTime dateTime) {
+  if (dateTime.compareTo(DateTime.now()) == 0) {
+    return true;
+  }
+  if (dateTime.compareTo(DateTime.now()) == 1) {
+    return true;
+  }
+  return false;
+}
+
+String checkDeaadline(DateTime datetime) {
+  if (datetime.day == DateTime.now().day &&
+      datetime.month == DateTime.now().month &&
+      datetime.year == DateTime.now().year) {
+    return 'Today Tasks';
+  } else if (datetime.isAfter(DateTime.now())) {
+    return 'Future Tasks';
+  } else {
+    return 'Past Tasks';
+  }
+}
+
+bool boolCheckDeaadline(DateTime dateTime) {
+  if (dateTime.day == DateTime.now().day &&
+      dateTime.month == DateTime.now().month &&
+      dateTime.year == DateTime.now().year) {
+    return true;
+  }
+  return false;
+}
+
+bool checkThisIsPastTask(DateTime dateTime) {
+  if (DateUtils.dateOnly(dateTime)
+          .compareTo(DateUtils.dateOnly(DateTime.now())) ==
+      -1) {
+    return true;
+  }
+  return false;
 }

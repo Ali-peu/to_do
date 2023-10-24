@@ -1,11 +1,18 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
-import 'package:to_do/auth/main_page.dart';
+import 'package:hive_flutter/adapters.dart';
 import 'package:to_do/firebase_options.dart';
+import 'package:to_do/global/app_colors.dart';
+import 'package:to_do/model/note.dart';
+import 'package:to_do/model/note_adapter.dart';
+import 'package:to_do/page/home.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
+  await Hive.initFlutter();
+  Hive.registerAdapter(NoteAdapter());
+  await Hive.openBox<Note>('box');
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
@@ -17,9 +24,15 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const MaterialApp(
+    return MaterialApp(
       debugShowCheckedModeBanner: false,
-      home: MainPageForDetermine(),
+      theme: ThemeData(
+          splashFactory: NoSplash.splashFactory,
+          cardColor: StyleApp().appColor,
+          canvasColor: StyleApp().appColor,
+          appBarTheme: AppBarTheme(elevation: 0.0, color: StyleApp().appColor),
+          focusColor: StyleApp().inActiveWidgetsColor),
+      home: const MyHomePage(),
     );
   }
 }

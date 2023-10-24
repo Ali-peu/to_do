@@ -1,9 +1,7 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
-
 class Note {
   String description;
   String id;
-  Timestamp time;
+  DateTime time;
   bool isDone;
   String category;
 
@@ -18,7 +16,7 @@ class Note {
     return Note(
         description: json['description'],
         id: json['id'],
-        time: json['time'] as Timestamp,
+        time: json['time'],
         isDone: json['isDone'],
         category: json['category']);
   }

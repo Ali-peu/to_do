@@ -1,8 +1,9 @@
-import 'package:firebase_auth/firebase_auth.dart';
-
 import 'package:flutter/material.dart';
+import 'package:hive/hive.dart';
 
 import 'package:to_do/data/firestore.dart';
+
+import '../model/note.dart';
 
 class AccountPage extends StatefulWidget {
   const AccountPage({super.key});
@@ -13,7 +14,21 @@ class AccountPage extends StatefulWidget {
 
 // MediaQuery.of(context).size.height * .60,
 class _AccountPageState extends State<AccountPage> {
-  final user = FirebaseAuth.instance.currentUser!;
+  void getBox() async {
+    await Hive.openBox<Note>('box');
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    getBox();
+
+    final box = Hive.box<Note>('box');
+    box.watch().listen((event) {
+      getBox();
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -32,9 +47,9 @@ class _AccountPageState extends State<AccountPage> {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Text(
-                'It\'s your account page ${user.email}!',
-                style: const TextStyle(fontSize: 30, color: Colors.black),
+              const Text(
+                'It\'s your account page!',
+                style: TextStyle(fontSize: 30, color: Colors.black),
               ),
               ElevatedButton(
                 onPressed: () {

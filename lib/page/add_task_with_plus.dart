@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:hive/hive.dart';
+import 'package:to_do/data/hive_data.dart';
 
-import 'package:to_do/data/firestore.dart';
+import 'package:to_do/model/note.dart';
+import 'package:uuid/uuid.dart';
 
 class AddTask extends StatefulWidget {
   const AddTask({super.key});
@@ -11,11 +14,22 @@ class AddTask extends StatefulWidget {
 
 class _AddTaskState extends State<AddTask> {
   final subtitle = TextEditingController();
-  int _value = 1;
+  int _dropDownButtonValue = 1;
   DateTime dateTime = DateTime.now();
-  late String category = 'No category';
+  String category = 'All';
+
+  List<Note> toDoTask = [];
 
   final FocusNode _focusNode2 = FocusNode();
+  void saveTask() async {
+    await Hive.openBox<Note>('box');
+    HiveDataBase().saveNote(Note(
+        description: subtitle.text,
+        id: const Uuid().v4(),
+        isDone: false,
+        time: DateUtils.dateOnly(dateTime),
+        category: category));
+  }
 
   void _showDatePicker() {
     showDatePicker(
@@ -25,7 +39,9 @@ class _AddTaskState extends State<AddTask> {
       lastDate: DateTime(2025),
     ).then((value) {
       setState(() {
-        dateTime = value!;
+        if (mounted && value != null && value != dateTime) {
+          dateTime = value;
+        }
       });
     });
   }
@@ -39,7 +55,7 @@ class _AddTaskState extends State<AddTask> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Expanded(
+            Flexible(
                 child: Container(
                     decoration: BoxDecoration(
                         color: Colors.grey.withOpacity(0.15),
@@ -61,7 +77,7 @@ class _AddTaskState extends State<AddTask> {
                     child: DropdownButton(
                       icon: const Visibility(
                           visible: false, child: Icon(Icons.arrow_downward)),
-                      value: _value,
+                      value: _dropDownButtonValue,
                       items: [
                         dropdownButtonForCategory(3, 'Study'),
                         dropdownButtonForCategory(2, 'Work'),
@@ -69,7 +85,7 @@ class _AddTaskState extends State<AddTask> {
                       ],
                       onChanged: (value) {
                         setState(() {
-                          _value = value!;
+                          _dropDownButtonValue = value!;
                           category;
                         });
                       },
@@ -101,6 +117,9 @@ class _AddTaskState extends State<AddTask> {
       ),
       onTap: () {
         setState(() {
+          if (dropDownitemcategory == 'No category') {
+            category = 'All';
+          }
           category = dropDownitemcategory;
         });
       },
@@ -109,8 +128,12 @@ class _AddTaskState extends State<AddTask> {
 
   Widget button() {
     return ElevatedButton(
-        onPressed: () {
-          FirebaseDatasource().addNote(subtitle.text, dateTime, category);
+        onPressed: () async {
+          if (subtitle.text.isEmpty) {
+            return Navigator.pop(context);
+          }
+          saveTask();
+
           Navigator.pop(context);
         },
         style: ElevatedButton.styleFrom(

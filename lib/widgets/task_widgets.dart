@@ -1,6 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:to_do/data/firestore.dart';
+import 'package:flutter_slidable/flutter_slidable.dart';
+
+import 'package:to_do/data/hive_data.dart';
+import 'package:to_do/global/app_colors.dart';
 import 'package:to_do/global/edit_task.dart';
+
 import 'package:to_do/global/validador_text.dart';
 import 'package:to_do/model/note.dart';
 
@@ -13,66 +17,110 @@ class TaskWidget extends StatefulWidget {
 }
 
 class _TaskWidgetState extends State<TaskWidget> {
+  bool isDone = false;
   TextEditingController taskDescription = TextEditingController();
+  late DateTime dateTime = widget._note.time;
+  void _showDatePicker() {
+    showDatePicker(
+      context: context,
+      initialDate: dateTime,
+      firstDate: DateTime(2023, 01, 01),
+      lastDate: DateTime(2025),
+    ).then((value) {
+      setState(() {
+        if (mounted && value != null && value != dateTime) {
+          dateTime = value;
+          HiveDataBase().updateDatetime(widget._note, dateTime);
+        }
+      });
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
-    double widht = MediaQuery.of(context).size.height * 0.9;
-    double height = MediaQuery.of(context).size.height * 0.1;
-    bool isDone = widget._note.isDone;
-    return InkWell(
-      onTap: () {
-        Navigator.of(context).push(
-          MaterialPageRoute(
-            builder: (context) => EditTask(widget._note),
+    return Container(
+      decoration: BoxDecoration(
+          shape: BoxShape.rectangle, borderRadius: BorderRadius.circular(25.0)),
+      padding: const EdgeInsets.all(8.0),
+      child: Slidable(
+          endActionPane: ActionPane(
+            motion: const ScrollMotion(),
+            children: [
+              SlidableAction(
+                onPressed: (context) =>
+                    (HiveDataBase().deleteNote(widget._note)),
+                backgroundColor: const Color(0xFFFE4A49),
+                foregroundColor: Colors.white,
+                icon: Icons.delete,
+                label: 'Delete',
+              ),
+              SlidableAction(
+                onPressed: (context) => (_showDatePicker()),
+                backgroundColor: const Color.fromARGB(255, 66, 141, 232),
+                foregroundColor: Colors.white,
+                icon: Icons.date_range_rounded,
+                label: 'Data',
+              )
+            ],
           ),
-        );
-      },
-      child: Padding(
-        padding: const EdgeInsets.all(8.0),
-        child: Container(
-          width: widht,
-          height: height,
-          decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(25),
-              color: Colors.grey.withOpacity(0.01),
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.grey.withOpacity(0.01),
-                  spreadRadius: 0,
-                  blurRadius: 0,
-                )
-              ]),
-          child:
-              Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
-            Flexible(
-              fit: FlexFit.tight,
-              child: Text(
-                showCorrectTextInTaskContainer(widget._note.description),
-                maxLines: 1,
-                style: TextStyle(
-                    fontSize: 25,
-                    decoration: widget._note.isDone
-                        ? TextDecoration.lineThrough
-                        : TextDecoration.none,
-                    color: widget._note.isDone ? Colors.grey : Colors.black),
+          child: ColoredBox(
+            color: StyleApp().taskColoR,
+            child: ListTile(
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => EditTask(widget._note),
+                  ),
+                );
+              },
+              trailing: IconButton(
+                icon: const Icon(Icons.flag_outlined),
+                onPressed: () {},
+              ),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(1),
+                side: const BorderSide(color: Colors.black),
+              ),
+              title: Padding(
+                padding: const EdgeInsets.symmetric(vertical: 8.0),
+                child: noteTitleText(),
+              ),
+              subtitle: boolCheckDeaadline(widget._note.time)
+                  ? const Text('')
+                  : Text(
+                      deadlineTask(widget._note.time.toString()),
+                      style: TextStyle(
+                          color: isThatDeadlineAsGone(widget._note.time)
+                              ? Colors.black
+                              : const Color.fromARGB(255, 255, 17, 0),
+                          fontSize: 12),
+                    ),
+              leading: GestureDetector(
+                child: Checkbox(
+                    value: isDone,
+                    onChanged: (value) {
+                      setState(() {
+                        isDone = !isDone;
+                      });
+                      HiveDataBase().isdone(widget._note, isDone);
+                    }),
               ),
             ),
-            Align(
-              alignment: Alignment.centerLeft,
-              child: Checkbox(
-                  splashRadius: 8,
-                  value: isDone,
-                  onChanged: (value) {
-                    setState(() {
-                      isDone = !isDone;
-                    });
-                    FirebaseDatasource().isdone(widget._note.id, isDone);
-                  }),
-            )
-          ]),
-        ),
-      ),
+          )),
+    );
+  }
+
+  Text noteTitleText() {
+    return Text(
+      showCorrectTextInTaskContainer(widget._note.description),
+      maxLines: 1,
+      style: TextStyle(
+          fontSize: 25,
+          decoration: widget._note.isDone
+              ? TextDecoration.lineThrough
+              : TextDecoration.none,
+          color: widget._note.isDone ? Colors.grey : Colors.black),
     );
   }
 }
