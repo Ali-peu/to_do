@@ -28,7 +28,8 @@ class _AddTaskState extends State<AddTask> {
         id: const Uuid().v4(),
         isDone: false,
         time: DateUtils.dateOnly(dateTime),
-        category: category));
+        category: category,
+        isThisStar: false));
   }
 
   void _showDatePicker() {

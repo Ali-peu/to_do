@@ -1,3 +1,4 @@
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:hive/hive.dart';
 import 'package:to_do/model/note.dart';
 
@@ -40,7 +41,7 @@ class HiveDataBase {
   Future<void> isdone(Note note, bool noteIsDone) async {
     final box = await Hive.openBox<Note>('box');
     final updatingNote = box.get(note.id);
-    updatingNote!.isDone = noteIsDone;
+    updatingNote!.isDone = !noteIsDone;
     box.put(note.id, updatingNote);
   }
 
@@ -49,5 +50,15 @@ class HiveDataBase {
     final notes =
         box.values.where((element) => element.time == selectedDay).toList();
     return notes;
+  }
+
+  Future<void> starNote(Note note, bool noteIsStar) async {
+    final box = await Hive.openBox<Note>('box');
+    final updatingNote = box.get(note.id);
+    updatingNote!.isThisStar = !noteIsStar;
+    box.put(note.id, updatingNote);
+    Fluttertoast.showToast(
+        msg: updatingNote.isThisStar ? 'Задача добавлена' : 'Задача удалена',
+        gravity: ToastGravity.BOTTOM);
   }
 }

@@ -26,9 +26,13 @@ class _TaskWidgetForCalendarState extends State<TaskWidgetForCalendar> {
             showCorrectTextInTaskContainer(widget._note.description),
             style: const TextStyle(fontSize: 25, color: Colors.black),
           ),
-          trailing: IconButton(
-            icon: const Icon(Icons.flag_outlined),
-            onPressed: () {},
+          trailing: SizedBox(
+            width: 25,
+            height: 25,
+            child: IconButton(
+              icon: const Icon(Icons.flag_outlined),
+              onPressed: () {},
+            ),
           ),
         ),
       ),

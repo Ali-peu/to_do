@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 
 import 'package:to_do/data/hive_data.dart';
 import 'package:to_do/global/app_colors.dart';
@@ -20,6 +21,7 @@ class _TaskWidgetState extends State<TaskWidget> {
   bool isDone = false;
   TextEditingController taskDescription = TextEditingController();
   late DateTime dateTime = widget._note.time;
+
   void _showDatePicker() {
     showDatePicker(
       context: context,
@@ -47,8 +49,7 @@ class _TaskWidgetState extends State<TaskWidget> {
             motion: const ScrollMotion(),
             children: [
               SlidableAction(
-                onPressed: (context) =>
-                    (HiveDataBase().deleteNote(widget._note)),
+                onPressed: (context) => (showAlertDialog()),
                 backgroundColor: const Color(0xFFFE4A49),
                 foregroundColor: Colors.white,
                 icon: Icons.delete,
@@ -60,54 +61,78 @@ class _TaskWidgetState extends State<TaskWidget> {
                 foregroundColor: Colors.white,
                 icon: Icons.date_range_rounded,
                 label: 'Data',
+              ),
+              SlidableAction(
+                onPressed: (context) => (HiveDataBase().starNote(
+                  widget._note,
+                  widget._note.isThisStar,
+                )),
+                backgroundColor: const Color.fromARGB(255, 233, 242, 61),
+                foregroundColor: Colors.white,
+                icon: widget._note.isThisStar ? Icons.star : Icons.star_border,
+                label: 'Star',
               )
             ],
           ),
           child: ColoredBox(
             color: StyleApp().taskColoR,
             child: ListTile(
-              onTap: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => EditTask(widget._note),
-                  ),
-                );
-              },
-              trailing: IconButton(
-                icon: const Icon(Icons.flag_outlined),
-                onPressed: () {},
-              ),
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(1),
-                side: const BorderSide(color: Colors.black),
-              ),
-              title: Padding(
-                padding: const EdgeInsets.symmetric(vertical: 8.0),
-                child: noteTitleText(),
-              ),
-              subtitle: boolCheckDeaadline(widget._note.time)
-                  ? const Text('')
-                  : Text(
-                      deadlineTask(widget._note.time.toString()),
-                      style: TextStyle(
-                          color: isThatDeadlineAsGone(widget._note.time)
-                              ? Colors.black
-                              : const Color.fromARGB(255, 255, 17, 0),
-                          fontSize: 12),
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => EditTask(widget._note),
                     ),
-              leading: GestureDetector(
-                child: Checkbox(
-                    value: isDone,
-                    onChanged: (value) {
-                      setState(() {
-                        isDone = !isDone;
-                      });
-                      HiveDataBase().isdone(widget._note, isDone);
-                    }),
-              ),
-            ),
+                  );
+                },
+                trailing: IconButton(
+                  icon: const Icon(Icons.flag_outlined),
+                  onPressed: () {},
+                ),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(1),
+                  side: const BorderSide(color: Colors.black),
+                ),
+                title: Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 8.0),
+                  child: noteTitleText(),
+                ),
+                subtitle: boolCheckDeaadline(widget._note.time)
+                    ? null
+                    : Text(
+                        deadlineTask(widget._note.time.toString()),
+                        style: TextStyle(
+                            color: isThatDeadlineAsGone(widget._note.time)
+                                ? Colors.black
+                                : const Color.fromARGB(255, 255, 17, 0),
+                            fontSize: 12),
+                      ),
+                leading: IconButton(
+                    onPressed: () {
+                      HiveDataBase().isdone(widget._note, widget._note.isDone);
+                    },
+                    icon: widget._note.isDone
+                        ? const Icon(Icons.expand_circle_down_rounded)
+                        : const Icon(Icons.expand_circle_down_outlined))),
           )),
+    );
+  }
+
+  Widget showAlertDialog() {
+    return AlertDialog(
+      title: const Text('Удалить задание?'),
+      actions: [
+        TextButton(
+            onPressed: () {
+              HiveDataBase().deleteNote(widget._note);
+            },
+            child: const Text('Удалить')),
+        TextButton(
+            onPressed: () {
+              Navigator.of(context).pop(context);
+            },
+            child: const Text('Отмена')),
+      ],
     );
   }
 
