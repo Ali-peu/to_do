@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:hive/hive.dart';
 import 'package:hive_flutter/adapters.dart';
@@ -14,39 +16,30 @@ class TaskPage extends StatefulWidget {
 
 class _TaskPageState extends State<TaskPage> {
   String chooseCategory = 'All';
-  Future<Box<Note>> boxListTask = Hive.openBox<Note>('box');
+  final notesBox = Hive.box<Note>('box');
 
   List<String> category = ['All', 'Study', 'Work'];
 
   @override
   void initState() {
     super.initState();
-    boxListTask;
-
-    // Создайте слушателя для бокса Hive
+    openBoxAndListen();
   }
 
-  int currentIndex = 1;
+  void openBoxAndListen() async {
+    final box = await Hive.openBox<Note>('box');
+    box.watch().listen((event) {
+      // Здесь можно обновить состояние виджета при изменении данных в боксе
+      setState(() {});
+    });
+  }
+
+  int currentIndex = 0;
   TextEditingController taskText = TextEditingController();
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: buildAppBar(),
-      body: FutureBuilder(
-        future: boxListTask,
-        initialData: Hive.box<Note>('box'),
-        builder: (BuildContext context, AsyncSnapshot<Box<Note>> response) {
-          if (!response.hasData) {
-            return const Center(child: Text('Loading...'));
-          } else if (response.data!.isEmpty) {
-            return const Center(child: Text('У вас на сегодня нет задач'));
-          } else {
-            return buildTaskList(response.data!);
-          }
-        },
-      ),
-    );
+    return Scaffold(appBar: buildAppBar(), body: buildTaskList(notesBox));
   }
 
   AppBar buildAppBar() {
@@ -92,24 +85,22 @@ class _TaskPageState extends State<TaskPage> {
 
     return ListView(
       children: [
-        buildExpansionTile('Past', currentIndex, past),
-        buildExpansionTile('Today', currentIndex, today),
-        buildExpansionTile('Future', currentIndex, future),
-        buildExpansionTile('Tasks done today', currentIndex, todayAndDone),
+        buildExpansionTile('Past', past),
+        buildExpansionTile('Today', today),
+        buildExpansionTile('Future', future),
+        buildExpansionTile('Tasks done today', todayAndDone),
       ],
     );
   }
 
-  Widget buildExpansionTile(String title, int indexIcon, List<Note> taskList) {
+  Widget buildExpansionTile(String title, List<Note> taskList) {
     return Visibility(
       visible: taskList.isNotEmpty,
       child: ExpansionTile(
         controller: ExpansionTileController(),
         initiallyExpanded: true,
         onExpansionChanged: (bool value) {
-          setState(() {
-            indexIcon = value ? 1 : 0;
-          });
+          setState(() {});
         },
         title: Row(
           children: [
@@ -124,7 +115,7 @@ class _TaskPageState extends State<TaskPage> {
                         : Tween<double>(begin: 1, end: 0).animate(anim),
                     child: FadeTransition(opacity: anim, child: child),
                   ),
-                  child: indexIcon == 0
+                  child: currentIndex == 0
                       ? const Icon(Icons.arrow_drop_down_sharp,
                           key: ValueKey('icon1'))
                       : const Icon(

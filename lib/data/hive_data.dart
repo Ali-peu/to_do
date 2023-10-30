@@ -1,11 +1,15 @@
+import 'dart:async';
+
+import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:hive/hive.dart';
 import 'package:to_do/model/note.dart';
 
-class HiveDataBase {
+class HiveDataBase extends ChangeNotifier {
   void saveNote(Note note) async {
     final box = await Hive.openBox<Note>('box');
     box.put(note.id, note);
+    notifyListeners();
   }
 
   void deleteNote(Note note) async {
@@ -60,5 +64,11 @@ class HiveDataBase {
     Fluttertoast.showToast(
         msg: updatingNote.isThisStar ? 'Задача добавлена' : 'Задача удалена',
         gravity: ToastGravity.BOTTOM);
+  }
+
+  @override
+  void notifyListeners() {
+    // TODO: implement notifyListeners
+    super.notifyListeners();
   }
 }

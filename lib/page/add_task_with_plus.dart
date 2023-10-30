@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:hive/hive.dart';
 import 'package:to_do/data/hive_data.dart';
@@ -22,14 +24,19 @@ class _AddTaskState extends State<AddTask> {
 
   final FocusNode _focusNode2 = FocusNode();
   void saveTask() async {
+    print('afadfa');
     await Hive.openBox<Note>('box');
-    HiveDataBase().saveNote(Note(
-        description: subtitle.text,
-        id: const Uuid().v4(),
-        isDone: false,
-        time: DateUtils.dateOnly(dateTime),
-        category: category,
-        isThisStar: false));
+    setState(() {
+      HiveDataBase().saveNote(Note(
+          description: subtitle.text,
+          id: const Uuid().v4(),
+          isDone: false,
+          time: DateUtils.dateOnly(dateTime),
+          category: category,
+          isThisStar: false));
+    });
+
+    print('adasd');
   }
 
   void _showDatePicker() {
@@ -76,6 +83,14 @@ class _AddTaskState extends State<AddTask> {
                       visible: false, child: Icon(Icons.arrow_downward)),
                   value: _dropDownButtonValue,
                   items: [
+                    DropdownMenuItem(
+                      value: 4,
+                      child: const Text(
+                        'Новая категория',
+                        style: const TextStyle(decoration: TextDecoration.none),
+                      ),
+                      onTap: () {},
+                    ),
                     dropdownButtonForCategory(3, 'Study'),
                     dropdownButtonForCategory(2, 'Work'),
                     dropdownButtonForCategory(1, 'No category'),
@@ -128,7 +143,6 @@ class _AddTaskState extends State<AddTask> {
             return Navigator.pop(context);
           }
           saveTask();
-
           Navigator.pop(context);
         },
         style: ElevatedButton.styleFrom(
@@ -158,7 +172,22 @@ class _AddTaskState extends State<AddTask> {
       ),
     );
   }
-  // Future _displayBottomSheet(BuildContext context, double height){
-  //   return
-  // }
+
+  void showAlert() async {
+    showDialog(
+        context: context,
+        builder: (context) {
+          return AlertDialog(
+            title: const Text('Добавить категорию?'),
+            actions: [
+              TextButton(onPressed: () {}, child: const Text('Добавить')),
+              TextButton(
+                  onPressed: () {
+                    Navigator.of(context).pop(context);
+                  },
+                  child: const Text('Отмена')),
+            ],
+          );
+        });
+  }
 }

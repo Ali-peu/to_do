@@ -3,6 +3,7 @@ import 'package:hive/hive.dart';
 import 'package:hive_flutter/adapters.dart';
 import 'package:to_do/auth/auth_page.dart';
 import 'package:to_do/model/note.dart';
+import 'package:to_do/page/account_page.dart';
 
 import 'package:to_do/page/add_task_with_plus.dart';
 import 'package:to_do/page/calendar_page.dart';
@@ -38,7 +39,7 @@ class _MyHomePageState extends State<MyHomePage> {
     return Scaffold(
       body: PageView(
         controller: pageController,
-        children: const [TaskPage(), CalendarPage(), AuthPageForDetermine()],
+        children: const [TaskPage(), CalendarPage(), AccountPage()],
       ),
       bottomNavigationBar: BottomNavigationBar(
         items: const <BottomNavigationBarItem>[
