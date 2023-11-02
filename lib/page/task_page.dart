@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:hive/hive.dart';
 import 'package:hive_flutter/adapters.dart';
+import 'package:to_do/data/hive/note_category_data.dart';
 import 'package:to_do/global/validador_text.dart';
+import 'package:to_do/model/category_note.dart';
 import 'package:to_do/model/note.dart';
+import 'package:to_do/page/category_edit.dart';
 import 'package:to_do/widgets/task_widgets.dart';
 
 class TaskPage extends StatefulWidget {
@@ -15,12 +18,15 @@ class TaskPage extends StatefulWidget {
 class _TaskPageState extends State<TaskPage> {
   String chooseCategory = 'All';
   final notesBox = Hive.box<Note>('box');
-
-  List<String> category = ['All', 'Study', 'Work'];
+  final box = Hive.box<CategoryNote>('boxCategory');
+  List<CategoryNote> categoryListNote = [];
 
   @override
   void initState() {
     super.initState();
+
+    HiveCategoryDataBase().initBoxCategory();
+    categoryListNote = box.values.toList();
     notesBox.watch().listen((event) {
       setState(() {}); // Обновляет экран не удалять
     });
@@ -36,29 +42,60 @@ class _TaskPageState extends State<TaskPage> {
 
   AppBar buildAppBar() {
     return AppBar(
-      title: Row(
-        children:
-            category.map((category) => buildCategoryButton(category)).toList(),
+      title: SizedBox(
+        height: 60,
+        width: double.infinity,
+        child: SingleChildScrollView(
+          primary: false,
+          physics: const AlwaysScrollableScrollPhysics(),
+          scrollDirection: Axis.horizontal,
+          child: Row(
+            verticalDirection: VerticalDirection.up,
+            children: categoryListNote
+                .map((category) => buildCategoryButton(category.category))
+                .skip(1)
+                .toList(),
+          ),
+        ),
       ),
+      actions: [
+        IconButton(
+          onPressed: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => const Editcategory(),
+              ),
+            );
+          },
+          icon: const Icon(
+            Icons.settings,
+            color: Colors.red,
+          ),
+        ),
+      ],
     );
   }
 
   Widget buildCategoryButton(String category) {
-    return ElevatedButton(
-      onPressed: () {
-        setState(() {
-          chooseCategory = category;
-        });
-      },
-      style: ElevatedButton.styleFrom(
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(30.0),
+    return Padding(
+      padding: const EdgeInsets.all(8.0),
+      child: ElevatedButton(
+        onPressed: () {
+          setState(() {
+            chooseCategory = category;
+          });
+        },
+        style: ElevatedButton.styleFrom(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(30.0),
+          ),
+          padding: const EdgeInsets.symmetric(vertical: 15, horizontal: 40),
         ),
-        padding: const EdgeInsets.symmetric(vertical: 15, horizontal: 40),
-      ),
-      child: Text(
-        category,
-        style: const TextStyle(color: Colors.white),
+        child: Text(
+          category,
+          style: const TextStyle(color: Colors.white),
+        ),
       ),
     );
   }

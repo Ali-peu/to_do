@@ -3,7 +3,7 @@ import 'package:fluttertoast/fluttertoast.dart';
 import 'package:timezone/data/latest.dart' as tz;
 import 'package:timezone/timezone.dart' as tz;
 
-import 'package:to_do/data/hive_data.dart';
+import 'package:to_do/data/hive/hive_data.dart';
 import 'package:to_do/global/notification_app.dart';
 
 import 'package:to_do/global/validador_text.dart';

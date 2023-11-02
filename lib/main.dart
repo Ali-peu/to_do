@@ -5,6 +5,7 @@ import 'package:to_do/firebase_options.dart';
 import 'package:to_do/global/app_colors.dart';
 import 'package:to_do/global/notification_app.dart';
 import 'package:to_do/model/category_adapter.dart';
+import 'package:to_do/model/category_note.dart';
 import 'package:to_do/model/note.dart';
 import 'package:to_do/model/note_adapter.dart';
 import 'package:to_do/page/home.dart';
@@ -17,7 +18,7 @@ void main() async {
   Hive.registerAdapter(NoteAdapter());
   await Hive.openBox<Note>('box');
   Hive.registerAdapter(CategoryAdapter());
-  await Hive.openBox('boxCategory');
+  await Hive.openBox<CategoryNote>('boxCategory');
 
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,

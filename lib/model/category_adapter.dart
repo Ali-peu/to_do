@@ -8,6 +8,7 @@ class CategoryAdapter extends TypeAdapter<CategoryNote> {
   @override
   CategoryNote read(BinaryReader reader) {
     return CategoryNote(
+      id: reader.readInt(),
       category: reader.readString(),
     );
   }
@@ -15,6 +16,7 @@ class CategoryAdapter extends TypeAdapter<CategoryNote> {
   @override
   void write(BinaryWriter writer, CategoryNote obj) {
     // Convert to milliseconds
+    writer.writeInt(obj.id);
     writer.writeString(obj.category);
   }
 }
