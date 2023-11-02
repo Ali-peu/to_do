@@ -1,8 +1,8 @@
-import 'dart:async';
-
 import 'package:flutter/material.dart';
 import 'package:hive/hive.dart';
-import 'package:to_do/data/hive_data.dart';
+import 'package:to_do/data/hive/hive_data.dart';
+import 'package:to_do/data/hive/note_category_data.dart';
+import 'package:to_do/model/category_note.dart';
 
 import 'package:to_do/model/note.dart';
 import 'package:uuid/uuid.dart';
@@ -15,28 +15,45 @@ class AddTask extends StatefulWidget {
 }
 
 class _AddTaskState extends State<AddTask> {
+  final box = Hive.box<CategoryNote>('boxCategory');
+  @override
+  void initState() {
+    super.initState();
+
+    HiveCategoryDataBase().initBoxCategory();
+    categoryListNote = box.values.toList();
+  }
+
   final subtitle = TextEditingController();
+  final categoryContoller = TextEditingController();
+
   int _dropDownButtonValue = 1;
+
   DateTime dateTime = DateTime.now();
+  List<CategoryNote> categoryListNote = [];
+  List<String> categoryList = ['All', 'Work', 'Study'];
   String category = 'All';
+
+  late var firstValueCategory = box.values.first.category;
+
+  String noteReplaytime = 'Нет';
 
   List<Note> toDoTask = [];
 
   final FocusNode _focusNode2 = FocusNode();
   void saveTask() async {
-    print('afadfa');
     await Hive.openBox<Note>('box');
     setState(() {
       HiveDataBase().saveNote(Note(
-          description: subtitle.text,
-          id: const Uuid().v4(),
-          isDone: false,
-          time: DateUtils.dateOnly(dateTime),
-          category: category,
-          isThisStar: false));
+        description: subtitle.text,
+        id: const Uuid().v4(),
+        isDone: false,
+        time: DateUtils.dateOnly(dateTime),
+        category: category,
+        isThisStar: false,
+      ));
+      Hive.box<Note>('box');
     });
-
-    print('adasd');
   }
 
   void _showDatePicker() {
@@ -57,7 +74,7 @@ class _AddTaskState extends State<AddTask> {
   @override
   Widget build(BuildContext context) {
     return Column(
-      mainAxisAlignment: MainAxisAlignment.center,
+      mainAxisSize: MainAxisSize.min,
       children: [
         Flexible(
             child: Container(
@@ -83,19 +100,19 @@ class _AddTaskState extends State<AddTask> {
                       visible: false, child: Icon(Icons.arrow_downward)),
                   value: _dropDownButtonValue,
                   items: [
-                    DropdownMenuItem(
-                      value: 4,
-                      child: const Text(
-                        'Новая категория',
-                        style: const TextStyle(decoration: TextDecoration.none),
-                      ),
-                      onTap: () {},
-                    ),
-                    dropdownButtonForCategory(3, 'Study'),
-                    dropdownButtonForCategory(2, 'Work'),
-                    dropdownButtonForCategory(1, 'No category'),
+                    // DropdownMenuItem(
+                    //     value: 4,
+                    //     child: const Text(
+                    //       'Новая категория',
+                    //       style: TextStyle(decoration: TextDecoration.none),
+                    //     ),
+                    //     onTap: () {}),
+                    for (var i in categoryListNote) {}
                   ],
                   onChanged: (value) {
+                    if (value == 4) {
+                      showAlertDialog();
+                    }
                     setState(() {
                       _dropDownButtonValue = value!;
                       category;
@@ -117,20 +134,19 @@ class _AddTaskState extends State<AddTask> {
     );
   }
 
-  DropdownMenuItem<int> dropdownButtonForCategory(
-      int value, String dropDownitemcategory) {
+  DropdownMenuItem<int> dropdownButtonForCategory(CategoryNote categoryNote) {
     return DropdownMenuItem(
-      value: value,
+      value: categoryNote.id,
       child: Text(
-        dropDownitemcategory,
+        categoryNote.category,
         style: const TextStyle(decoration: TextDecoration.none),
       ),
       onTap: () {
         setState(() {
-          if (dropDownitemcategory == 'No category') {
-            category = 'All';
+          if (categoryNote.category == 'No category') {
+            firstValueCategory = 'All';
           }
-          category = dropDownitemcategory;
+          firstValueCategory = categoryNote.category;
         });
       },
     );
@@ -173,14 +189,28 @@ class _AddTaskState extends State<AddTask> {
     );
   }
 
-  void showAlert() async {
+  void showAlertDialog() {
+    print('is it working?');
     showDialog(
         context: context,
         builder: (context) {
           return AlertDialog(
             title: const Text('Добавить категорию?'),
+            content: TextField(
+              controller: categoryContoller,
+              onSubmitted: (value) {
+                categoryList.add(value);
+              },
+              decoration: const InputDecoration(hintText: 'Напишите категорию'),
+            ),
             actions: [
-              TextButton(onPressed: () {}, child: const Text('Добавить')),
+              TextButton(
+                  onPressed: () {
+                    categoryList.add(categoryContoller.text);
+
+                    Navigator.of(context).pop(context);
+                  },
+                  child: const Text('Добавить')),
               TextButton(
                   onPressed: () {
                     Navigator.of(context).pop(context);
@@ -189,5 +219,6 @@ class _AddTaskState extends State<AddTask> {
             ],
           );
         });
+    print(categoryList);
   }
 }

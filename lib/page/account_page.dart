@@ -10,21 +10,15 @@ class AccountPage extends StatefulWidget {
   State<AccountPage> createState() => _AccountPageState();
 }
 
-// MediaQuery.of(context).size.height * .60,
 class _AccountPageState extends State<AccountPage> {
-  void getBox() async {
-    await Hive.openBox<Note>('box');
-  }
-
   final box = Hive.box<Note>('box');
 
   @override
   void initState() {
     super.initState();
 
-    final box = Hive.box<Note>('box');
     box.watch().listen((event) {
-      getBox();
+      setState(() {});
     });
   }
 
@@ -47,8 +41,8 @@ class _AccountPageState extends State<AccountPage> {
                   Icons.account_box,
                   size: 25,
                 )),
-            title: Text("Account"),
-            subtitle: Text(("sub Account")),
+            title: const Text("Account"),
+            subtitle: const Text(("sub Account")),
           ),
         ),
         Padding(

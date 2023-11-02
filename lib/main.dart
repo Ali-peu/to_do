@@ -3,16 +3,21 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:hive_flutter/adapters.dart';
 import 'package:to_do/firebase_options.dart';
 import 'package:to_do/global/app_colors.dart';
+import 'package:to_do/global/notification_app.dart';
+import 'package:to_do/model/category_adapter.dart';
 import 'package:to_do/model/note.dart';
 import 'package:to_do/model/note_adapter.dart';
 import 'package:to_do/page/home.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  await NotificationApi.init();
 
   await Hive.initFlutter();
   Hive.registerAdapter(NoteAdapter());
   await Hive.openBox<Note>('box');
+  Hive.registerAdapter(CategoryAdapter());
+  await Hive.openBox('boxCategory');
 
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,

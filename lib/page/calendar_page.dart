@@ -4,7 +4,6 @@ import 'package:table_calendar/table_calendar.dart';
 
 import 'package:to_do/model/note.dart';
 import 'package:to_do/widgets/task_widget_for_calendar_page.dart';
-import 'package:to_do/widgets/task_widgets.dart';
 
 class CalendarPage extends StatefulWidget {
   const CalendarPage({Key? key}) : super(key: key);

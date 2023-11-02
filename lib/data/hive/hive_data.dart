@@ -66,9 +66,12 @@ class HiveDataBase extends ChangeNotifier {
         gravity: ToastGravity.BOTTOM);
   }
 
-  @override
-  void notifyListeners() {
-    // TODO: implement notifyListeners
-    super.notifyListeners();
-  }
+  // Future<void> updateReplayTime(Note note, String replayTime) async {
+  //   final box = await Hive.openBox<Note>('box');
+  //   final updatingNote = box.get(note.id);
+
+  //   updatingNote!.noteReplay = replayTime;
+
+  //   box.put(note.id, updatingNote);
+  // }
 }

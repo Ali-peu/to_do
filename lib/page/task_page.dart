@@ -1,5 +1,3 @@
-import 'dart:async';
-
 import 'package:flutter/material.dart';
 import 'package:hive/hive.dart';
 import 'package:hive_flutter/adapters.dart';
@@ -23,14 +21,8 @@ class _TaskPageState extends State<TaskPage> {
   @override
   void initState() {
     super.initState();
-    openBoxAndListen();
-  }
-
-  void openBoxAndListen() async {
-    final box = await Hive.openBox<Note>('box');
-    box.watch().listen((event) {
-      // Здесь можно обновить состояние виджета при изменении данных в боксе
-      setState(() {});
+    notesBox.watch().listen((event) {
+      setState(() {}); // Обновляет экран не удалять
     });
   }
 
@@ -83,17 +75,32 @@ class _TaskPageState extends State<TaskPage> {
     List<Note> todayAndDone =
         taskList.where((element) => isTodayAndDone(element)).toList();
 
-    return ListView(
-      children: [
-        buildExpansionTile('Past', past),
-        buildExpansionTile('Today', today),
-        buildExpansionTile('Future', future),
-        buildExpansionTile('Tasks done today', todayAndDone),
-      ],
-    );
+    setState(() {
+      taskList;
+      today;
+      past;
+      future;
+      todayAndDone;
+    });
+
+    if (taskList.isEmpty) {
+      return const Center(child: Text('Нет задач'));
+    } else {
+      return ListView(
+        children: [
+          buildExpansionTile('Past', past),
+          buildExpansionTile('Today', today),
+          buildExpansionTile('Future', future),
+          buildExpansionTile('Tasks done today', todayAndDone),
+        ],
+      );
+    }
   }
 
   Widget buildExpansionTile(String title, List<Note> taskList) {
+    setState(() {
+      taskList;
+    });
     return Visibility(
       visible: taskList.isNotEmpty,
       child: ExpansionTile(

@@ -1,8 +1,12 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
+<!--<uses-permission android:name="android.permission.USE_EXACT_ALARM" />   Удалить если все сломается-->
     <application
+    
         android:label="to_do"
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher">
+        <!--<receiver android:exported="false" android:name="com.dexterous.flutterlocalnotifications.ScheduledNotificationReceiver" /> Удалить если все сломается-->
+        <!--<receiver android:exported="false" android:name="com.dexterous.flutterlocalnotifications.ScheduledNotificationBootReceiver"> Удалить если все сломается-->
         <activity
             android:name=".MainActivity"
             android:exported="true"
@@ -22,6 +26,10 @@
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
                 <category android:name="android.intent.category.LAUNCHER"/>
+                <action android:name="android.intent.action.BOOT_COMPLETED"/> <!--Удалить если все сломается-->
+                <action android:name="android.intent.action.MY_PACKAGE_REPLACED"/><!--Удалить если все сломается-->
+                <action android:name="android.intent.action.QUICKBOOT_POWERON" /><!--Удалить если все сломается-->
+                <action android:name="com.htc.intent.action.QUICKBOOT_POWERON"/><!--Удалить если все сломается-->
             </intent-filter>
         </activity>
         <!-- Don't delete the meta-data below.

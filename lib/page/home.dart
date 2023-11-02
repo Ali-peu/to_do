@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:hive/hive.dart';
 import 'package:hive_flutter/adapters.dart';
-import 'package:to_do/auth/auth_page.dart';
+
 import 'package:to_do/model/note.dart';
 import 'package:to_do/page/account_page.dart';
 
@@ -37,6 +37,7 @@ class _MyHomePageState extends State<MyHomePage> {
   Widget build(BuildContext context) {
     double height = MediaQuery.of(context).size.height * 0.23;
     return Scaffold(
+      resizeToAvoidBottomInset: true,
       body: PageView(
         controller: pageController,
         children: const [TaskPage(), CalendarPage(), AccountPage()],
@@ -65,6 +66,7 @@ class _MyHomePageState extends State<MyHomePage> {
   Future _displayBottomSheet(BuildContext context, double height) {
     return showModalBottomSheet(
         context: context,
+        isScrollControlled: true,
         shape: const RoundedRectangleBorder(
           borderRadius: BorderRadius.vertical(top: Radius.circular(25)),
         ),

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
-import 'package:to_do/data/hive_data.dart';
+import 'package:to_do/data/hive/hive_data.dart';
 import 'package:to_do/global/app_colors.dart';
 import 'package:to_do/global/edit_task.dart';
 import 'package:to_do/global/validador_text.dart';
@@ -15,73 +15,73 @@ class TaskWidget extends StatefulWidget {
 }
 
 class _TaskWidgetState extends State<TaskWidget> {
-  final GlobalKey _iconButtonKey = GlobalKey();
-  OverlayEntry? _activeOverlayEntry;
-  showOverlay(BuildContext context, Offset position) async {
-    if (_activeOverlayEntry != null) {
-      _activeOverlayEntry!.remove();
-    }
-    OverlayState overlayState = Overlay.of(context);
-    OverlayEntry overlayEntry = OverlayEntry(
-        builder: (context) => Positioned(
-            top: position.dy,
-            right: MediaQuery.of(context).size.width - position.dx,
-            child: Container(
-              color: Color.fromARGB(255, 99, 28, 165),
-              height: MediaQuery.of(context).size.height * 0.3,
-              width: MediaQuery.of(context).size.width * 0.4,
-              child: Column(children: [
-                Text('Флаг',
-                    style: TextStyle(
-                        fontSize: MediaQuery.of(context).size.height * 0.030,
-                        color: Colors.orange)),
-                SingleChildScrollView(
-                  scrollDirection: Axis.horizontal,
-                  child: Row(
-                    children: [
-                      flagIcons(Colors.green),
-                      flagIcons(Colors.red),
-                      flagIcons(Colors.blue),
-                      flagIcons(Colors.amber),
-                    ],
-                  ),
-                ),
-                Text("Число",
-                    style: TextStyle(
-                        fontSize: MediaQuery.of(context).size.height * 0.025,
-                        color: Colors.orangeAccent)),
-                SingleChildScrollView(
-                  scrollDirection: Axis.horizontal,
-                  child: Row(
-                    children: [
-                      iconCircul(Colors.green),
-                      iconCircul(Colors.red),
-                      iconCircul(Colors.blue),
-                      iconCircul(Colors.amber)
-                    ],
-                  ),
-                )
-              ]),
-            )));
+  // final GlobalKey _iconButtonKey = GlobalKey();
+  // OverlayEntry? _activeOverlayEntry;
+  // showOverlay(BuildContext context, Offset position) async {
+  //   if (_activeOverlayEntry != null) {
+  //     _activeOverlayEntry!.remove();
+  //   }
+  //   OverlayState overlayState = Overlay.of(context);
+  //   OverlayEntry overlayEntry = OverlayEntry(
+  //       builder: (context) => Positioned(
+  //           top: position.dy,
+  //           right: MediaQuery.of(context).size.width - position.dx,
+  //           child: Container(
+  //             color: const Color.fromARGB(255, 99, 28, 165),
+  //             height: MediaQuery.of(context).size.height * 0.3,
+  //             width: MediaQuery.of(context).size.width * 0.4,
+  //             child: Column(children: [
+  //               Text('Флаг',
+  //                   style: TextStyle(
+  //                       fontSize: MediaQuery.of(context).size.height * 0.030,
+  //                       color: Colors.orange)),
+  //               SingleChildScrollView(
+  //                 scrollDirection: Axis.horizontal,
+  //                 child: Row(
+  //                   children: [
+  //                     flagIcons(Colors.green),
+  //                     flagIcons(Colors.red),
+  //                     flagIcons(Colors.blue),
+  //                     flagIcons(Colors.amber),
+  //                   ],
+  //                 ),
+  //               ),
+  //               Text("Число",
+  //                   style: TextStyle(
+  //                       fontSize: MediaQuery.of(context).size.height * 0.025,
+  //                       color: Colors.orangeAccent)),
+  //               SingleChildScrollView(
+  //                 scrollDirection: Axis.horizontal,
+  //                 child: Row(
+  //                   children: [
+  //                     iconCircul(Colors.green),
+  //                     iconCircul(Colors.red),
+  //                     iconCircul(Colors.blue),
+  //                     iconCircul(Colors.amber)
+  //                   ],
+  //                 ),
+  //               )
+  //             ]),
+  //           )));
 
-    overlayState.insert(overlayEntry);
-    _activeOverlayEntry = overlayEntry;
+  //   overlayState.insert(overlayEntry);
+  //   _activeOverlayEntry = overlayEntry;
 
-    await Future.delayed(const Duration(seconds: 1));
+  //   await Future.delayed(const Duration(seconds: 1));
 
-    overlayEntry.remove();
-    _activeOverlayEntry = null;
-  }
+  //   overlayEntry.remove();
+  //   _activeOverlayEntry = null;
+  // }
 
-  Widget flagIcons(Color color) {
-    return Icon(Icons.flag,
-        color: color, size: MediaQuery.of(context).size.height * 0.05);
-  }
+  // Widget flagIcons(Color color) {
+  //   return Icon(Icons.flag,
+  //       color: color, size: MediaQuery.of(context).size.height * 0.05);
+  // }
 
-  Widget iconCircul(Color color) {
-    return Icon(Icons.circle,
-        color: color, size: MediaQuery.of(context).size.height * 0.05);
-  }
+  // Widget iconCircul(Color color) {
+  //   return Icon(Icons.circle,
+  //       color: color, size: MediaQuery.of(context).size.height * 0.05);
+  // }
 
   bool isDone = false;
   TextEditingController taskDescription = TextEditingController();
@@ -162,15 +162,9 @@ class _TaskWidgetState extends State<TaskWidget> {
                   );
                 },
                 trailing: IconButton(
-                  key: _iconButtonKey,
+                  // key: _iconButtonKey,
                   icon: const Icon(Icons.flag),
-                  onPressed: () {
-                    final RenderBox renderBox = _iconButtonKey.currentContext!
-                        .findRenderObject() as RenderBox;
-                    final Offset position =
-                        renderBox.localToGlobal(Offset.zero);
-                    showOverlay(context, position);
-                  },
+                  onPressed: () {},
                 ),
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(1),
@@ -202,6 +196,7 @@ class _TaskWidgetState extends State<TaskWidget> {
   }
 
   void showAlert() async {
+    print('Открыта алерт удаление');
     showDialog(
         context: context,
         builder: (context) {
@@ -212,6 +207,7 @@ class _TaskWidgetState extends State<TaskWidget> {
                   onPressed: () {
                     HiveDataBase().deleteNote(widget._note);
                     Navigator.of(context).pop(context);
+                    print('Задача удалене');
                   },
                   child: const Text('Удалить')),
               TextButton(

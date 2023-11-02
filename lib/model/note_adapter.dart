@@ -8,13 +8,14 @@ class NoteAdapter extends TypeAdapter<Note> {
   @override
   Note read(BinaryReader reader) {
     return Note(
-        description: reader.readString(),
-        id: reader.readString(),
-        isDone: reader.readBool(),
-        time: DateTime.fromMillisecondsSinceEpoch(
-            reader.readInt()), // Convert to DateTime
-        category: reader.readString(),
-        isThisStar: reader.readBool());
+      description: reader.readString(),
+      id: reader.readString(),
+      isDone: reader.readBool(),
+      time: DateTime.fromMillisecondsSinceEpoch(
+          reader.readInt()), // Convert to DateTime
+      category: reader.readString(),
+      isThisStar: reader.readBool(),
+    );
   }
 
   @override
