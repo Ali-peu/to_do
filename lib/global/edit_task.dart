@@ -1,13 +1,14 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
-import 'package:timezone/data/latest.dart' as tz;
-import 'package:timezone/timezone.dart' as tz;
-
 import 'package:to_do/data/hive/hive_data.dart';
-import 'package:to_do/global/notification_app.dart';
-
 import 'package:to_do/global/validador_text.dart';
+
 import 'package:to_do/model/note.dart';
+import 'package:to_do/page/timer_in_edit_task.dart';
+
+enum SampleItem { itemOne, itemTwo, itemThree, itemFourth }
 
 class EditTask extends StatefulWidget {
   final Note _note;
@@ -32,8 +33,31 @@ class _EditTaskState extends State<EditTask> {
         msg: 'Обновление не может быть пустым', gravity: ToastGravity.SNACKBAR);
   }
 
-  late String time = dateTimeDeleteSeconds(widget._note.time.toString());
   TimeOfDay timeOfDay = TimeOfDay.now();
+
+  late TimeOfDay timeOfDayToNotification = TimeOfDay.now();
+  SampleItem? selectedMenu;
+
+  void pushToTimer() {
+    Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => const MyTimer(),
+        ));
+  }
+
+  void changeNoteStatus() {
+    unawaited(HiveDataBase().isdone(widget._note, widget._note.isDone));
+  }
+
+  void deleteNote() {
+    unawaited(HiveDataBase().deleteNote(widget._note));
+    Navigator.pop(context);
+  }
+
+  void shareNote() {
+    Fluttertoast.showToast(msg: 'Пока не знаю как');
+  }
 
   void _showDatePicker() {
     showDatePicker(
@@ -46,8 +70,6 @@ class _EditTaskState extends State<EditTask> {
         if (value != null) {
           HiveDataBase().updateDatetime(widget._note, value);
         }
-
-        time = dateTimeDeleteSeconds(value.toString());
       });
     });
   }
@@ -55,9 +77,9 @@ class _EditTaskState extends State<EditTask> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        leading: iconButtonToBack(context),
-      ),
+      appBar: AppBar(leading: iconButtonToBack(context), actions: [
+        PopUpMenuFromAppBar(),
+      ]),
       body: SafeArea(
           child: Padding(
               padding: const EdgeInsets.all(8),
@@ -71,18 +93,52 @@ class _EditTaskState extends State<EditTask> {
                   color: Color.fromARGB(255, 168, 168, 168),
                 ),
                 rington(),
-                // if (widget._note.noteReplay != 'Нет')
-                //   Column(
-                //     children: [
-                //       replayTime('напоминание в', widget._note.noteReplay),
-                //       replayTime('Тип напоминание', 'Уведомление')
-                //     ],
-                //   ),
+                if (widget._note.replayTime != 'Нет')
+                  Column(
+                    children: [
+                      replayTime('напоминание в',
+                          timeOfDayToNotification.format(context)),
+                      replayTime('Тип напоминание', 'Уведомление')
+                    ],
+                  ),
                 const Divider(
                   color: Color.fromARGB(255, 168, 168, 168),
                 ),
                 someThing()
               ]))),
+    );
+  }
+
+  PopupMenuButton<SampleItem> PopUpMenuFromAppBar() {
+    return PopupMenuButton<SampleItem>(
+      initialValue: selectedMenu,
+      // Callback that sets the selected popup menu item.
+      onSelected: (SampleItem item) {
+        setState(() {
+          selectedMenu = item;
+        });
+      },
+      itemBuilder: (BuildContext context) => <PopupMenuEntry<SampleItem>>[
+        PopupMenuItem<SampleItem>(
+          value: SampleItem.itemOne,
+          onTap: pushToTimer,
+          child: const Text('Таймер'),
+        ),
+        PopupMenuItem<SampleItem>(
+            value: SampleItem.itemTwo,
+            onTap: changeNoteStatus,
+            child: const Text('Отметить как выполненное')),
+        PopupMenuItem<SampleItem>(
+          value: SampleItem.itemThree,
+          onTap: deleteNote,
+          child: const Text('Удалить'),
+        ),
+        PopupMenuItem<SampleItem>(
+          value: SampleItem.itemFourth,
+          onTap: shareNote,
+          child: const Text('Поделиться'),
+        ),
+      ],
     );
   }
 
@@ -140,10 +196,9 @@ class _EditTaskState extends State<EditTask> {
             await showTimePicker(context: context, initialTime: timeOfDay);
         if (timeToPick == null) return;
         setState(() {
-          timeOfDay = timeToPick;
-
-          // HiveDataBase()
-          // .updateReplayTime(widget._note, timeToPick.format(context));
+          timeOfDayToNotification = subtractMinutes(timeToPick, 5);
+          unawaited(HiveDataBase()
+              .updateReplayTime(widget._note, timeToPick.format(context)));
         });
       },
       child: SizedBox(
@@ -159,7 +214,7 @@ class _EditTaskState extends State<EditTask> {
                     style: TextStyle(color: Colors.grey, fontSize: 20)),
               ),
             ),
-            Text(widget._note.time.toString(),
+            Text(widget._note.replayTime,
                 style: const TextStyle(color: Colors.grey, fontSize: 20)),
           ],
         ),
@@ -192,7 +247,7 @@ class _EditTaskState extends State<EditTask> {
                   borderRadius: BorderRadius.circular(5)),
               child: Padding(
                 padding: const EdgeInsets.all(8.0),
-                child: Text(time,
+                child: Text(dateTimeDeleteSeconds(widget._note.time.toString()),
                     style: TextStyle(
                         color: Colors.black.withOpacity(0.75), fontSize: 16)),
               ),
@@ -206,7 +261,7 @@ class _EditTaskState extends State<EditTask> {
   Widget taskTextforEdit() {
     return TextField(
       autofocus: true,
-      maxLines: 6,
+      maxLines: 7,
       decoration: const InputDecoration(
         contentPadding: EdgeInsets.symmetric(horizontal: 15, vertical: 15),
         border: InputBorder.none,
@@ -225,8 +280,9 @@ class _EditTaskState extends State<EditTask> {
         if (taskText!.text.isEmpty) {
           return _showSnackbar();
         }
-        HiveDataBase().update(widget._note, taskText!.text);
-        Navigator.of(context).pop(context);
+
+        unawaited(HiveDataBase().update(widget._note, taskText!.text));
+        Navigator.pop(context);
       },
     );
   }

@@ -13,8 +13,6 @@ class TaskWidgetForCalendar extends StatefulWidget {
 }
 
 class _TaskWidgetForCalendarState extends State<TaskWidgetForCalendar> {
-  TextEditingController taskDescription = TextEditingController();
-
   @override
   Widget build(BuildContext context) {
     return Padding(

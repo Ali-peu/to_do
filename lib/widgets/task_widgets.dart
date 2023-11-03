@@ -196,7 +196,6 @@ class _TaskWidgetState extends State<TaskWidget> {
   }
 
   void showAlert() async {
-    print('Открыта алерт удаление');
     showDialog(
         context: context,
         builder: (context) {
@@ -207,7 +206,6 @@ class _TaskWidgetState extends State<TaskWidget> {
                   onPressed: () {
                     HiveDataBase().deleteNote(widget._note);
                     Navigator.of(context).pop(context);
-                    print('Задача удалене');
                   },
                   child: const Text('Удалить')),
               TextButton(

@@ -31,7 +31,7 @@ class _AddTaskState extends State<AddTask> {
 
   DateTime dateTime = DateTime.now();
   List<CategoryNote> categoryListNote = [];
-  List<String> categoryList = ['All', 'Work', 'Study'];
+
   String category = 'All';
 
   late var firstValueCategory = box.values.first.category;
@@ -45,13 +45,13 @@ class _AddTaskState extends State<AddTask> {
     await Hive.openBox<Note>('box');
     setState(() {
       HiveDataBase().saveNote(Note(
-        description: subtitle.text,
-        id: const Uuid().v4(),
-        isDone: false,
-        time: DateUtils.dateOnly(dateTime),
-        category: firstValueCategory,
-        isThisStar: false,
-      ));
+          description: subtitle.text,
+          id: const Uuid().v4(),
+          isDone: false,
+          time: DateUtils.dateOnly(dateTime),
+          category: firstValueCategory,
+          isThisStar: false,
+          replayTime: noteReplaytime));
       Hive.box<Note>('box');
     });
   }
@@ -137,11 +137,7 @@ class _AddTaskState extends State<AddTask> {
             });
           },
           value: _dropDownButtonValue,
-          items: box.values
-              .map((e) => dropdownButtonForCategory(e))
-              .toList()
-              .reversed
-              .toList()),
+          items: box.values.map((e) => dropdownButtonForCategory(e)).toList()),
     );
   }
 
@@ -213,6 +209,5 @@ class _AddTaskState extends State<AddTask> {
             ],
           );
         });
-    print(categoryListNote);
   }
 }

@@ -9,6 +9,7 @@ import 'package:to_do/model/category_note.dart';
 import 'package:to_do/model/note.dart';
 import 'package:to_do/model/note_adapter.dart';
 import 'package:to_do/page/home.dart';
+import 'package:to_do/page/timer_in_edit_task.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();

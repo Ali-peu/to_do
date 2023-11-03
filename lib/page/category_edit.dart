@@ -60,7 +60,6 @@ class _EditcategoryState extends State<Editcategory> {
   }
 
   void showAlert(CategoryNote categoryNote) async {
-    print('Открыта алерт удаление');
     showDialog(
         context: context,
         builder: (context) {
@@ -71,7 +70,6 @@ class _EditcategoryState extends State<Editcategory> {
                   onPressed: () {
                     HiveCategoryDataBase().deleteCategoryNote(categoryNote);
                     Navigator.of(context).pop(context);
-                    print('Задача удалене');
                   },
                   child: const Text('Удалить')),
               TextButton(

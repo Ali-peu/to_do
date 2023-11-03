@@ -27,8 +27,11 @@ class _TaskPageState extends State<TaskPage> {
 
     HiveCategoryDataBase().initBoxCategory();
     categoryListNote = box.values.toList();
+
     notesBox.watch().listen((event) {
-      setState(() {}); // Обновляет экран не удалять
+      if (mounted) {
+        setState(() {}); // Обновляет экран не удалять
+      }
     });
   }
 

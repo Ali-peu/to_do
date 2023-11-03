@@ -12,7 +12,7 @@ class HiveDataBase extends ChangeNotifier {
     notifyListeners();
   }
 
-  void deleteNote(Note note) async {
+  Future<void> deleteNote(Note note) async {
     final box = await Hive.openBox<Note>('box');
     box.delete(note.id);
   }
@@ -66,12 +66,12 @@ class HiveDataBase extends ChangeNotifier {
         gravity: ToastGravity.BOTTOM);
   }
 
-  // Future<void> updateReplayTime(Note note, String replayTime) async {
-  //   final box = await Hive.openBox<Note>('box');
-  //   final updatingNote = box.get(note.id);
+  Future<void> updateReplayTime(Note note, String replayTime) async {
+    final box = await Hive.openBox<Note>('box');
+    final updatingNote = box.get(note.id);
 
-  //   updatingNote!.noteReplay = replayTime;
+    updatingNote!.replayTime = replayTime;
 
-  //   box.put(note.id, updatingNote);
-  // }
+    box.put(note.id, updatingNote);
+  }
 }

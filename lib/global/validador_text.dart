@@ -101,3 +101,17 @@ bool checkThisIsPastTask(DateTime dateTime) {
   }
   return false;
 }
+
+TimeOfDay subtractMinutes(TimeOfDay time, int minutes) {
+  int totalMinutes = time.hour * 60 + time.minute;
+  int newTotalMinutes = totalMinutes - minutes;
+
+  if (newTotalMinutes < 0) {
+    newTotalMinutes += 1440;
+  }
+
+  final newHour = newTotalMinutes ~/ 60;
+  final newMinute = newTotalMinutes % 60;
+
+  return TimeOfDay(hour: newHour, minute: newMinute);
+}
