@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:hive/hive.dart';
+import 'package:to_do/model/note.dart';
 
 String? emailCheck(String? email) {
   if (email == null || email.isEmpty) {
@@ -114,4 +116,49 @@ TimeOfDay subtractMinutes(TimeOfDay time, int minutes) {
   final newMinute = newTotalMinutes % 60;
 
   return TimeOfDay(hour: newHour, minute: newMinute);
+}
+
+double toDouble(TimeOfDay myTime) => myTime.hour + myTime.minute / 60.0;
+String correctTimeOfReplay(TimeOfDay noteReplayTime) {
+  return '';
+}
+
+bool checkIsReplayTimeDeadline(String noteTime) {
+  TimeOfDay timeOfDay = replayTimeToTimeOFDay(noteTime);
+
+  TimeOfDay now = TimeOfDay.now();
+
+  if (toDouble(timeOfDay) > toDouble(now)) {
+    return true;
+  } else {
+    return false;
+  }
+}
+
+TimeOfDay replayTimeToTimeOFDay(String time) {
+  String hour = '';
+  String minute = '';
+  if (time.length == 8) {
+    hour = time.substring(0, 2);
+    minute = time.substring(3, 5);
+  } else {
+    hour = time.substring(0, 1);
+    minute = time.substring(2, 4);
+  }
+
+  TimeOfDay noteTime =
+      TimeOfDay(hour: int.parse(hour), minute: int.parse(minute));
+
+  return noteTime;
+}
+
+int countNotesInThisWeek(Box<Note> box) {
+  List<Note> noteList = box.values
+      .where((element) =>
+          !element.isDone &&
+          element.time.isAfter(element.time.subtract(Duration(days: 3))) &&
+          element.time.isBefore(element.time.add(Duration(days: 3))))
+      .toList();
+
+  return noteList.length;
 }

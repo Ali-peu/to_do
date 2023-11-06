@@ -1,31 +1,26 @@
 import 'dart:async';
 
-import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:hive/hive.dart';
 import 'package:to_do/model/note.dart';
 
-class HiveDataBase extends ChangeNotifier {
+class HiveDataBase {
+  final box = Hive.box<Note>('box');
   void saveNote(Note note) async {
-    final box = await Hive.openBox<Note>('box');
     box.put(note.id, note);
-    notifyListeners();
   }
 
   Future<void> deleteNote(Note note) async {
-    final box = await Hive.openBox<Note>('box');
     box.delete(note.id);
   }
 
   Future<List<Note>> chooseNotes(String category) async {
-    final box = await Hive.openBox<Note>('box');
     List<Note> categoryNotes =
         box.values.where((element) => element.description == category).toList();
     return categoryNotes;
   }
 
   Future<void> update(Note note, String text) async {
-    final box = await Hive.openBox<Note>('box');
     final updatingNote = box.get(note.id);
 
     updatingNote!.description = text;
@@ -34,7 +29,6 @@ class HiveDataBase extends ChangeNotifier {
   }
 
   Future<void> updateDatetime(Note note, DateTime taskDatetime) async {
-    final box = await Hive.openBox<Note>('box');
     final updatingNote = box.get(note.id);
 
     updatingNote!.time = taskDatetime;
@@ -43,21 +37,18 @@ class HiveDataBase extends ChangeNotifier {
   }
 
   Future<void> isdone(Note note, bool noteIsDone) async {
-    final box = await Hive.openBox<Note>('box');
     final updatingNote = box.get(note.id);
     updatingNote!.isDone = !noteIsDone;
     box.put(note.id, updatingNote);
   }
 
   Future<List<Note>> theThisDataNotes(DateTime selectedDay) async {
-    final box = await Hive.openBox<Note>('box');
     final notes =
         box.values.where((element) => element.time == selectedDay).toList();
     return notes;
   }
 
   Future<void> starNote(Note note, bool noteIsStar) async {
-    final box = await Hive.openBox<Note>('box');
     final updatingNote = box.get(note.id);
     updatingNote!.isThisStar = !noteIsStar;
     box.put(note.id, updatingNote);
@@ -66,12 +57,23 @@ class HiveDataBase extends ChangeNotifier {
         gravity: ToastGravity.BOTTOM);
   }
 
+  bool searchNoteWithCategory(String category) {
+    if (box.values.where((e) => e.category == category).isNotEmpty) {
+      return true;
+    }
+    return false;
+  }
+
   Future<void> updateReplayTime(Note note, String replayTime) async {
-    final box = await Hive.openBox<Note>('box');
     final updatingNote = box.get(note.id);
 
     updatingNote!.replayTime = replayTime;
 
     box.put(note.id, updatingNote);
   }
+
+  // Future<void> searchResults(String query) {
+  //   box.values.where((element) =>
+  //       element.description.toLowerCase().contains(query.toLowerCase()));
+  // }
 }

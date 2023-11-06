@@ -175,7 +175,14 @@ class _TaskWidgetState extends State<TaskWidget> {
                   child: noteTitleText(),
                 ),
                 subtitle: boolCheckDeaadline(widget._note.time)
-                    ? null
+                    ? (widget._note.replayTime == 'Нет'
+                        ? const Text('')
+                        : Text(widget._note.replayTime,
+                            style: TextStyle(
+                                color: checkIsReplayTimeDeadline(
+                                        widget._note.replayTime)
+                                    ? Colors.black
+                                    : Colors.red)))
                     : Text(
                         deadlineTask(widget._note.time.toString()),
                         style: TextStyle(

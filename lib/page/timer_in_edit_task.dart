@@ -20,13 +20,13 @@ class _MyTimerState extends State<MyTimer> {
   bool isStopOrResume = false;
 
   final CountDownController _controller = CountDownController();
-  // final player = AudioPlayer();
+  final player = AudioPlayer();
 
   TextEditingController timeController = TextEditingController();
   @override
   void initState() {
     super.initState();
-    // player.setSource(AssetSource('sounds/timer_alam.wav'));
+    player.setSource(AssetSource('sounds/timer_alam.wav'));
   }
 
   @override
@@ -97,7 +97,7 @@ class _MyTimerState extends State<MyTimer> {
                   });
                 },
                 child:
-                    isStopOrResume ? const Text("Stop") : const Text('Resume')),
+                    isStopOrResume ? const Text('Resume') : const Text("Stop")),
             TextButton(
                 onPressed: () {
                   setState(() {
@@ -107,7 +107,7 @@ class _MyTimerState extends State<MyTimer> {
                 child: const Text("New Time")),
             TextButton(
                 onPressed: () {
-                  // unawaited(stopAlarm());
+                  unawaited(stopAlarm());
                 },
                 child: const Text("Stop music"))
           ],
@@ -190,11 +190,8 @@ class _MyTimerState extends State<MyTimer> {
 
         // This Callback will execute when the Countdown Ends.
         onComplete: () {
-          // try {
-          //   playAlarm();
-          // } catch (e) {
-          //   print(e);
-          // }
+          playAlarm();
+
           // Here, do whatever you want
           debugPrint('Countdown Ended');
         },
@@ -225,11 +222,11 @@ class _MyTimerState extends State<MyTimer> {
     );
   }
 
-  // Future<void> playAlarm() async {
-  //   await player.resume();
-  // }
+  Future<void> playAlarm() async {
+    await player.resume();
+  }
 
-  // Future<void> stopAlarm() async {
-  //   await player.stop();
-  // }
+  Future<void> stopAlarm() async {
+    await player.stop();
+  }
 }

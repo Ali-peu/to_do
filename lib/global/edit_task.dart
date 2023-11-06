@@ -3,10 +3,13 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:to_do/data/hive/hive_data.dart';
+import 'package:to_do/global/app_colors.dart';
+import 'package:to_do/global/notification_app.dart';
 import 'package:to_do/global/validador_text.dart';
 
 import 'package:to_do/model/note.dart';
 import 'package:to_do/page/timer_in_edit_task.dart';
+import 'package:timezone/timezone.dart' as tz;
 
 enum SampleItem { itemOne, itemTwo, itemThree, itemFourth }
 
@@ -19,9 +22,20 @@ class EditTask extends StatefulWidget {
 }
 
 class _EditTaskState extends State<EditTask> {
+  late tz.Location local = tz.local;
+  late DateTime dateTime = DateTime.now();
+  String noticeTimerStr = '';
+  String noticeTimeBeforeFiveMinute = '';
+
+  var formattedTimeOfDayInUP = '';
+  var formattedTimeOfDayInDown = '';
+
   @override
   void initState() {
     super.initState();
+    noticeTimeBeforeFiveMinute;
+
+    local = tz.getLocation('Asia/Almaty');
 
     taskText = TextEditingController(text: widget._note.description);
   }
@@ -77,9 +91,13 @@ class _EditTaskState extends State<EditTask> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(leading: iconButtonToBack(context), actions: [
-        PopUpMenuFromAppBar(),
-      ]),
+      backgroundColor:
+          widget._note.isDone ? Colors.grey[300] : StyleApp().appColor,
+      appBar: AppBar(
+          backgroundColor:
+              widget._note.isDone ? Colors.grey[300] : StyleApp().appColor,
+          leading: iconButtonToBack(context),
+          actions: [popUpMenuFromAppBar()]),
       body: SafeArea(
           child: Padding(
               padding: const EdgeInsets.all(8),
@@ -96,8 +114,7 @@ class _EditTaskState extends State<EditTask> {
                 if (widget._note.replayTime != 'Нет')
                   Column(
                     children: [
-                      replayTime('напоминание в',
-                          timeOfDayToNotification.format(context)),
+                      replayTime('напоминание в', noticeTimeBeforeFiveMinute),
                       replayTime('Тип напоминание', 'Уведомление')
                     ],
                   ),
@@ -109,8 +126,9 @@ class _EditTaskState extends State<EditTask> {
     );
   }
 
-  PopupMenuButton<SampleItem> PopUpMenuFromAppBar() {
+  PopupMenuButton<SampleItem> popUpMenuFromAppBar() {
     return PopupMenuButton<SampleItem>(
+      icon: const Icon(Icons.settings, color: Colors.black),
       initialValue: selectedMenu,
       // Callback that sets the selected popup menu item.
       onSelected: (SampleItem item) {
@@ -127,7 +145,9 @@ class _EditTaskState extends State<EditTask> {
         PopupMenuItem<SampleItem>(
             value: SampleItem.itemTwo,
             onTap: changeNoteStatus,
-            child: const Text('Отметить как выполненное')),
+            child: widget._note.isDone
+                ? const Text('Отметить как невыполненное')
+                : const Text('Отметить как выполненное')),
         PopupMenuItem<SampleItem>(
           value: SampleItem.itemThree,
           onTap: deleteNote,
@@ -196,10 +216,29 @@ class _EditTaskState extends State<EditTask> {
             await showTimePicker(context: context, initialTime: timeOfDay);
         if (timeToPick == null) return;
         setState(() {
+          // починить что то сделал сам не понял
+
+          noticeTimerStr = timeToPick.format(context);
+
           timeOfDayToNotification = subtractMinutes(timeToPick, 5);
-          unawaited(HiveDataBase()
-              .updateReplayTime(widget._note, timeToPick.format(context)));
+
+          noticeTimeBeforeFiveMinute = timeOfDayToNotification.format(context);
+
+          unawaited(
+              HiveDataBase().updateReplayTime(widget._note, noticeTimerStr));
+          dateTime = DateTime(
+              DateTime.now().year,
+              DateTime.now().month,
+              DateTime.now().day,
+              timeOfDayToNotification.hour,
+              timeOfDayToNotification.minute);
         });
+        NotificationApi.showScheduleNotification(
+            title: "Schedule Notification",
+            body: "This is a Schedule Notification",
+            payload: "This is schedule data",
+            datetime: dateTime,
+            local: local);
       },
       child: SizedBox(
         height: 60,

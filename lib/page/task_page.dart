@@ -1,4 +1,6 @@
+import 'package:circle_checkbox/redev_checkbox.dart';
 import 'package:flutter/material.dart';
+
 import 'package:hive/hive.dart';
 import 'package:hive_flutter/adapters.dart';
 import 'package:to_do/data/hive/note_category_data.dart';
@@ -15,11 +17,28 @@ class TaskPage extends StatefulWidget {
   State<TaskPage> createState() => _TaskPageState();
 }
 
+enum PopUpMenu { search, sort, editCategory }
+
 class _TaskPageState extends State<TaskPage> {
   String chooseCategory = 'All';
   final notesBox = Hive.box<Note>('box');
   final box = Hive.box<CategoryNote>('boxCategory');
   List<CategoryNote> categoryListNote = [];
+
+  List<String> sortVariable = [
+    'Срок и время',
+    'По алфавиту от А до Я',
+    'По алфавиту от Я-А',
+    'Вручную(длинительное нажатие для сортировки)'
+  ];
+  String selectedSortValue = 'Вручную(длинительное нажатие для сортировки)';
+  bool? sortValueChoise = false;
+
+  void setSelectedSortValue(String value) {
+    setState(() => selectedSortValue = value);
+  }
+
+  TextEditingController searchController = TextEditingController();
 
   @override
   void initState() {
@@ -33,10 +52,26 @@ class _TaskPageState extends State<TaskPage> {
         setState(() {}); // Обновляет экран не удалять
       }
     });
+    box.watch().listen((event) {
+      setState(() {});
+    });
   }
 
-  int currentIndex = 0;
+  PopUpMenu? selectedMenu;
+
+  int currentIndex1 = 0;
+  int currentIndex2 = 0;
+  int currentIndex3 = 0;
+  int currentIndex4 = 0;
   TextEditingController taskText = TextEditingController();
+
+  void pushToEditCategory() {
+    Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => const Editcategory(),
+        ));
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -49,6 +84,7 @@ class _TaskPageState extends State<TaskPage> {
         height: 60,
         width: double.infinity,
         child: SingleChildScrollView(
+          // Скролиться только в андроид
           primary: false,
           physics: const AlwaysScrollableScrollPhysics(),
           scrollDirection: Axis.horizontal,
@@ -56,27 +92,12 @@ class _TaskPageState extends State<TaskPage> {
             verticalDirection: VerticalDirection.up,
             children: categoryListNote
                 .map((category) => buildCategoryButton(category.category))
-                .skip(1)
+                .skip(1) // (Пропускаю первое Добавить категорию!№)
                 .toList(),
           ),
         ),
       ),
-      actions: [
-        IconButton(
-          onPressed: () {
-            Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (context) => const Editcategory(),
-              ),
-            );
-          },
-          icon: const Icon(
-            Icons.settings,
-            color: Colors.red,
-          ),
-        ),
-      ],
+      actions: [popUpMenuFromAppBar()],
     );
   }
 
@@ -103,8 +124,8 @@ class _TaskPageState extends State<TaskPage> {
     );
   }
 
-  Widget buildTaskList(Box<Note> response) {
-    List<Note> taskList = response.values
+  Widget buildTaskList(Box<Note> box) {
+    List<Note> taskList = box.values
         .where((element) => isTaskInCategory(element, chooseCategory))
         .toList();
 
@@ -115,31 +136,36 @@ class _TaskPageState extends State<TaskPage> {
     List<Note> todayAndDone =
         taskList.where((element) => isTodayAndDone(element)).toList();
 
-    setState(() {
-      taskList;
-      today;
-      past;
-      future;
-      todayAndDone;
-    });
+    // setState(() { не нужен вроде
+    //   taskList;
+    //   today;
+    //   past;
+    //   future;
+    //   todayAndDone;
+    // });
+    sortingList(selectedSortValue, today);
+    sortingList(selectedSortValue, past);
+    sortingList(selectedSortValue, future);
+    sortingList(selectedSortValue, todayAndDone);
 
     if (taskList.isEmpty) {
       return const Center(child: Text('Нет задач'));
     } else {
       return ListView(
         children: [
-          buildExpansionTile('Past', past),
-          buildExpansionTile('Today', today),
-          buildExpansionTile('Future', future),
-          buildExpansionTile('Tasks done today', todayAndDone),
+          buildExpansionTile('Past', past, currentIndex1),
+          buildExpansionTile('Today', today, currentIndex2),
+          buildExpansionTile('Future', future, currentIndex3),
+          buildExpansionTile('Tasks done today', todayAndDone, currentIndex4),
         ],
       );
     }
   }
 
-  Widget buildExpansionTile(String title, List<Note> taskList) {
+  Widget buildExpansionTile(
+      String title, List<Note> taskList, int currentIndex1) {
     setState(() {
-      taskList;
+      taskList; //НАДО ли тут обновлять?
     });
     return Visibility(
       visible: taskList.isNotEmpty,
@@ -147,7 +173,9 @@ class _TaskPageState extends State<TaskPage> {
         controller: ExpansionTileController(),
         initiallyExpanded: true,
         onExpansionChanged: (bool value) {
-          setState(() {});
+          setState(() {
+            currentIndex1 = value ? 0 : 1; // Проверить работает ли?
+          });
         },
         title: Row(
           children: [
@@ -162,7 +190,7 @@ class _TaskPageState extends State<TaskPage> {
                         : Tween<double>(begin: 1, end: 0).animate(anim),
                     child: FadeTransition(opacity: anim, child: child),
                   ),
-                  child: currentIndex == 0
+                  child: currentIndex1 == 0
                       ? const Icon(Icons.arrow_drop_down_sharp,
                           key: ValueKey('icon1'))
                       : const Icon(
@@ -202,6 +230,128 @@ class _TaskPageState extends State<TaskPage> {
     );
   }
 
+  PopupMenuButton<PopUpMenu> popUpMenuFromAppBar() {
+    return PopupMenuButton<PopUpMenu>(
+      icon: const Icon(Icons.settings, color: Colors.black),
+      initialValue: selectedMenu,
+      // Callback that sets the selected popup menu item.
+      onSelected: (PopUpMenu item) {
+        setState(() {
+          selectedMenu = item;
+        });
+      },
+      itemBuilder: (BuildContext context) => <PopupMenuEntry<PopUpMenu>>[
+        PopupMenuItem<PopUpMenu>(
+          value: PopUpMenu.search,
+          onTap: () {
+            showSearch(context: context, delegate: MySearchDelegate());
+          },
+          child: const Text('Поиск'),
+        ),
+        PopupMenuItem<PopUpMenu>(
+            value: PopUpMenu.sort,
+            onTap: () {
+              showDialog(
+                  context: context,
+                  builder: (context) {
+                    return Dialog(
+                      child: SizedBox(
+                          width: MediaQuery.sizeOf(context).width * 0.9,
+                          height: MediaQuery.sizeOf(context).height * 0.62,
+                          child: Column(
+                            children: [
+                              const Align(
+                                alignment: Alignment.topLeft,
+                                child: Padding(
+                                  padding: EdgeInsets.all(8.0),
+                                  child: Text(
+                                    'Задачи отсортированы по',
+                                    style: TextStyle(fontSize: 20),
+                                  ),
+                                ),
+                              ),
+                              Flexible(
+                                child: ListView.builder(
+                                  itemCount: sortVariable.length,
+                                  itemBuilder: (context, index) {
+                                    return ListTile(
+                                      title: Padding(
+                                        padding: const EdgeInsets.all(8.0),
+                                        child: Text(sortVariable[index]),
+                                      ),
+                                      leading: CircleCheckbox(
+                                        value: sortValueChoise,
+                                        onChanged: (newValue) {
+                                          print(
+                                              "Checkbox onChanged: $newValue");
+                                          setState(() {
+                                            sortValueChoise = newValue;
+                                          });
+                                          print(
+                                              "Checkbox onChanged: $sortValueChoise");
+                                          setSelectedSortValue(
+                                              sortVariable[index]);
+                                          print(selectedSortValue);
+                                        },
+                                      ),
+                                    );
+                                  },
+                                ),
+                              ),
+                              Align(
+                                alignment: Alignment.bottomRight,
+                                child: Padding(
+                                  padding: const EdgeInsets.all(8.0),
+                                  child: TextButton(
+                                    child: Text(
+                                      'Выбор',
+                                      style: TextStyle(
+                                          fontSize: 20,
+                                          color: Colors.blue[200]),
+                                    ),
+                                    onPressed: () {
+                                      setState(() {});
+                                      Navigator.pop(context);
+                                    },
+                                  ),
+                                ),
+                              )
+                            ],
+                          )),
+                    );
+                  });
+            },
+            child: const Text('Сортировка')),
+        PopupMenuItem<PopUpMenu>(
+          value: PopUpMenu.editCategory,
+          onTap: pushToEditCategory,
+          child: const Text('Редактировать категории'),
+        ),
+      ],
+    );
+  }
+
+  void sortingList(String sortValue, List<Note> noteList) {
+    switch (sortValue) {
+      case 'Срок и время':
+        noteList.sort((a, b) => a.time.compareTo(b.time));
+        break;
+      case 'По алфавиту от А до Я':
+        noteList.sort((a, b) =>
+            a.description.toLowerCase().compareTo(b.description.toLowerCase()));
+        break;
+      case "По алфавиту от Я-А":
+        noteList.sort((a, b) =>
+            b.description.toLowerCase().compareTo(a.description.toLowerCase()));
+        break;
+      case 'Вручную(длинительное нажатие для сортировки)':
+        noteList;
+        break;
+      default:
+        noteList;
+    }
+  }
+
   bool isTaskInCategory(Note note, String category) {
     return category == 'All' || note.category == category;
   }
@@ -220,5 +370,53 @@ class _TaskPageState extends State<TaskPage> {
 
   bool isTodayAndDone(Note note) {
     return boolCheckDeaadline(note.time) && note.isDone;
+  }
+}
+
+class MySearchDelegate extends SearchDelegate {
+  final box = Hive.box<Note>('box');
+
+  @override
+  Widget buildLeading(BuildContext context) => IconButton(
+      onPressed: () => close(context, null),
+      icon: const Icon(
+        Icons.arrow_back,
+        color: Colors.black,
+      ));
+
+  @override
+  List<Widget>? buildActions(BuildContext context) => [
+        IconButton(
+            onPressed: () {
+              query = '';
+            },
+            icon: const Icon(
+              Icons.clear,
+              color: Colors.black,
+            ))
+      ];
+
+  @override
+  Widget buildResults(BuildContext context) {
+    return ListView(
+        //taskList.map<Widget>((note) => TaskWidget(note)).toList(),
+        children: box.values
+            .where((element) =>
+                element.description.toLowerCase().contains(query.toLowerCase()))
+            .toList()
+            .map<Widget>((note) => TaskWidget(note))
+            .toList());
+  }
+
+  @override
+  Widget buildSuggestions(BuildContext context) {
+    return ListView(
+        //taskList.map<Widget>((note) => TaskWidget(note)).toList(),
+        children: box.values
+            .where((element) =>
+                element.description.toLowerCase().contains(query.toLowerCase()))
+            .toList()
+            .map<Widget>((note) => TaskWidget(note))
+            .toList());
   }
 }

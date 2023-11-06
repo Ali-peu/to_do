@@ -66,7 +66,6 @@ class _MyHomePageState extends State<MyHomePage> {
   Future _displayBottomSheet(BuildContext context, double height) {
     return showModalBottomSheet(
         context: context,
-        isScrollControlled: true,
         shape: const RoundedRectangleBorder(
           borderRadius: BorderRadius.vertical(top: Radius.circular(25)),
         ),

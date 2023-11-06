@@ -242,3 +242,22 @@ class _AddTaskState extends State<AddTask> {
     print(categoryList);
   }
 }
+
+
+subtitle: boolCheckDeaadline(widget._note.time)
+                    ? (widget._note.replayTime != 'Нет'
+                        ? Text(
+                            widget._note.replayTime,
+                            style:  TextStyle(color: stringToTimeOfDay(widget._note.replayTime) ?Colors.red : Colors.black,
+                            fontSize: 12),
+                          
+                          )
+                        : const Text(''))
+                    : Text(
+                        deadlineTask(widget._note.time.toString()),
+                        style: TextStyle(
+                            color: isThatDeadlineAsGone(widget._note.time)
+                                ? Colors.black
+                                : const Color.fromARGB(255, 255, 17, 0),
+                            fontSize: 12),
+                      ),

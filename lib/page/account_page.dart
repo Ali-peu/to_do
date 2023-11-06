@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:hive/hive.dart';
+import 'package:to_do/global/validador_text.dart';
 // import 'package:syncfusion_flutter_charts/charts.dart';
 import '../model/note.dart';
 
@@ -17,9 +18,7 @@ class _AccountPageState extends State<AccountPage> {
   void initState() {
     super.initState();
 
-    box.watch().listen((event) {
-      setState(() {});
-    });
+    box.watch().listen((event) {});
   }
 
   @override
@@ -76,11 +75,7 @@ class _AccountPageState extends State<AccountPage> {
                   child: Column(
                       mainAxisAlignment: MainAxisAlignment.spaceAround,
                       children: [
-                        Text(
-                            box.values
-                                .where((element) => !element.isDone)
-                                .length
-                                .toString(),
+                        Text(countNotesInThisWeek(box).toString(),
                             style: const TextStyle(fontSize: 30)),
                         const Text('Невыполненные задачи')
                       ]),

@@ -22,6 +22,11 @@ class _AddTaskState extends State<AddTask> {
 
     HiveCategoryDataBase().initBoxCategory();
     categoryListNote = box.values.toList();
+    box.watch().listen((event) {
+      if (mounted) {
+        setState(() {});
+      }
+    });
   }
 
   final subtitle = TextEditingController();
@@ -193,7 +198,7 @@ class _AddTaskState extends State<AddTask> {
               TextButton(
                   onPressed: () {
                     HiveCategoryDataBase().saveCategoryNote(CategoryNote(
-                        id: categoryListNote.length + 1,
+                        id: categoryListNote.length,
                         category: categoryContoller.text));
 
                     firstValueCategory = categoryContoller.text;
