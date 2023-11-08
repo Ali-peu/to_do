@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:hive/hive.dart';
 import 'package:to_do/data/hive/hive_data.dart';
@@ -34,7 +36,8 @@ class _AddTaskState extends State<AddTask> {
 
   int _dropDownButtonValue = 1;
 
-  DateTime dateTime = DateTime.now();
+  DateTime selectedDate = DateTime.now();
+
   List<CategoryNote> categoryListNote = [];
 
   String category = 'All';
@@ -43,37 +46,134 @@ class _AddTaskState extends State<AddTask> {
 
   String noteReplaytime = 'Нет';
 
-  List<Note> toDoTask = [];
-
   final FocusNode _focusNode2 = FocusNode();
   void saveTask() async {
-    await Hive.openBox<Note>('box');
-    setState(() {
-      HiveDataBase().saveNote(Note(
-          description: subtitle.text,
-          id: const Uuid().v4(),
-          isDone: false,
-          time: DateUtils.dateOnly(dateTime),
-          category: firstValueCategory,
-          isThisStar: false,
-          replayTime: noteReplaytime));
-      Hive.box<Note>('box');
-    });
+    if (mounted) {
+      await Hive.openBox<Note>('box');
+    }
+    unawaited(HiveDataBase().saveNote(Note(
+        description: subtitle.text,
+        id: const Uuid().v4(),
+        isDone: false,
+        time: DateUtils.dateOnly(selectedDate),
+        category: firstValueCategory,
+        isThisStar: false,
+        replayTime: noteReplaytime)));
   }
 
-  void _showDatePicker() {
-    showDatePicker(
+  DateTime weekdayOf(DateTime time, int weekday) =>
+      time.add(Duration(days: weekday - time.weekday));
+
+  DateTime saturdayOf(DateTime time) => weekdayOf(time, 5);
+
+  TimeOfDay timeOfDay = TimeOfDay.now();
+
+  Future<DateTime?> _showCustomDatePicker() {
+    return showDialog<DateTime>(
       context: context,
-      initialDate: dateTime,
-      firstDate: DateTime(2023, 01, 01),
-      lastDate: DateTime(2025),
-    ).then((value) {
-      setState(() {
-        if (mounted && value != null && value != dateTime) {
-          dateTime = value;
-        }
-      });
-    });
+      builder: (BuildContext context) {
+        return StatefulBuilder(
+            builder: (BuildContext context, StateSetter setState) {
+          return AlertDialog(
+            content: Container(
+              // Задайте подходящий размер контейнера
+              width: double.maxFinite,
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: <Widget>[
+                  CalendarDatePicker(
+                    initialDate: selectedDate,
+                    firstDate: DateTime(2023, 1, 1),
+                    lastDate: DateTime(2025),
+                    onDateChanged: (DateTime date) {
+                      selectedDate = date;
+                    },
+                  ),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceAround,
+                    children: <Widget>[
+                      // Добавьте свои кнопки здесь
+                      calendartextButton(
+                          setState, 'Сегодня', Duration(days: 0)),
+
+                      calendartextButton(setState, 'Завтра', Duration(days: 1)),
+                      calendartextButton(
+                          setState, 'Через 3 дня', Duration(days: 3)),
+                    ],
+                  ),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceAround,
+                    children: <Widget>[
+                      TextButton(
+                        child: Text('В эти выходные'),
+                        onPressed: () {
+                          setState(() {
+                            selectedDate = saturdayOf(DateTime.now());
+                          });
+                        },
+                      ),
+                      calendartextButton(
+                          setState, 'Через неделю', Duration(days: 7)),
+                    ],
+                  ),
+                  InkWell(
+                    onTap: () async {
+                      TimeOfDay? timeToPick = await showTimePicker(
+                          context: context,
+                          initialTime: timeOfDay,
+                          initialEntryMode: TimePickerEntryMode.dialOnly);
+                      if (timeToPick == null) return;
+                      setState(() {
+                        // починить что то сделал сам не понял
+                        noteReplaytime = timeToPick.format(context);
+                      });
+                    },
+                    child: ListTile(
+                      leading: const Icon(Icons.access_time_rounded),
+                      title: const Text('Время'),
+                      trailing: Text(noteReplaytime),
+                    ),
+                  )
+                ],
+              ),
+            ),
+            actions: <Widget>[
+              TextButton(
+                child: Text('ОТМЕНА'),
+                onPressed: () => Navigator.of(context).pop(),
+              ),
+              TextButton(
+                child: Text('ОК'),
+                onPressed: () => Navigator.of(context).pop(selectedDate),
+              ),
+            ],
+          );
+        });
+      },
+    );
+  }
+
+  TextButton calendartextButton(
+      StateSetter setState, String label, Duration duration) {
+    return TextButton(
+      child: Text(label),
+      onPressed: () {
+        setState(() {
+          selectedDate = DateTime.now().add(duration);
+        });
+      },
+    );
+  }
+
+  TextButton calendarTextButton(String label, Duration duration) {
+    return TextButton(
+      child: Text(label),
+      onPressed: () {
+        setState(() {
+          selectedDate = DateTime.now().add(duration);
+        });
+      },
+    );
   }
 
   @override
@@ -98,7 +198,7 @@ class _AddTaskState extends State<AddTask> {
               IconButton(
                 icon: const Icon(Icons.edit_calendar_outlined),
                 onPressed: () {
-                  _showDatePicker();
+                  _showCustomDatePicker();
                 },
               ),
             ])),

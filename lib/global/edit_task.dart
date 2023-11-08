@@ -212,8 +212,10 @@ class _EditTaskState extends State<EditTask> {
   InkWell rington() {
     return InkWell(
       onTap: () async {
-        TimeOfDay? timeToPick =
-            await showTimePicker(context: context, initialTime: timeOfDay);
+        TimeOfDay? timeToPick = await showTimePicker(
+            context: context,
+            initialTime: timeOfDay,
+            initialEntryMode: TimePickerEntryMode.dialOnly);
         if (timeToPick == null) return;
         setState(() {
           // починить что то сделал сам не понял

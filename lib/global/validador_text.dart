@@ -156,8 +156,9 @@ int countNotesInThisWeek(Box<Note> box) {
   List<Note> noteList = box.values
       .where((element) =>
           !element.isDone &&
-          element.time.isAfter(element.time.subtract(Duration(days: 3))) &&
-          element.time.isBefore(element.time.add(Duration(days: 3))))
+          element.time
+              .isAfter(element.time.subtract(const Duration(days: 3))) &&
+          element.time.isBefore(element.time.add(const Duration(days: 3))))
       .toList();
 
   return noteList.length;

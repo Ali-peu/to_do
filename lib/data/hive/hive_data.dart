@@ -6,8 +6,12 @@ import 'package:to_do/model/note.dart';
 
 class HiveDataBase {
   final box = Hive.box<Note>('box');
-  void saveNote(Note note) async {
+  Future<void> saveNote(Note note) async {
     box.put(note.id, note);
+  }
+
+  Future<void> deleteAll() async {
+    box.clear();
   }
 
   Future<void> deleteNote(Note note) async {

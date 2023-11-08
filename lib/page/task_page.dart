@@ -1,8 +1,11 @@
+import 'dart:async';
+
 import 'package:circle_checkbox/redev_checkbox.dart';
 import 'package:flutter/material.dart';
 
 import 'package:hive/hive.dart';
 import 'package:hive_flutter/adapters.dart';
+import 'package:to_do/data/hive/hive_data.dart';
 import 'package:to_do/data/hive/note_category_data.dart';
 import 'package:to_do/global/validador_text.dart';
 import 'package:to_do/model/category_note.dart';
@@ -17,7 +20,7 @@ class TaskPage extends StatefulWidget {
   State<TaskPage> createState() => _TaskPageState();
 }
 
-enum PopUpMenu { search, sort, editCategory }
+enum PopUpMenu { search, sort, editCategory, deleteAll }
 
 class _TaskPageState extends State<TaskPage> {
   String chooseCategory = 'All';
@@ -53,7 +56,9 @@ class _TaskPageState extends State<TaskPage> {
       }
     });
     box.watch().listen((event) {
-      setState(() {});
+      if (mounted) {
+        setState(() {});
+      }
     });
   }
 
@@ -282,16 +287,11 @@ class _TaskPageState extends State<TaskPage> {
                                       leading: CircleCheckbox(
                                         value: sortValueChoise,
                                         onChanged: (newValue) {
-                                          print(
-                                              "Checkbox onChanged: $newValue");
                                           setState(() {
                                             sortValueChoise = newValue;
                                           });
-                                          print(
-                                              "Checkbox onChanged: $sortValueChoise");
                                           setSelectedSortValue(
                                               sortVariable[index]);
-                                          print(selectedSortValue);
                                         },
                                       ),
                                     );
@@ -326,6 +326,13 @@ class _TaskPageState extends State<TaskPage> {
           value: PopUpMenu.editCategory,
           onTap: pushToEditCategory,
           child: const Text('Редактировать категории'),
+        ),
+        PopupMenuItem<PopUpMenu>(
+          value: PopUpMenu.deleteAll,
+          onTap: () {
+            unawaited(HiveDataBase().deleteAll());
+          },
+          child: const Text('Удалить все задании'),
         ),
       ],
     );
