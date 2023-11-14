@@ -61,9 +61,11 @@ void showAlertDialog(
           actions: [
             TextButton(
                 onPressed: () {
-                  HiveCategoryDataBase().saveCategoryNote(CategoryNote(
-                      id: box.values.toList().length,
-                      category: categoryContoller.text));
+                  if (categoryContoller.text.isNotEmpty) {
+                    HiveCategoryDataBase().saveCategoryNote(CategoryNote(
+                        id: box.values.toList().length,
+                        category: categoryContoller.text));
+                  }
 
                   Navigator.of(context).pop(context);
                 },
