@@ -61,7 +61,6 @@ class _CalendarPageState extends State<CalendarPage> {
                     return const Center(
                       child: Text(
                         'У вас нет задач на этот день',
-                        style: TextStyle(color: Colors.teal),
                       ),
                     );
                   } else {

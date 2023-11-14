@@ -48,8 +48,10 @@ dependencies:
   flutter_timer_countdown: ^1.0.6
   flutter_datetime_picker_utils: ^1.0.1
   circular_countdown_timer: ^0.2.3
-  audioplayers: ^5.2.0
+
   circle_checkbox: ^0.0.2+1
+  provider: ^6.1.0
+  just_audio: ^0.9.35
  
   
   
@@ -59,10 +61,28 @@ dependencies:
   # The following adds the Cupertino Icons font to your application.
   # Use with the CupertinoIcons class for iOS style icons.
  
+flutter_launcher_icons:
+  android: "launcher_icon"
+  ios: true
+  image_path: "images/first.png"
+  min_sdk_android: 21 # android min sdk min:16, default 21
+  web:
+    generate: true
+    image_path: "images/first.png"
+    background_color: "#1E90FF"
+    theme_color: "#1E90FF"
+  windows:
+    generate: true
+    image_path: "images/first.png"
+    icon_size: 48 # min:48, max:256, default: 48
+  macos:
+    generate: true
+    image_path: "images/first.png"
 
 dev_dependencies:
   flutter_test:
     sdk: flutter
+  flutter_launcher_icons: "^0.13.1"
  
   
 

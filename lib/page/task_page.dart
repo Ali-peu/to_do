@@ -5,12 +5,15 @@ import 'package:flutter/material.dart';
 
 import 'package:hive/hive.dart';
 import 'package:hive_flutter/adapters.dart';
+import 'package:provider/provider.dart';
 import 'package:to_do/data/hive/hive_data.dart';
 import 'package:to_do/data/hive/note_category_data.dart';
+import 'package:to_do/global/theme.dart';
 import 'package:to_do/global/validador_text.dart';
 import 'package:to_do/model/category_note.dart';
 import 'package:to_do/model/note.dart';
 import 'package:to_do/page/category_edit.dart';
+import 'package:to_do/page/notifier.dart';
 import 'package:to_do/widgets/task_widgets.dart';
 
 class TaskPage extends StatefulWidget {
@@ -23,7 +26,9 @@ class TaskPage extends StatefulWidget {
 enum PopUpMenu { search, sort, editCategory, deleteAll }
 
 class _TaskPageState extends State<TaskPage> {
-  String chooseCategory = 'All';
+  ThemeProvider notifier = ThemeProvider();
+  // String chooseCategory = 'All';
+
   final notesBox = Hive.box<Note>('box');
   final box = Hive.box<CategoryNote>('boxCategory');
   List<CategoryNote> categoryListNote = [];
@@ -80,26 +85,24 @@ class _TaskPageState extends State<TaskPage> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(appBar: buildAppBar(), body: buildTaskList(notesBox));
+    return ChangeNotifierProvider(
+        create: (context) => ThemeProvider(),
+        child: Scaffold(appBar: buildAppBar(), body: buildTaskList(notesBox)));
   }
 
   AppBar buildAppBar() {
     return AppBar(
-      title: SizedBox(
-        height: 60,
-        width: double.infinity,
-        child: SingleChildScrollView(
-          // Скролиться только в андроид
-          primary: false,
-          physics: const AlwaysScrollableScrollPhysics(),
-          scrollDirection: Axis.horizontal,
-          child: Row(
-            verticalDirection: VerticalDirection.up,
-            children: categoryListNote
-                .map((category) => buildCategoryButton(category.category))
-                .skip(1) // (Пропускаю первое Добавить категорию!№)
-                .toList(),
-          ),
+      title: SingleChildScrollView(
+        // Скролиться только в андроид
+        primary: false,
+        physics: const AlwaysScrollableScrollPhysics(),
+        scrollDirection: Axis.horizontal,
+        child: Row(
+          verticalDirection: VerticalDirection.up,
+          children: categoryListNote
+              .map((category) => buildCategoryButton(category.category))
+              .skip(1) // (Пропускаю первое Добавить категорию!№)
+              .toList(),
         ),
       ),
       actions: [popUpMenuFromAppBar()],
@@ -111,27 +114,27 @@ class _TaskPageState extends State<TaskPage> {
       padding: const EdgeInsets.all(8.0),
       child: ElevatedButton(
         onPressed: () {
+          notifier.changeWord(category);
           setState(() {
-            chooseCategory = category;
+            // chooseCategory = category;
+            // notifier.changeWord(category);
           });
         },
         style: ElevatedButton.styleFrom(
+          backgroundColor: Theme.of(context).colorScheme.secondary,
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(30.0),
           ),
           padding: const EdgeInsets.symmetric(vertical: 15, horizontal: 40),
         ),
-        child: Text(
-          category,
-          style: const TextStyle(color: Colors.white),
-        ),
+        child: Text(category),
       ),
     );
   }
 
   Widget buildTaskList(Box<Note> box) {
     List<Note> taskList = box.values
-        .where((element) => isTaskInCategory(element, chooseCategory))
+        .where((element) => isTaskInCategory(element, notifier.category))
         .toList();
 
     List<Note> today = taskList.where((element) => isToday(element)).toList();
@@ -182,62 +185,20 @@ class _TaskPageState extends State<TaskPage> {
             currentIndex1 = value ? 0 : 1; // Проверить работает ли?
           });
         },
-        title: Row(
-          children: [
-            Text(title),
-            AbsorbPointer(
-              child: IconButton(
-                icon: AnimatedSwitcher(
-                  duration: const Duration(milliseconds: 300),
-                  transitionBuilder: (child, anim) => RotationTransition(
-                    turns: child.key == const ValueKey('icon1')
-                        ? Tween<double>(begin: 0, end: 1).animate(anim)
-                        : Tween<double>(begin: 1, end: 0).animate(anim),
-                    child: FadeTransition(opacity: anim, child: child),
-                  ),
-                  child: currentIndex1 == 0
-                      ? const Icon(Icons.arrow_drop_down_sharp,
-                          key: ValueKey('icon1'))
-                      : const Icon(
-                          Icons.home, //Icons.arrow_drop_up_sharp
-                          key: ValueKey('icon2'),
-                        ),
-                ),
-                onPressed: () {},
-              ),
-            ),
-          ],
+        shape: const Border(),
+        title: Text(
+          title,
+          style: const TextStyle(color: Colors.black, fontSize: 25),
         ),
-        trailing: const Visibility(visible: false, child: Text('')),
+        // trailing: const Visibility(visible: false, child: Text('')),
         children: taskList.map<Widget>((note) => TaskWidget(note)).toList(),
       ),
     );
   }
 
-  Widget buildExpansionTileIcon(int currentIcon) {
-    return IconButton(
-      icon: AnimatedSwitcher(
-        duration: const Duration(milliseconds: 300),
-        transitionBuilder: (child, anim) => RotationTransition(
-          turns: child.key == const ValueKey('icon1')
-              ? Tween<double>(begin: 0, end: 1).animate(anim)
-              : Tween<double>(begin: 1, end: 0).animate(anim),
-          child: FadeTransition(opacity: anim, child: child),
-        ),
-        child: currentIcon == 0
-            ? const Icon(Icons.arrow_drop_down_sharp, key: ValueKey('icon1'))
-            : const Icon(
-                Icons.home, //Icons.arrow_drop_up_sharp
-                key: ValueKey('icon2'),
-              ),
-      ),
-      onPressed: () {},
-    );
-  }
-
   PopupMenuButton<PopUpMenu> popUpMenuFromAppBar() {
     return PopupMenuButton<PopUpMenu>(
-      icon: const Icon(Icons.settings, color: Colors.black),
+      icon: const Icon(Icons.settings),
       initialValue: selectedMenu,
       // Callback that sets the selected popup menu item.
       onSelected: (PopUpMenu item) {
@@ -271,7 +232,6 @@ class _TaskPageState extends State<TaskPage> {
                                   padding: EdgeInsets.all(8.0),
                                   child: Text(
                                     'Задачи отсортированы по',
-                                    style: TextStyle(fontSize: 20),
                                   ),
                                 ),
                               ),
@@ -303,11 +263,8 @@ class _TaskPageState extends State<TaskPage> {
                                 child: Padding(
                                   padding: const EdgeInsets.all(8.0),
                                   child: TextButton(
-                                    child: Text(
+                                    child: const Text(
                                       'Выбор',
-                                      style: TextStyle(
-                                          fontSize: 20,
-                                          color: Colors.blue[200]),
                                     ),
                                     onPressed: () {
                                       setState(() {});
@@ -388,7 +345,6 @@ class MySearchDelegate extends SearchDelegate {
       onPressed: () => close(context, null),
       icon: const Icon(
         Icons.arrow_back,
-        color: Colors.black,
       ));
 
   @override
@@ -399,7 +355,6 @@ class MySearchDelegate extends SearchDelegate {
             },
             icon: const Icon(
               Icons.clear,
-              color: Colors.black,
             ))
       ];
 

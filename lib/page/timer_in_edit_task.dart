@@ -1,8 +1,7 @@
 import 'dart:async';
-
+import 'package:just_audio/just_audio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:audioplayers/audioplayers.dart';
 
 import 'package:circular_countdown_timer/circular_countdown_timer.dart';
 
@@ -18,15 +17,14 @@ class _MyTimerState extends State<MyTimer> {
   int minute = 0;
 
   bool isStopOrResume = false;
-
-  final CountDownController _controller = CountDownController();
   final player = AudioPlayer();
+  final CountDownController _controller = CountDownController();
 
   TextEditingController timeController = TextEditingController();
   @override
   void initState() {
     super.initState();
-    player.setSource(AssetSource('sounds/timer_alam.wav'));
+    player.setAsset('sounds/timer_alam.wav');
   }
 
   @override
@@ -36,7 +34,6 @@ class _MyTimerState extends State<MyTimer> {
           leading: IconButton(
             icon: const Icon(
               Icons.arrow_back,
-              color: Colors.black,
             ),
             onPressed: () {
               Navigator.pop(context);
@@ -223,7 +220,7 @@ class _MyTimerState extends State<MyTimer> {
   }
 
   Future<void> playAlarm() async {
-    await player.resume();
+    await player.play();
   }
 
   Future<void> stopAlarm() async {

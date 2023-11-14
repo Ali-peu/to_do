@@ -68,10 +68,18 @@ class HiveDataBase {
     return false;
   }
 
-  Future<void> updateReplayTime(Note note, String replayTime) async {
+  Future<void> updateReplayTime(Note note, DateTime choiseReplayTime) async {
     final updatingNote = box.get(note.id);
 
-    updatingNote!.replayTime = replayTime;
+    updatingNote!.replayTime1 = choiseReplayTime;
+
+    box.put(note.id, updatingNote);
+  }
+
+  Future<void> updateReplayTime2(Note note, DateTime choiseReplayTime) async {
+    final updatingNote = box.get(note.id);
+
+    updatingNote!.replayTime2 = choiseReplayTime;
 
     box.put(note.id, updatingNote);
   }

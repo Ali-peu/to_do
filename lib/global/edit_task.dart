@@ -2,14 +2,16 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import 'package:hive/hive.dart';
 import 'package:to_do/data/hive/hive_data.dart';
-import 'package:to_do/global/app_colors.dart';
+
 import 'package:to_do/global/notification_app.dart';
 import 'package:to_do/global/validador_text.dart';
 
 import 'package:to_do/model/note.dart';
 import 'package:to_do/page/timer_in_edit_task.dart';
 import 'package:timezone/timezone.dart' as tz;
+import 'package:to_do/widgets/timer_frame.dart';
 
 enum SampleItem { itemOne, itemTwo, itemThree, itemFourth }
 
@@ -22,18 +24,12 @@ class EditTask extends StatefulWidget {
 }
 
 class _EditTaskState extends State<EditTask> {
-  late tz.Location local = tz.local;
-  late DateTime dateTime = DateTime.now();
-  String noticeTimerStr = '';
-  String noticeTimeBeforeFiveMinute = '';
-
-  var formattedTimeOfDayInUP = '';
-  var formattedTimeOfDayInDown = '';
+  tz.Location local = tz.local;
+  DateTime dateTime = DateTime.now();
 
   @override
   void initState() {
     super.initState();
-    noticeTimeBeforeFiveMinute;
 
     local = tz.getLocation('Asia/Almaty');
 
@@ -73,6 +69,7 @@ class _EditTaskState extends State<EditTask> {
     Fluttertoast.showToast(msg: 'Пока не знаю как');
   }
 
+  DateTime? updateTime;
   void _showDatePicker() {
     showDatePicker(
       context: context,
@@ -91,11 +88,13 @@ class _EditTaskState extends State<EditTask> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor:
-          widget._note.isDone ? Colors.grey[300] : StyleApp().appColor,
+      backgroundColor: widget._note.isDone
+          ? Colors.grey[300]
+          : Theme.of(context).scaffoldBackgroundColor,
       appBar: AppBar(
-          backgroundColor:
-              widget._note.isDone ? Colors.grey[300] : StyleApp().appColor,
+          backgroundColor: widget._note.isDone
+              ? Colors.grey[300]
+              : Theme.of(context).scaffoldBackgroundColor,
           leading: iconButtonToBack(context),
           actions: [popUpMenuFromAppBar()]),
       body: SafeArea(
@@ -103,24 +102,18 @@ class _EditTaskState extends State<EditTask> {
               padding: const EdgeInsets.all(8),
               child: Column(children: [
                 taskTextforEdit(),
-                const Divider(
-                  color: Color.fromARGB(255, 168, 168, 168),
-                ),
+                const Divider(),
                 editDate(),
-                const Divider(
-                  color: Color.fromARGB(255, 168, 168, 168),
-                ),
+                const Divider(),
                 rington(),
-                if (widget._note.replayTime != 'Нет')
+                if (widget._note.replayTime1 != widget._note.time)
                   Column(
                     children: [
-                      replayTime('напоминание в', noticeTimeBeforeFiveMinute),
-                      replayTime('Тип напоминание', 'Уведомление')
+                      replayTime('напоминание в', widget._note.replayTime2),
+                      replayTime2('Тип напоминание', 'Уведомление')
                     ],
                   ),
-                const Divider(
-                  color: Color.fromARGB(255, 168, 168, 168),
-                ),
+                const Divider(),
                 someThing()
               ]))),
     );
@@ -128,7 +121,7 @@ class _EditTaskState extends State<EditTask> {
 
   PopupMenuButton<SampleItem> popUpMenuFromAppBar() {
     return PopupMenuButton<SampleItem>(
-      icon: const Icon(Icons.settings, color: Colors.black),
+      icon: const Icon(Icons.settings),
       initialValue: selectedMenu,
       // Callback that sets the selected popup menu item.
       onSelected: (SampleItem item) {
@@ -162,7 +155,7 @@ class _EditTaskState extends State<EditTask> {
     );
   }
 
-  InkWell replayTime(String type, String subType) {
+  InkWell replayTime(String type, DateTime subType) {
     return InkWell(
       onTap: () {},
       child: SizedBox(
@@ -174,12 +167,40 @@ class _EditTaskState extends State<EditTask> {
             Flexible(
               child: Align(
                 alignment: Alignment.centerLeft,
-                child: Text(type,
-                    style: const TextStyle(color: Colors.grey, fontSize: 20)),
+                child: Text(
+                  type,
+                ),
               ),
             ),
-            Text(subType,
-                style: const TextStyle(color: Colors.grey, fontSize: 20)),
+            Text(
+              TimeOfDay.fromDateTime(subType).toString(),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  InkWell replayTime2(String type, String subType) {
+    return InkWell(
+      onTap: () {},
+      child: SizedBox(
+        height: 60,
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            const SizedBox(width: 24),
+            Flexible(
+              child: Align(
+                alignment: Alignment.centerLeft,
+                child: Text(
+                  type,
+                ),
+              ),
+            ),
+            Text(
+              subType,
+            ),
           ],
         ),
       ),
@@ -194,15 +215,16 @@ class _EditTaskState extends State<EditTask> {
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            Icon(Icons.repeat, size: 24, color: Colors.grey),
+            Icon(Icons.repeat),
             Flexible(
               child: Align(
                 alignment: Alignment.centerLeft,
-                child: Text("Повторить задание",
-                    style: TextStyle(color: Colors.grey, fontSize: 20)),
+                child: Text(
+                  "Повторить задание",
+                ),
               ),
             ),
-            Text('Нет', style: TextStyle(color: Colors.grey, fontSize: 20)),
+            Text('Нет'),
           ],
         ),
       ),
@@ -220,14 +242,23 @@ class _EditTaskState extends State<EditTask> {
         setState(() {
           // починить что то сделал сам не понял
 
-          noticeTimerStr = timeToPick.format(context);
-
           timeOfDayToNotification = subtractMinutes(timeToPick, 5);
-
-          noticeTimeBeforeFiveMinute = timeOfDayToNotification.format(context);
-
+          var timeToPickDate = DateTime(
+              widget._note.time.year,
+              widget._note.time.month,
+              widget._note.time.day,
+              timeToPick.hour,
+              timeToPick.minute);
+          var timeToPickDate2 = DateTime(
+              widget._note.time.year,
+              widget._note.time.month,
+              widget._note.time.day,
+              timeToPick.hour,
+              timeToPick.minute - 5);
           unawaited(
-              HiveDataBase().updateReplayTime(widget._note, noticeTimerStr));
+              HiveDataBase().updateReplayTime(widget._note, timeToPickDate));
+          unawaited(
+              HiveDataBase().updateReplayTime2(widget._note, timeToPickDate2));
           dateTime = DateTime(
               DateTime.now().year,
               DateTime.now().month,
@@ -247,16 +278,20 @@ class _EditTaskState extends State<EditTask> {
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            const Icon(Icons.access_time, size: 24, color: Colors.grey),
+            const Icon(Icons.access_time),
             const Flexible(
               child: Align(
                 alignment: Alignment.centerLeft,
-                child: Text('Время & Напоминание',
-                    style: TextStyle(color: Colors.grey, fontSize: 20)),
+                child: Text(
+                  'Время & Напоминание',
+                ),
               ),
             ),
-            Text(widget._note.replayTime,
-                style: const TextStyle(color: Colors.grey, fontSize: 20)),
+            Text(
+              widget._note.replayTime1 == widget._note.time
+                  ? "Нет"
+                  : TimeOfDay.fromDateTime(widget._note.replayTime1).toString(),
+            ),
           ],
         ),
       ),
@@ -265,33 +300,39 @@ class _EditTaskState extends State<EditTask> {
 
   InkWell editDate() {
     return InkWell(
-      onTap: () {
-        _showDatePicker();
+      onTap: () async {
+        updateTime = await MyCustomCalendar().showCustomDatePickerPac(context);
+        setState(() {
+          updateTime;
+        });
+        HiveDataBase()
+            .updateDatetime(widget._note, updateTime ?? widget._note.time);
+
+        HiveDataBase().updateReplayTime(widget._note, dateTime);
       },
       child: SizedBox(
         height: 60,
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            const Icon(Icons.calendar_month_outlined,
-                size: 24, color: Colors.grey),
+            const Icon(
+              Icons.calendar_month_outlined,
+            ),
             const Flexible(
               child: Align(
                 alignment: Alignment.centerLeft,
-                child: Text("Срок по задаче",
-                    style: TextStyle(color: Colors.grey, fontSize: 20)),
+                child: Text(
+                  "Срок по задаче",
+                ),
               ),
             ),
             Container(
-              decoration: BoxDecoration(
-                  color: Colors.lightBlue.withOpacity(0.06),
-                  borderRadius: BorderRadius.circular(5)),
+              decoration: BoxDecoration(borderRadius: BorderRadius.circular(5)),
               child: Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: Text(dateTimeDeleteSeconds(widget._note.time.toString()),
-                    style: TextStyle(
-                        color: Colors.black.withOpacity(0.75), fontSize: 16)),
-              ),
+                  padding: const EdgeInsets.all(8.0),
+                  child: Text(
+                    dateTimeDeleteSeconds(widget._note.time.toString()),
+                  )),
             ),
           ],
         ),
@@ -315,8 +356,6 @@ class _EditTaskState extends State<EditTask> {
   IconButton iconButtonToBack(BuildContext context) {
     return IconButton(
       icon: const Icon(Icons.arrow_back),
-      iconSize: 30,
-      color: Colors.black,
       onPressed: () {
         if (taskText!.text.isEmpty) {
           return _showSnackbar();

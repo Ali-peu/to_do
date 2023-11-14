@@ -5,8 +5,8 @@ class Note {
   bool isDone;
   String category;
   bool isThisStar;
-  String replayTime;
-
+  DateTime replayTime1;
+  DateTime replayTime2;
   Note({
     required this.description,
     required this.id,
@@ -14,18 +14,20 @@ class Note {
     required this.time,
     required this.category,
     required this.isThisStar,
-    required this.replayTime,
+    required this.replayTime1,
+    required this.replayTime2,
   });
 
-  factory Note.fromJson(Map<String, dynamic> json) {
-    return Note(
-      description: json['description'],
-      id: json['id'],
-      time: json['time'],
-      isDone: json['isDone'],
-      category: json['category'],
-      isThisStar: json['isThisStar'],
-      replayTime: json['replayTime'],
-    );
-  }
+  // factory Note.fromJson(Map<String, dynamic> json) { Пока не нужен потому что я никуда данные не отправляю
+  //   return Note(
+  //     description: json['description'],
+  //     id: json['id'],
+  //     time: json['time'],
+  //     isDone: json['isDone'],
+  //     category: json['category'],
+  //     isThisStar: json['isThisStar'],
+  //     replayTime1: json
+
+  //   );
+  // }
 }

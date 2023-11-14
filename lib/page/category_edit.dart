@@ -38,8 +38,6 @@ class _EditcategoryState extends State<Editcategory> {
       appBar: AppBar(
         leading: IconButton(
           icon: const Icon(Icons.arrow_back),
-          iconSize: 30,
-          color: Colors.black,
           onPressed: () {
             Navigator.of(context).pop(context);
           },
@@ -59,7 +57,7 @@ class _EditcategoryState extends State<Editcategory> {
       title: Text(categoryNote.category),
       trailing: categoryNote.id > 3
           ? IconButton(
-              icon: const Icon(Icons.delete, color: Colors.red),
+              icon: const Icon(Icons.delete),
               onPressed: () {
                 showAlert(categoryNote);
               },

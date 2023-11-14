@@ -2,9 +2,9 @@
 <!--<uses-permission android:name="android.permission.USE_EXACT_ALARM" />   Удалить если все сломается-->
     <application
     
-        android:label="to_do"
+        android:label="To-Do List"
         android:name="${applicationName}"
-        android:icon="@mipmap/ic_launcher">
+        android:icon="@mipmap/launcher_icon">
         <!--<receiver android:exported="false" android:name="com.dexterous.flutterlocalnotifications.ScheduledNotificationReceiver" /> Удалить если все сломается-->
         <!--<receiver android:exported="false" android:name="com.dexterous.flutterlocalnotifications.ScheduledNotificationBootReceiver"> Удалить если все сломается-->
         <activity

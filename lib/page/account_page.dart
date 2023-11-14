@@ -34,11 +34,9 @@ class _AccountPageState extends State<AccountPage> {
                 padding: const EdgeInsets.all(20.0),
                 decoration: const BoxDecoration(
                   shape: BoxShape.circle,
-                  color: Colors.white,
                 ),
                 child: const Icon(
                   Icons.account_box,
-                  size: 25,
                 )),
             title: const Text("Account"),
             subtitle: const Text(("sub Account")),
@@ -52,34 +50,29 @@ class _AccountPageState extends State<AccountPage> {
               SizedBox(
                 height: height * 0.2,
                 width: width * 0.45,
-                child: ColoredBox(
-                  color: Colors.blue,
-                  child: Column(
-                      mainAxisAlignment: MainAxisAlignment.spaceAround,
-                      children: [
-                        Text(
-                            box.values
-                                .where((element) => element.isDone)
-                                .length
-                                .toString(),
-                            style: const TextStyle(fontSize: 30)),
-                        const Text('Выполненные задачи')
-                      ]),
-                ),
+                child: Column(
+                    mainAxisAlignment: MainAxisAlignment.spaceAround,
+                    children: [
+                      Text(
+                        box.values
+                            .where((element) => element.isDone)
+                            .length
+                            .toString(),
+                      ),
+                      const Text('Выполненные задачи')
+                    ]),
               ),
               SizedBox(
                 height: height * 0.2,
                 width: width * 0.45,
-                child: ColoredBox(
-                  color: Colors.blue,
-                  child: Column(
-                      mainAxisAlignment: MainAxisAlignment.spaceAround,
-                      children: [
-                        Text(countNotesInThisWeek(box).toString(),
-                            style: const TextStyle(fontSize: 30)),
-                        const Text('Невыполненные задачи')
-                      ]),
-                ),
+                child: Column(
+                    mainAxisAlignment: MainAxisAlignment.spaceAround,
+                    children: [
+                      Text(
+                        countNotesInThisWeek(box).toString(),
+                      ),
+                      const Text('Невыполненные задачи')
+                    ]),
               ),
             ],
           ),
@@ -89,7 +82,6 @@ class _AccountPageState extends State<AccountPage> {
           child: Container(
             width: width * 0.9,
             height: height * 0.4,
-            color: Colors.white,
             child: const Center(child: Text("Тут должен быть график")),
           ),
         )

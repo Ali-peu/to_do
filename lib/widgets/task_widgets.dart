@@ -1,10 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:to_do/data/hive/hive_data.dart';
-import 'package:to_do/global/app_colors.dart';
+
 import 'package:to_do/global/edit_task.dart';
 import 'package:to_do/global/validador_text.dart';
 import 'package:to_do/model/note.dart';
+
+import 'package:to_do/widgets/timer_frame.dart';
 
 class TaskWidget extends StatefulWidget {
   final Note _note;
@@ -15,111 +18,15 @@ class TaskWidget extends StatefulWidget {
 }
 
 class _TaskWidgetState extends State<TaskWidget> {
-  // final GlobalKey _iconButtonKey = GlobalKey();
-  // OverlayEntry? _activeOverlayEntry;
-  // showOverlay(BuildContext context, Offset position) async {
-  //   if (_activeOverlayEntry != null) {
-  //     _activeOverlayEntry!.remove();
-  //   }
-  //   OverlayState overlayState = Overlay.of(context);
-  //   OverlayEntry overlayEntry = OverlayEntry(
-  //       builder: (context) => Positioned(
-  //           top: position.dy,
-  //           right: MediaQuery.of(context).size.width - position.dx,
-  //           child: Container(
-  //             color: const Color.fromARGB(255, 99, 28, 165),
-  //             height: MediaQuery.of(context).size.height * 0.3,
-  //             width: MediaQuery.of(context).size.width * 0.4,
-  //             child: Column(children: [
-  //               Text('Флаг',
-  //                   style: TextStyle(
-  //                       fontSize: MediaQuery.of(context).size.height * 0.030,
-  //                       color: Colors.orange)),
-  //               SingleChildScrollView(
-  //                 scrollDirection: Axis.horizontal,
-  //                 child: Row(
-  //                   children: [
-  //                     flagIcons(Colors.green),
-  //                     flagIcons(Colors.red),
-  //                     flagIcons(Colors.blue),
-  //                     flagIcons(Colors.amber),
-  //                   ],
-  //                 ),
-  //               ),
-  //               Text("Число",
-  //                   style: TextStyle(
-  //                       fontSize: MediaQuery.of(context).size.height * 0.025,
-  //                       color: Colors.orangeAccent)),
-  //               SingleChildScrollView(
-  //                 scrollDirection: Axis.horizontal,
-  //                 child: Row(
-  //                   children: [
-  //                     iconCircul(Colors.green),
-  //                     iconCircul(Colors.red),
-  //                     iconCircul(Colors.blue),
-  //                     iconCircul(Colors.amber)
-  //                   ],
-  //                 ),
-  //               )
-  //             ]),
-  //           )));
-
-  //   overlayState.insert(overlayEntry);
-  //   _activeOverlayEntry = overlayEntry;
-
-  //   await Future.delayed(const Duration(seconds: 1));
-
-  //   overlayEntry.remove();
-  //   _activeOverlayEntry = null;
-  // }
-
-  // Widget flagIcons(Color color) {
-  //   return Icon(Icons.flag,
-  //       color: color, size: MediaQuery.of(context).size.height * 0.05);
-  // }
-
-  // Widget iconCircul(Color color) {
-  //   return Icon(Icons.circle,
-  //       color: color, size: MediaQuery.of(context).size.height * 0.05);
-  // }
-
   bool isDone = false;
   TextEditingController taskDescription = TextEditingController();
-  late DateTime dateTime = widget._note.time;
-  Icon icon = const Icon(
-    Icons.flag_outlined,
-    color: Colors.white,
-  );
-  bool isContainerVisible = false;
 
-  void toggleContainerVisibility() {
-    setState(() {
-      isContainerVisible = !isContainerVisible;
-    });
-  }
-
-  void _showDatePicker() {
-    showDatePicker(
-      context: context,
-      initialDate: dateTime,
-      firstDate: DateTime(2023, 01, 01),
-      lastDate: DateTime(2025),
-    ).then((value) {
-      setState(() {
-        if (mounted && value != null && value != dateTime) {
-          dateTime = value;
-          HiveDataBase().updateDatetime(widget._note, dateTime);
-        }
-      });
-    });
-  }
+  DateTime? selectedTime;
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      decoration: BoxDecoration(
-          shape: BoxShape.rectangle, borderRadius: BorderRadius.circular(25.0)),
-      padding: const EdgeInsets.all(8.0),
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 2.0, horizontal: 8.0),
       child: Slidable(
           endActionPane: ActionPane(
             motion: const ScrollMotion(),
@@ -132,7 +39,11 @@ class _TaskWidgetState extends State<TaskWidget> {
                 label: 'Delete',
               ),
               SlidableAction(
-                onPressed: (context) => (_showDatePicker()),
+                onPressed: (context) async {
+                  DateTime? selectedTime =
+                      await MyCustomCalendar().showCustomDatePickerPac(context);
+                  HiveDataBase().updateDatetime(widget._note, selectedTime!);
+                },
                 backgroundColor: const Color.fromARGB(255, 66, 141, 232),
                 foregroundColor: Colors.white,
                 icon: Icons.date_range_rounded,
@@ -150,55 +61,60 @@ class _TaskWidgetState extends State<TaskWidget> {
               )
             ],
           ),
-          child: ColoredBox(
-            color: StyleApp().taskColoR,
-            child: ListTile(
-                onTap: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => EditTask(widget._note),
-                    ),
-                  );
-                },
-                trailing: IconButton(
-                  // key: _iconButtonKey,
-                  icon: const Icon(Icons.flag),
-                  onPressed: () {},
+          child: noteListTile()),
+    );
+  }
+
+  Widget noteListTile() {
+    return Card(
+      child: ListTile(
+          onTap: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => EditTask(widget._note),
+              ),
+            );
+          },
+          onLongPress: () {
+            Fluttertoast.showToast(msg: 'LongPress');
+          },
+          // shape: RoundedRectangleBorder(
+          //   borderRadius: BorderRadius.circular(1),
+          //   side: const BorderSide(),
+          // ),
+          title: Padding(
+            padding: const EdgeInsets.symmetric(vertical: 8.0),
+            child: noteTitleText(),
+          ),
+          subtitle: boolCheckDeaadline(widget._note.time)
+              ? (widget._note.replayTime1 == widget._note.time
+                  ? const Text('')
+                  : Text(
+                      TimeOfDay.fromDateTime(widget._note.replayTime1)
+                          .toString(),
+                      // style: TextStyle(
+                      //     color:
+                      //         // checkIsReplayTimeDeadline(widget._note.replayTime1)
+                      //         //     ? Colors.black
+                      //         //:
+                      //         Theme.of(context).colorScheme.error)
+                    ))
+              : Text(
+                  deadlineTask(widget._note.time.toString()),
+                  style: TextStyle(
+                      color: isThatDeadlineAsGone(widget._note.time)
+                          ? Colors.black
+                          : Theme.of(context).colorScheme.error,
+                      fontSize: 12),
                 ),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(1),
-                  side: const BorderSide(color: Colors.black),
-                ),
-                title: Padding(
-                  padding: const EdgeInsets.symmetric(vertical: 8.0),
-                  child: noteTitleText(),
-                ),
-                subtitle: boolCheckDeaadline(widget._note.time)
-                    ? (widget._note.replayTime == 'Нет'
-                        ? const Text('')
-                        : Text(widget._note.replayTime,
-                            style: TextStyle(
-                                color: checkIsReplayTimeDeadline(
-                                        widget._note.replayTime)
-                                    ? Colors.black
-                                    : Colors.red)))
-                    : Text(
-                        deadlineTask(widget._note.time.toString()),
-                        style: TextStyle(
-                            color: isThatDeadlineAsGone(widget._note.time)
-                                ? Colors.black
-                                : const Color.fromARGB(255, 255, 17, 0),
-                            fontSize: 12),
-                      ),
-                leading: IconButton(
-                    onPressed: () {
-                      HiveDataBase().isdone(widget._note, widget._note.isDone);
-                    },
-                    icon: widget._note.isDone
-                        ? const Icon(Icons.expand_circle_down_rounded)
-                        : const Icon(Icons.expand_circle_down_outlined))),
-          )),
+          leading: IconButton(
+              onPressed: () {
+                HiveDataBase().isdone(widget._note, widget._note.isDone);
+              },
+              icon: widget._note.isDone
+                  ? const Icon(Icons.expand_circle_down_rounded)
+                  : const Icon(Icons.expand_circle_down_outlined))),
     );
   }
 
@@ -214,12 +130,14 @@ class _TaskWidgetState extends State<TaskWidget> {
                     HiveDataBase().deleteNote(widget._note);
                     Navigator.of(context).pop(context);
                   },
-                  child: const Text('Удалить')),
+                  child: const Text('Удалить',
+                      style: TextStyle(color: Colors.black))),
               TextButton(
                   onPressed: () {
                     Navigator.of(context).pop(context);
                   },
-                  child: const Text('Отмена')),
+                  child: const Text('Отмена',
+                      style: TextStyle(color: Colors.black))),
             ],
           );
         });

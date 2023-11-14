@@ -15,7 +15,8 @@ class NoteAdapter extends TypeAdapter<Note> {
             reader.readInt()), // Convert to DateTime
         category: reader.readString(),
         isThisStar: reader.readBool(),
-        replayTime: reader.readString());
+        replayTime1: DateTime.fromMillisecondsSinceEpoch(reader.readInt()),
+        replayTime2: DateTime.fromMillisecondsSinceEpoch(reader.readInt()));
   }
 
   @override
@@ -26,6 +27,7 @@ class NoteAdapter extends TypeAdapter<Note> {
     writer.writeInt(obj.time.millisecondsSinceEpoch); // Convert to milliseconds
     writer.writeString(obj.category);
     writer.writeBool(obj.isThisStar);
-    writer.writeString(obj.replayTime);
+    writer.writeInt(obj.replayTime1.millisecondsSinceEpoch);
+    writer.writeInt(obj.replayTime2.millisecondsSinceEpoch);
   }
 }
