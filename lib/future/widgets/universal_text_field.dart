@@ -1,8 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:hive/hive.dart';
-import 'package:to_do/data/hive/note_category_data.dart';
 
-import 'package:to_do/domain/model/category_note.dart';
 
 // Widget universalTextFormField(
 //     TextEditingController controller,
@@ -47,7 +44,7 @@ import 'package:to_do/domain/model/category_note.dart';
 // }
 
 void showAlertDialog(
-    BuildContext context, TextEditingController categoryContoller, Box box) {
+    BuildContext context, TextEditingController categoryContoller) {
   showDialog(
       context: context,
       builder: (context) {
@@ -61,11 +58,11 @@ void showAlertDialog(
           actions: [
             TextButton(
                 onPressed: () {
-                  if (categoryContoller.text.isNotEmpty) {
-                    HiveCategoryDataBase().saveCategoryNote(CategoryNote(
-                        id: box.values.toList().length,
-                        category: categoryContoller.text));
-                  }
+                  // if (categoryContoller.text.isNotEmpty) {
+                  //   HiveCategoryDataBase().saveCategoryNote(CategoryNote(
+                  //       id: box.values.toList().length,
+                  //       category: categoryContoller.text));
+                  // }
 
                   Navigator.of(context).pop(context);
                 },

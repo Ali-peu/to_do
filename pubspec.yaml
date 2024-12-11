@@ -36,8 +36,6 @@ dependencies:
   uuid: ^4.1.0
   table_calendar: ^3.0.9
   fluttertoast: ^8.2.2
-  hive: ^2.2.3
-  hive_flutter: ^1.1.0
   google_sign_in: ^6.1.5 
   flutter_slidable: ^3.0.0
   syncfusion_flutter_charts: ^23.1.42
@@ -51,6 +49,8 @@ dependencies:
   go_router: ^14.6.2
   just_audio: ^0.9.35
   provider: ^6.1.2
+  drift: ^2.22.1
+  drift_flutter: ^0.1.0
  
   
   
@@ -82,6 +82,8 @@ dev_dependencies:
   flutter_test:
     sdk: flutter
   flutter_launcher_icons: "^0.13.1"
+  drift_dev: ^2.22.0
+  build_runner: ^2.4.13
  
   
 

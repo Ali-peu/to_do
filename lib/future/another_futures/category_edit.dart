@@ -1,12 +1,8 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
-import 'package:hive/hive.dart';
-import 'package:hive_flutter/adapters.dart';
-import 'package:to_do/data/hive/hive_data.dart';
-import 'package:to_do/data/hive/note_category_data.dart';
+import 'package:to_do/data/drift_datebase_providers/note_category_data.dart';
 import 'package:to_do/domain/model/category_note.dart';
-import 'package:to_do/domain/model/note.dart';
 
 class Editcategory extends StatefulWidget {
   const Editcategory({super.key});
@@ -16,21 +12,7 @@ class Editcategory extends StatefulWidget {
 }
 
 class _EditcategoryState extends State<Editcategory> {
-  final box = Hive.box<CategoryNote>('boxCategory');
   List<CategoryNote> categoryListNote = [];
-  final noteBox = Hive.box<Note>('box');
-
-  @override
-  void initState() {
-    super.initState();
-    noteBox;
-    categoryListNote = box.values.toList();
-    box.watch().listen((event) {
-      if (mounted) {
-        setState(() {}); // Обновляет экран не удалять
-      }
-    });
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -75,8 +57,7 @@ class _EditcategoryState extends State<Editcategory> {
             actions: [
               TextButton(
                   onPressed: () {
-                    if (HiveDataBase()
-                        .searchNoteWithCategory(categoryNote.category)) {
+                    if (false) {
                       showDialog(
                           context: context,
                           builder: (context) {
@@ -94,8 +75,8 @@ class _EditcategoryState extends State<Editcategory> {
                           });
                     }
 
-                    unawaited(HiveCategoryDataBase()
-                        .deleteCategoryNote(categoryNote));
+                    // unawaited(HiveCategoryDataBase()
+                    //     .deleteCategoryNote(categoryNote));
                     Navigator.pop(context);
                   },
                   child: const Text('Удалить')),

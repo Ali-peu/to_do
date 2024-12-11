@@ -2,21 +2,18 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
-import 'package:hive/hive.dart';
-import 'package:to_do/data/hive/hive_data.dart';
+import 'package:provider/provider.dart';
+import 'package:to_do/data/drift_datebase_providers/drift_database_provider_for_note.dart';
 
-import 'package:to_do/global/notification_app.dart';
-import 'package:to_do/configuration/validators/validador_text.dart';
 
 import 'package:to_do/domain/model/note.dart';
 import 'package:to_do/future/another_futures/timer_in_edit_task.dart';
 import 'package:timezone/timezone.dart' as tz;
-import 'package:to_do/future/widgets/timer_frame.dart';
 
 enum SampleItem { itemOne, itemTwo, itemThree, itemFourth }
 
 class EditTask extends StatefulWidget {
-  final Note _note;
+  final NoteModel _note;
   const EditTask(this._note, {super.key});
 
   @override
@@ -57,11 +54,11 @@ class _EditTaskState extends State<EditTask> {
   }
 
   void changeNoteStatus() {
-    unawaited(HiveDataBase().isdone(widget._note, widget._note.isDone));
+    unawaited(Provider.of<DriftDatebaseProviderForNote>(context,listen: false).updateNoteInDB(note: widget._note));
   }
 
   void deleteNote() {
-    unawaited(HiveDataBase().deleteNote(widget._note));
+    unawaited(Provider.of<DriftDatebaseProviderForNote>(context,listen: false).deleteNoteFromDB(id: widget._note.id));
     Navigator.pop(context);
   }
 
@@ -79,7 +76,7 @@ class _EditTaskState extends State<EditTask> {
     ).then((value) {
       setState(() {
         if (value != null) {
-          HiveDataBase().updateDatetime(widget._note, value);
+          changeNoteStatus();
         }
       });
     });
@@ -103,9 +100,9 @@ class _EditTaskState extends State<EditTask> {
               child: Column(children: [
                 taskTextforEdit(),
                 const Divider(),
-                editDate(),
+                // editDate(),
                 const Divider(),
-                rington(),
+                // rington(),
                 if (widget._note.replayTime1 != widget._note.time)
                   Column(
                     children: [
@@ -231,114 +228,114 @@ class _EditTaskState extends State<EditTask> {
     );
   }
 
-  InkWell rington() {
-    return InkWell(
-      onTap: () async {
-        TimeOfDay? timeToPick = await showTimePicker(
-            context: context,
-            initialTime: timeOfDay,
-            initialEntryMode: TimePickerEntryMode.dialOnly);
-        if (timeToPick == null) return;
-        setState(() {
-          // починить что то сделал сам не понял
+  // InkWell rington() {
+  //   return InkWell(
+  //     onTap: () async {
+  //       TimeOfDay? timeToPick = await showTimePicker(
+  //           context: context,
+  //           initialTime: timeOfDay,
+  //           initialEntryMode: TimePickerEntryMode.dialOnly);
+  //       if (timeToPick == null) return;
+  //       setState(() {
+  //         // починить что то сделал сам не понял
 
-          timeOfDayToNotification = subtractMinutes(timeToPick, 5);
-          var timeToPickDate = DateTime(
-              widget._note.time.year,
-              widget._note.time.month,
-              widget._note.time.day,
-              timeToPick.hour,
-              timeToPick.minute);
-          var timeToPickDate2 = DateTime(
-              widget._note.time.year,
-              widget._note.time.month,
-              widget._note.time.day,
-              timeToPick.hour,
-              timeToPick.minute - 5);
-          unawaited(
-              HiveDataBase().updateReplayTime(widget._note, timeToPickDate));
-          unawaited(
-              HiveDataBase().updateReplayTime2(widget._note, timeToPickDate2));
-          dateTime = DateTime(
-              DateTime.now().year,
-              DateTime.now().month,
-              DateTime.now().day,
-              timeOfDayToNotification.hour,
-              timeOfDayToNotification.minute);
-        });
-        NotificationApi.showScheduleNotification(
-            title: "Schedule Notification",
-            body: "This is a Schedule Notification",
-            payload: "This is schedule data",
-            datetime: dateTime,
-            local: local);
-      },
-      child: SizedBox(
-        height: 60,
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            const Icon(Icons.access_time),
-            const Flexible(
-              child: Align(
-                alignment: Alignment.centerLeft,
-                child: Text(
-                  'Время & Напоминание',
-                ),
-              ),
-            ),
-            Text(
-              widget._note.replayTime1 == widget._note.time
-                  ? "Нет"
-                  : TimeOfDay.fromDateTime(widget._note.replayTime1).toString(),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
+  //         timeOfDayToNotification = subtractMinutes(timeToPick, 5);
+  //         var timeToPickDate = DateTime(
+  //             widget._note.time.year,
+  //             widget._note.time.month,
+  //             widget._note.time.day,
+  //             timeToPick.hour,
+  //             timeToPick.minute);
+  //         var timeToPickDate2 = DateTime(
+  //             widget._note.time.year,
+  //             widget._note.time.month,
+  //             widget._note.time.day,
+  //             timeToPick.hour,
+  //             timeToPick.minute - 5);
+  //         unawaited(
+  //             HiveDataBase().updateReplayTime(widget._note, timeToPickDate));
+  //         unawaited(
+  //             HiveDataBase().updateReplayTime2(widget._note, timeToPickDate2));
+  //         dateTime = DateTime(
+  //             DateTime.now().year,
+  //             DateTime.now().month,
+  //             DateTime.now().day,
+  //             timeOfDayToNotification.hour,
+  //             timeOfDayToNotification.minute);
+  //       });
+  //       NotificationApi.showScheduleNotification(
+  //           title: "Schedule Notification",
+  //           body: "This is a Schedule Notification",
+  //           payload: "This is schedule data",
+  //           datetime: dateTime,
+  //           local: local);
+  //     },
+  //     child: SizedBox(
+  //       height: 60,
+  //       child: Row(
+  //         mainAxisAlignment: MainAxisAlignment.spaceBetween,
+  //         children: [
+  //           const Icon(Icons.access_time),
+  //           const Flexible(
+  //             child: Align(
+  //               alignment: Alignment.centerLeft,
+  //               child: Text(
+  //                 'Время & Напоминание',
+  //               ),
+  //             ),
+  //           ),
+  //           Text(
+  //             widget._note.replayTime1 == widget._note.time
+  //                 ? "Нет"
+  //                 : TimeOfDay.fromDateTime(widget._note.replayTime1).toString(),
+  //           ),
+  //         ],
+  //       ),
+  //     ),
+  //   );
+  // }
 
-  InkWell editDate() {
-    return InkWell(
-      onTap: () async {
-        updateTime = await MyCustomCalendar().showCustomDatePickerPac(context);
-        setState(() {
-          updateTime;
-        });
-        HiveDataBase()
-            .updateDatetime(widget._note, updateTime ?? widget._note.time);
+  // InkWell editDate() {
+  //   return InkWell(
+  //     onTap: () async {
+  //       updateTime = await MyCustomCalendar().showCustomDatePickerPac(context);
+  //       setState(() {
+  //         updateTime;
+  //       });
+  //       HiveDataBase()
+  //           .updateDatetime(widget._note, updateTime ?? widget._note.time);
 
-        HiveDataBase().updateReplayTime(widget._note, dateTime);
-      },
-      child: SizedBox(
-        height: 60,
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            const Icon(
-              Icons.calendar_month_outlined,
-            ),
-            const Flexible(
-              child: Align(
-                alignment: Alignment.centerLeft,
-                child: Text(
-                  "Срок по задаче",
-                ),
-              ),
-            ),
-            Container(
-              decoration: BoxDecoration(borderRadius: BorderRadius.circular(5)),
-              child: Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: Text(
-                    dateTimeDeleteSeconds(widget._note.time.toString()),
-                  )),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
+  //       HiveDataBase().updateReplayTime(widget._note, dateTime);
+  //     },
+  //     child: SizedBox(
+  //       height: 60,
+  //       child: Row(
+  //         mainAxisAlignment: MainAxisAlignment.spaceBetween,
+  //         children: [
+  //           const Icon(
+  //             Icons.calendar_month_outlined,
+  //           ),
+  //           const Flexible(
+  //             child: Align(
+  //               alignment: Alignment.centerLeft,
+  //               child: Text(
+  //                 "Срок по задаче",
+  //               ),
+  //             ),
+  //           ),
+  //           Container(
+  //             decoration: BoxDecoration(borderRadius: BorderRadius.circular(5)),
+  //             child: Padding(
+  //                 padding: const EdgeInsets.all(8.0),
+  //                 child: Text(
+  //                   dateTimeDeleteSeconds(widget._note.time.toString()),
+  //                 )),
+  //           ),
+  //         ],
+  //       ),
+  //     ),
+  //   );
+  // }
 
   Widget taskTextforEdit() {
     return TextField(
@@ -360,8 +357,8 @@ class _EditTaskState extends State<EditTask> {
         if (taskText!.text.isEmpty) {
           return _showSnackbar();
         }
-
-        unawaited(HiveDataBase().update(widget._note, taskText!.text));
+        changeNoteStatus();
+        // unawaited().update(widget._note, taskText!.text));
         Navigator.pop(context);
       },
     );

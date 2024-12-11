@@ -1,6 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:hive/hive.dart';
-import 'package:to_do/domain/model/note.dart';
 
 String? emailCheck(String? email) {
   if (email == null || email.isEmpty) {
@@ -152,14 +150,14 @@ TimeOfDay replayTimeToTimeOFDay(String time) {
   return noteTime;
 }
 
-int countNotesInThisWeek(Box<Note> box) {
-  List<Note> noteList = box.values
-      .where((element) =>
-          !element.isDone &&
-          element.time
-              .isAfter(element.time.subtract(const Duration(days: 3))) &&
-          element.time.isBefore(element.time.add(const Duration(days: 3))))
-      .toList();
+// int countNotesInThisWeek(Box<Note> box) {
+//   List<Note> noteList = box.values
+//       .where((element) =>
+//           !element.isDone &&
+//           element.time
+//               .isAfter(element.time.subtract(const Duration(days: 3))) &&
+//           element.time.isBefore(element.time.add(const Duration(days: 3))))
+//       .toList();
 
-  return noteList.length;
-}
+//   return noteList.length;
+// }

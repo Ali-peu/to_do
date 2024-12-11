@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:hive/hive.dart';
 import 'package:to_do/configuration/validators/validador_text.dart';
 // import 'package:syncfusion_flutter_charts/charts.dart';
 import '../../domain/model/note.dart';
@@ -12,13 +11,11 @@ class AccountPage extends StatefulWidget {
 }
 
 class _AccountPageState extends State<AccountPage> {
-  final box = Hive.box<Note>('box');
 
   @override
   void initState() {
     super.initState();
 
-    box.watch().listen((event) {});
   }
 
   @override
@@ -53,11 +50,7 @@ class _AccountPageState extends State<AccountPage> {
                 child: Column(
                     mainAxisAlignment: MainAxisAlignment.spaceAround,
                     children: [
-                      Text(
-                        box.values
-                            .where((element) => element.isDone)
-                            .length
-                            .toString(),
+                      Text(''
                       ),
                       const Text('Выполненные задачи')
                     ]),
@@ -69,8 +62,7 @@ class _AccountPageState extends State<AccountPage> {
                     mainAxisAlignment: MainAxisAlignment.spaceAround,
                     children: [
                       Text(
-                        countNotesInThisWeek(box).toString(),
-                      ),
+'0'                      ),
                       const Text('Невыполненные задачи')
                     ]),
               ),

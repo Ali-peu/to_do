@@ -4,7 +4,7 @@ import 'package:to_do/configuration/validators/validador_text.dart';
 import 'package:to_do/domain/model/note.dart';
 
 class TaskWidgetForCalendar extends StatelessWidget {
-  final Note _note;
+  final NoteModel _note;
   const TaskWidgetForCalendar(this._note, {super.key});
 
   @override

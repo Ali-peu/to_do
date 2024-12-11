@@ -1,9 +1,8 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
-import 'package:hive/hive.dart';
-import 'package:to_do/data/hive/hive_data.dart';
-import 'package:to_do/data/hive/note_category_data.dart';
+import 'package:to_do/data/drift_datebase_providers/drift_database_provider_for_note.dart';
+import 'package:to_do/data/drift_datebase_providers/note_category_data.dart';
 import 'package:to_do/domain/model/category_note.dart';
 
 import 'package:to_do/domain/model/note.dart';
@@ -19,20 +18,8 @@ class AddTask extends StatefulWidget {
 }
 
 class _AddTaskState extends State<AddTask> {
-  final box = Hive.box<CategoryNote>('boxCategory');
 
-  @override
-  void initState() {
-    super.initState();
 
-    HiveCategoryDataBase().initBoxCategory();
-    categoryListNote = box.values.toList();
-    box.watch().listen((event) {
-      if (mounted) {
-        setState(() {});
-      }
-    });
-  }
 
   final subtitle = TextEditingController();
   final categoryContoller = TextEditingController();
@@ -45,8 +32,7 @@ class _AddTaskState extends State<AddTask> {
 
   String category = 'All';
 
-  late var firstValueCategory =
-      box.values.where((element) => element.category == 'All').first;
+  late var firstValueCategory = CategoryNote(id: 0, category: category);
 
   DateTime replayTime = MyCustomCalendar().replayTime == null
       ? DateTime.now()
@@ -54,20 +40,17 @@ class _AddTaskState extends State<AddTask> {
 
   final FocusNode _focusNode2 = FocusNode();
   void saveTask() async {
-    Hive.box<Note>('box');
-    setState(() {
-      selectedDate; // Проверить нужен ли
-    });
+   
 
-    unawaited(HiveDataBase().saveNote(Note(
-        description: subtitle.text,
-        id: const Uuid().v4(),
-        isDone: false,
-        time: selectedDate,
-        category: firstValueCategory.category,
-        isThisStar: false,
-        replayTime1: replayTime,
-        replayTime2: replayTime)));
+    // unawaited(HiveDataBase().saveNote(Note(
+    //     description: subtitle.text,
+    //     id: const Uuid().v4(),
+    //     isDone: false,
+    //     time: selectedDate,
+    //     category: firstValueCategory.category,
+    //     isThisStar: false,
+    //     replayTime1: replayTime,
+    //     replayTime2: replayTime)));
   }
 
   @override
@@ -133,7 +116,7 @@ class _AddTaskState extends State<AddTask> {
           icon: const Visibility(visible: false, child: Text('')),
           onChanged: (value) {
             if (value == 0) {
-              showAlertDialog(context, categoryContoller, box);
+              showAlertDialog(context, categoryContoller);
             }
             setState(() {
               _dropDownButtonValue = value!;
@@ -141,7 +124,7 @@ class _AddTaskState extends State<AddTask> {
             });
           },
           value: _dropDownButtonValue,
-          items: box.values.map((e) => dropdownButtonForCategory(e)).toList()),
+          items: []),
     );
   }
 

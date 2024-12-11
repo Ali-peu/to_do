@@ -1,13 +1,17 @@
-class Note {
+import 'package:drift/drift.dart';
+import 'package:to_do/data/drift/drift_db.dart';
+
+class NoteModel {
   String description;
-  String id;
+  int id;
   DateTime time;
   bool isDone;
   String category;
   bool isThisStar;
   DateTime replayTime1;
   DateTime replayTime2;
-  Note({
+
+  NoteModel({
     required this.description,
     required this.id,
     required this.isDone,
@@ -18,16 +22,29 @@ class Note {
     required this.replayTime2,
   });
 
-  // factory Note.fromJson(Map<String, dynamic> json) { Пока не нужен потому что я никуда данные не отправляю
-  //   return Note(
-  //     description: json['description'],
-  //     id: json['id'],
-  //     time: json['time'],
-  //     isDone: json['isDone'],
-  //     category: json['category'],
-  //     isThisStar: json['isThisStar'],
-  //     replayTime1: json
+  static NotesCompanion toCompanion(NoteModel note) {
+    return NotesCompanion(
+      id: Value(note.id),
+      description: Value(note.description),
+      isDone: Value(note.isDone),
+      category: Value(note.category),
+      isThisStar: Value(note.isThisStar),
+      time: Value(note.time),
+      replayTime1: Value(note.replayTime1),
+      replayTime2: Value(note.replayTime2),
+    );
+  }
 
-  //   );
-  // }
+  static NoteModel fromCompanion(Note note) {
+      return NoteModel(
+        id: (note.id),
+        description: (note.description),
+        isDone: (note.isDone),
+        category: (note.category),
+        isThisStar: (note.isThisStar),
+        time: (note.time),
+        replayTime1: (note.replayTime1),
+        replayTime2: (note.replayTime2),
+      );
+  }
 }

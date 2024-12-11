@@ -3,11 +3,9 @@ import 'dart:async';
 // import 'package:circle_checkbox/redev_checkbox.dart';
 import 'package:flutter/material.dart';
 
-import 'package:hive/hive.dart';
-import 'package:hive_flutter/adapters.dart';
 import 'package:provider/provider.dart';
-import 'package:to_do/data/hive/hive_data.dart';
-import 'package:to_do/data/hive/note_category_data.dart';
+import 'package:to_do/data/drift_datebase_providers/drift_database_provider_for_note.dart';
+import 'package:to_do/data/drift_datebase_providers/note_category_data.dart';
 import 'package:to_do/global/theme.dart';
 import 'package:to_do/configuration/validators/validador_text.dart';
 import 'package:to_do/domain/model/category_note.dart';
@@ -29,8 +27,6 @@ class _TaskPageState extends State<TaskPage> {
   ThemeProvider notifier = ThemeProvider();
   // String chooseCategory = 'All';
 
-  final notesBox = Hive.box<Note>('box');
-  final box = Hive.box<CategoryNote>('boxCategory');
   List<CategoryNote> categoryListNote = [];
 
   List<String> sortVariable = [
@@ -48,24 +44,7 @@ class _TaskPageState extends State<TaskPage> {
 
   TextEditingController searchController = TextEditingController();
 
-  @override
-  void initState() {
-    super.initState();
-
-    HiveCategoryDataBase().initBoxCategory();
-    categoryListNote = box.values.toList();
-
-    notesBox.watch().listen((event) {
-      if (mounted) {
-        setState(() {}); // Обновляет экран не удалять
-      }
-    });
-    box.watch().listen((event) {
-      if (mounted) {
-        setState(() {});
-      }
-    });
-  }
+  
 
   PopUpMenu? selectedMenu;
 
@@ -87,7 +66,7 @@ class _TaskPageState extends State<TaskPage> {
   Widget build(BuildContext context) {
     return ChangeNotifierProvider(
         create: (context) => ThemeProvider(),
-        child: Scaffold(appBar: buildAppBar(), body: buildTaskList(notesBox)));
+        child: Scaffold(appBar: buildAppBar(), body: buildTaskList()));
   }
 
   AppBar buildAppBar() {
@@ -132,16 +111,17 @@ class _TaskPageState extends State<TaskPage> {
     );
   }
 
-  Widget buildTaskList(Box<Note> box) {
-    List<Note> taskList = box.values
-        .where((element) => isTaskInCategory(element, notifier.category))
-        .toList();
+  Widget buildTaskList() {
+    List<NoteModel> taskList = []; 
+    // Provider.of<DriftDatebaseProviderForNote>(context,listen: false).rea .values
+    //     .where((element) => isTaskInCategory(element, notifier.category))
+    //     .toList();
 
-    List<Note> today = taskList.where((element) => isToday(element)).toList();
-    List<Note> past = taskList.where((element) => isPastTask(element)).toList();
-    List<Note> future =
+    List<NoteModel> today = taskList.where((element) => isToday(element)).toList();
+    List<NoteModel> past = taskList.where((element) => isPastTask(element)).toList();
+    List<NoteModel> future =
         taskList.where((element) => isFutureTask(element)).toList();
-    List<Note> todayAndDone =
+    List<NoteModel> todayAndDone =
         taskList.where((element) => isTodayAndDone(element)).toList();
 
     // setState(() { не нужен вроде
@@ -171,7 +151,7 @@ class _TaskPageState extends State<TaskPage> {
   }
 
   Widget buildExpansionTile(
-      String title, List<Note> taskList, int currentIndex1) {
+      String title, List<NoteModel> taskList, int currentIndex1) {
     setState(() {
       taskList; //НАДО ли тут обновлять?
     });
@@ -288,7 +268,7 @@ class _TaskPageState extends State<TaskPage> {
         PopupMenuItem<PopUpMenu>(
           value: PopUpMenu.deleteAll,
           onTap: () {
-            unawaited(HiveDataBase().deleteAll());
+            // unawaited(HiveDataBase().deleteAll());
           },
           child: const Text('Удалить все задании'),
         ),
@@ -296,7 +276,7 @@ class _TaskPageState extends State<TaskPage> {
     );
   }
 
-  void sortingList(String sortValue, List<Note> noteList) {
+  void sortingList(String sortValue, List<NoteModel> noteList) {
     switch (sortValue) {
       case 'Срок и время':
         noteList.sort((a, b) => a.time.compareTo(b.time));
@@ -317,29 +297,28 @@ class _TaskPageState extends State<TaskPage> {
     }
   }
 
-  bool isTaskInCategory(Note note, String category) {
+  bool isTaskInCategory(NoteModel note, String category) {
     return category == 'All' || note.category == category;
   }
 
-  bool isToday(Note note) {
+  bool isToday(NoteModel note) {
     return boolCheckDeaadline(note.time) && !note.isDone;
   }
 
-  bool isPastTask(Note note) {
+  bool isPastTask(NoteModel note) {
     return checkThisIsPastTask(note.time);
   }
 
-  bool isFutureTask(Note note) {
+  bool isFutureTask(NoteModel note) {
     return note.time.isAfter(DateTime.now());
   }
 
-  bool isTodayAndDone(Note note) {
+  bool isTodayAndDone(NoteModel note) {
     return boolCheckDeaadline(note.time) && note.isDone;
   }
 }
 
 class MySearchDelegate extends SearchDelegate {
-  final box = Hive.box<Note>('box');
 
   @override
   Widget buildLeading(BuildContext context) => IconButton(
@@ -363,23 +342,27 @@ class MySearchDelegate extends SearchDelegate {
   Widget buildResults(BuildContext context) {
     return ListView(
         //taskList.map<Widget>((note) => TaskWidget(note)).toList(),
-        children: box.values
-            .where((element) =>
-                element.description.toLowerCase().contains(query.toLowerCase()))
-            .toList()
-            .map<Widget>((note) => TaskWidget(note))
-            .toList());
+        children:  []
+        // box.values
+        //     .where((element) =>
+        //         element.description.toLowerCase().contains(query.toLowerCase()))
+        //     .toList()
+        //     .map<Widget>((note) => TaskWidget(note))
+        //     .toList()
+            );
   }
 
   @override
   Widget buildSuggestions(BuildContext context) {
     return ListView(
         //taskList.map<Widget>((note) => TaskWidget(note)).toList(),
-        children: box.values
-            .where((element) =>
-                element.description.toLowerCase().contains(query.toLowerCase()))
-            .toList()
-            .map<Widget>((note) => TaskWidget(note))
-            .toList());
+        children: []
+        //  box.values
+        //     .where((element) =>
+        //         element.description.toLowerCase().contains(query.toLowerCase()))
+        //     .toList()
+        //     .map<Widget>((note) => TaskWidget(note))
+        //     .toList()
+            );
   }
 }

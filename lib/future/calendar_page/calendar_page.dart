@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:hive/hive.dart';
 import 'package:table_calendar/table_calendar.dart';
 
 import 'package:to_do/domain/model/note.dart';
@@ -16,7 +15,7 @@ class _CalendarPageState extends State<CalendarPage> {
   late DateTime _selectedDay = DateTime.now();
   DateTime _focusedDay = DateTime.now();
   CalendarFormat _calendarFormat = CalendarFormat.month;
-  Future<Box<Note>> listTask = Hive.openBox<Note>('box');
+  Future<List<NoteModel>> listTask = Future.value([]);
 
   @override
   void initState() {
@@ -53,19 +52,18 @@ class _CalendarPageState extends State<CalendarPage> {
             ),
           ),
           Flexible(
-            child: FutureBuilder(
+            child: FutureBuilder<List<NoteModel>>(
                 future: listTask,
-                initialData: Hive.box<Note>('box'),
-                builder: (BuildContext context, AsyncSnapshot<Box<Note>> box) {
-                  if (box.data == null || box.data!.isEmpty) {
+                initialData: const [],
+                builder: ( context,  snapshot) {
+                  if (snapshot.data == null || snapshot.data!.isEmpty) {
                     return const Center(
                       child: Text(
                         'У вас нет задач на этот день',
                       ),
                     );
                   } else {
-                    List<Note> dateNotes = box.data!.values
-                        .where((element) =>
+                    List<NoteModel> dateNotes = snapshot.data!.where((element) =>
                             DateUtils.dateOnly(element.time) ==
                             DateUtils.dateOnly(_focusedDay))
                         .toList();

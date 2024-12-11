@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:fluttertoast/fluttertoast.dart';
-import 'package:to_do/data/hive/hive_data.dart';
+import 'package:to_do/data/drift_datebase_providers/drift_database_provider_for_note.dart';
 
 import 'package:to_do/global/edit_task.dart';
 import 'package:to_do/configuration/validators/validador_text.dart';
@@ -10,7 +10,7 @@ import 'package:to_do/domain/model/note.dart';
 import 'package:to_do/future/widgets/timer_frame.dart';
 
 class TaskWidget extends StatefulWidget {
-  final Note _note;
+  final NoteModel _note;
   const TaskWidget(this._note, {super.key});
 
   @override
@@ -42,7 +42,7 @@ class _TaskWidgetState extends State<TaskWidget> {
                 onPressed: (context) async {
                   DateTime? selectedTime =
                       await MyCustomCalendar().showCustomDatePickerPac(context);
-                  HiveDataBase().updateDatetime(widget._note, selectedTime ?? DateTime.now());
+                  // HiveDataBase().updateDatetime(widget._note, selectedTime ?? DateTime.now());
                 },
                 backgroundColor: const Color.fromARGB(255, 66, 141, 232),
                 foregroundColor: Colors.white,
@@ -50,10 +50,12 @@ class _TaskWidgetState extends State<TaskWidget> {
                 label: 'Data',
               ),
               SlidableAction(
-                onPressed: (context) => (HiveDataBase().starNote(
-                  widget._note,
-                  widget._note.isThisStar,
-                )),
+                onPressed: (context) =>(){},
+                //  (HiveDataBase().starNote(
+                  // widget._note,
+                  // widget._note.isThisStar,
+                // )),
+              
                 backgroundColor: const Color.fromARGB(255, 233, 242, 61),
                 foregroundColor: Colors.white,
                 icon: widget._note.isThisStar ? Icons.star : Icons.star_border,
@@ -110,7 +112,7 @@ class _TaskWidgetState extends State<TaskWidget> {
                 ),
           leading: IconButton(
               onPressed: () {
-                HiveDataBase().isdone(widget._note, widget._note.isDone);
+                // HiveDataBase().isdone(widget._note, widget._note.isDone);
               },
               icon: widget._note.isDone
                   ? const Icon(Icons.expand_circle_down_rounded)
@@ -127,7 +129,7 @@ class _TaskWidgetState extends State<TaskWidget> {
             actions: [
               TextButton(
                   onPressed: () {
-                    HiveDataBase().deleteNote(widget._note);
+                    // HiveDataBase().deleteNote(widget._note);
                     Navigator.of(context).pop(context);
                   },
                   child: const Text('Удалить',

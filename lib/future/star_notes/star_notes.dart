@@ -1,8 +1,5 @@
-import 'dart:async';
 
 import 'package:flutter/material.dart';
-import 'package:hive/hive.dart';
-import 'package:to_do/data/hive/hive_data.dart';
 import 'package:to_do/domain/model/note.dart';
 
 class StarNotePages extends StatefulWidget {
@@ -13,21 +10,9 @@ class StarNotePages extends StatefulWidget {
 }
 
 class _StarNotePagesState extends State<StarNotePages> {
-  @override
-  void initState() {
-    super.initState();
-    starMotes =
-        box.values.where((element) => element.isThisStar == true).toList();
-    box.watch().listen((event) {
-      if (mounted) {
-        setState(() {});
-      }
-    });
-  }
 
-  List<Note> starMotes = [];
+  List<NoteModel> starMotes = [];
 
-  final box = Hive.box<Note>('box');
   @override
   Widget build(BuildContext context) {
     List<Widget> content;
@@ -42,7 +27,7 @@ class _StarNotePagesState extends State<StarNotePages> {
               Icons.delete,
             ),
             onPressed: () {
-              unawaited(HiveDataBase().starNote(element, element.isThisStar));
+              // unawaited(HiveDataBase().starNote(element, element.isThisStar));
             },
           ),
         );
