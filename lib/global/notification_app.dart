@@ -19,7 +19,8 @@ class NotificationApi {
         AndroidInitializationSettings('@mipmap/ic_launcher');
     final DarwinInitializationSettings initializationSettingsDarwin =
         DarwinInitializationSettings(
-            onDidReceiveLocalNotification: ((id, title, body, payload) {}));
+            // onDidReceiveLocalNotification: ((id, title, body, payload) {})
+            );
     const LinuxInitializationSettings initializationSettingsLinux =
         LinuxInitializationSettings(defaultActionName: 'Open notification');
     final InitializationSettings initializationSettings =

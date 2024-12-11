@@ -1,6 +1,6 @@
 import 'dart:async';
 
-import 'package:circle_checkbox/redev_checkbox.dart';
+// import 'package:circle_checkbox/redev_checkbox.dart';
 import 'package:flutter/material.dart';
 
 import 'package:hive/hive.dart';
@@ -244,16 +244,17 @@ class _TaskPageState extends State<TaskPage> {
                                         padding: const EdgeInsets.all(8.0),
                                         child: Text(sortVariable[index]),
                                       ),
-                                      leading: CircleCheckbox(
-                                        value: sortValueChoise,
-                                        onChanged: (newValue) {
-                                          setState(() {
-                                            sortValueChoise = newValue;
-                                          });
-                                          setSelectedSortValue(
-                                              sortVariable[index]);
-                                        },
-                                      ),
+                                      // leading:
+                                      // CircleCheckbox(
+                                      //   value: sortValueChoise,
+                                      //   onChanged: (newValue) {
+                                      //     setState(() {
+                                      //       sortValueChoise = newValue;
+                                      //     });
+                                      //     setSelectedSortValue(
+                                      //         sortVariable[index]);
+                                      //   },
+                                      // ),
                                     );
                                   },
                                 ),

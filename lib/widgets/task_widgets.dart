@@ -42,7 +42,7 @@ class _TaskWidgetState extends State<TaskWidget> {
                 onPressed: (context) async {
                   DateTime? selectedTime =
                       await MyCustomCalendar().showCustomDatePickerPac(context);
-                  HiveDataBase().updateDatetime(widget._note, selectedTime!);
+                  HiveDataBase().updateDatetime(widget._note, selectedTime ?? DateTime.now());
                 },
                 backgroundColor: const Color.fromARGB(255, 66, 141, 232),
                 foregroundColor: Colors.white,
