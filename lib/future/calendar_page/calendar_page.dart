@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:hive/hive.dart';
 import 'package:table_calendar/table_calendar.dart';
 
-import 'package:to_do/model/note.dart';
-import 'package:to_do/widgets/task_widget_for_calendar_page.dart';
+import 'package:to_do/domain/model/note.dart';
+import 'package:to_do/future/widgets/task_widget_for_calendar_page.dart';
 
 class CalendarPage extends StatefulWidget {
   const CalendarPage({Key? key}) : super(key: key);

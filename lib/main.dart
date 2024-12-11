@@ -7,15 +7,15 @@ import 'package:to_do/data/theme/theme_app.dart';
 
 import 'package:to_do/global/notification_app.dart';
 import 'package:to_do/global/theme.dart';
-import 'package:to_do/model/category_adapter.dart';
-import 'package:to_do/model/category_note.dart';
-import 'package:to_do/model/note.dart';
-import 'package:to_do/model/note_adapter.dart';
+import 'package:to_do/domain/model/category_adapter.dart';
+import 'package:to_do/domain/model/category_note.dart';
+import 'package:to_do/domain/model/note.dart';
+import 'package:to_do/domain/model/note_adapter.dart';
 
 import 'package:to_do/data/hive/note_category_data.dart';
 
 import 'package:timezone/data/latest.dart' as tz;
-import 'package:to_do/page/home.dart';
+import 'package:to_do/future/another_futures/home.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();

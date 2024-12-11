@@ -4,10 +4,10 @@ import 'package:fluttertoast/fluttertoast.dart';
 import 'package:to_do/data/hive/hive_data.dart';
 
 import 'package:to_do/global/edit_task.dart';
-import 'package:to_do/global/validador_text.dart';
-import 'package:to_do/model/note.dart';
+import 'package:to_do/configuration/validators/validador_text.dart';
+import 'package:to_do/domain/model/note.dart';
 
-import 'package:to_do/widgets/timer_frame.dart';
+import 'package:to_do/future/widgets/timer_frame.dart';
 
 class TaskWidget extends StatefulWidget {
   final Note _note;

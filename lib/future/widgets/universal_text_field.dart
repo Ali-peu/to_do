@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:hive/hive.dart';
 import 'package:to_do/data/hive/note_category_data.dart';
 
-import 'package:to_do/model/category_note.dart';
+import 'package:to_do/domain/model/category_note.dart';
 
 // Widget universalTextFormField(
 //     TextEditingController controller,

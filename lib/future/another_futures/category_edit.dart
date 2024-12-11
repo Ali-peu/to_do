@@ -5,8 +5,8 @@ import 'package:hive/hive.dart';
 import 'package:hive_flutter/adapters.dart';
 import 'package:to_do/data/hive/hive_data.dart';
 import 'package:to_do/data/hive/note_category_data.dart';
-import 'package:to_do/model/category_note.dart';
-import 'package:to_do/model/note.dart';
+import 'package:to_do/domain/model/category_note.dart';
+import 'package:to_do/domain/model/note.dart';
 
 class Editcategory extends StatefulWidget {
   const Editcategory({super.key});

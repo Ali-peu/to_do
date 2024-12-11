@@ -1,5 +1,5 @@
 import 'package:hive/hive.dart';
-import 'package:to_do/model/category_note.dart';
+import 'package:to_do/domain/model/category_note.dart';
 
 class HiveCategoryDataBase {
   final box = Hive.box<CategoryNote>('boxCategory');

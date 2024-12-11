@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
-import 'package:to_do/global/validador_text.dart';
-import 'package:to_do/model/note.dart';
+import 'package:to_do/configuration/validators/validador_text.dart';
+import 'package:to_do/domain/model/note.dart';
 
 class TaskWidgetForCalendar extends StatelessWidget {
   final Note _note;

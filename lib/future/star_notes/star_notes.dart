@@ -3,7 +3,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:hive/hive.dart';
 import 'package:to_do/data/hive/hive_data.dart';
-import 'package:to_do/model/note.dart';
+import 'package:to_do/domain/model/note.dart';
 
 class StarNotePages extends StatefulWidget {
   const StarNotePages({super.key});

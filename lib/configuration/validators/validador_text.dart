@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:hive/hive.dart';
-import 'package:to_do/model/note.dart';
+import 'package:to_do/domain/model/note.dart';
 
 String? emailCheck(String? email) {
   if (email == null || email.isEmpty) {

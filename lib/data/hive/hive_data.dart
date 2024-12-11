@@ -2,7 +2,7 @@ import 'dart:async';
 
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:hive/hive.dart';
-import 'package:to_do/model/note.dart';
+import 'package:to_do/domain/model/note.dart';
 
 class HiveDataBase {
   final box = Hive.box<Note>('box');

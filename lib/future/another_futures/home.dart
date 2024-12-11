@@ -3,18 +3,18 @@ import 'package:hive/hive.dart';
 import 'package:hive_flutter/adapters.dart';
 import 'package:provider/provider.dart';
 import 'package:to_do/global/theme.dart';
-import 'package:to_do/model/category_note.dart';
+import 'package:to_do/domain/model/category_note.dart';
 
-import 'package:to_do/model/note.dart';
-import 'package:to_do/page/account_page.dart';
+import 'package:to_do/domain/model/note.dart';
+import 'package:to_do/future/account_page/account_page.dart';
 
-import 'package:to_do/page/add_task_with_plus.dart';
-import 'package:to_do/page/app_theme_change_page.dart';
-import 'package:to_do/page/calendar_page.dart';
-import 'package:to_do/page/notifier.dart';
-import 'package:to_do/page/star_notes.dart';
-import 'package:to_do/page/task_page.dart';
-import 'package:to_do/widgets/universal_text_field.dart';
+import 'package:to_do/future/another_futures/add_task_with_plus.dart';
+import 'package:to_do/future/another_futures/app_theme_change_page.dart';
+import 'package:to_do/future/calendar_page/calendar_page.dart';
+import 'package:to_do/future/another_futures/notifier.dart';
+import 'package:to_do/future/star_notes/star_notes.dart';
+import 'package:to_do/future/task_page/task_page.dart';
+import 'package:to_do/future/widgets/universal_text_field.dart';
 
 class MyHomePage extends StatefulWidget {
   const MyHomePage({super.key});

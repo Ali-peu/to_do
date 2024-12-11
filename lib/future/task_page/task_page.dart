@@ -9,12 +9,12 @@ import 'package:provider/provider.dart';
 import 'package:to_do/data/hive/hive_data.dart';
 import 'package:to_do/data/hive/note_category_data.dart';
 import 'package:to_do/global/theme.dart';
-import 'package:to_do/global/validador_text.dart';
-import 'package:to_do/model/category_note.dart';
-import 'package:to_do/model/note.dart';
-import 'package:to_do/page/category_edit.dart';
-import 'package:to_do/page/notifier.dart';
-import 'package:to_do/widgets/task_widgets.dart';
+import 'package:to_do/configuration/validators/validador_text.dart';
+import 'package:to_do/domain/model/category_note.dart';
+import 'package:to_do/domain/model/note.dart';
+import 'package:to_do/future/another_futures/category_edit.dart';
+import 'package:to_do/future/another_futures/notifier.dart';
+import 'package:to_do/future/widgets/task_widgets.dart';
 
 class TaskPage extends StatefulWidget {
   const TaskPage({super.key});
