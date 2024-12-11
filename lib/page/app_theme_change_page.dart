@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:to_do/global/theme.dart';
-import 'package:to_do/global/theme_app.dart';
+import 'package:to_do/data/theme/theme_app.dart';
 
 class AppThemeChange extends StatelessWidget {
   // Темно-синяя тема

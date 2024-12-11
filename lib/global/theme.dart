@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:to_do/global/theme_app.dart';
+import 'package:to_do/data/theme/theme_app.dart';
 
 class ThemeProvider with ChangeNotifier {
   ThemeData _themeData = AppTheme.lightTheme; // начальная тема

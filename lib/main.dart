@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 
 import 'package:hive_flutter/adapters.dart';
 import 'package:provider/provider.dart';
+import 'package:to_do/data/router/app_router.dart';
+import 'package:to_do/data/theme/theme_app.dart';
 
 import 'package:to_do/global/notification_app.dart';
 import 'package:to_do/global/theme.dart';
@@ -39,10 +41,11 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final themeProvider = Provider.of<ThemeProvider>(context);
-    return MaterialApp(
-      debugShowCheckedModeBanner: false,
-      theme: themeProvider.themeData,
-      home: const MyHomePage(),
-    );
+    return MaterialApp.router(
+        routerConfig: router,
+        debugShowCheckedModeBanner: false,
+        theme: themeProvider.themeData
+        // home: const MyHomePage(),
+        );
   }
 }

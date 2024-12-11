@@ -19,8 +19,6 @@ class AppTheme {
       scrim: Colors.pink,
       onSecondary: Colors.blue.shade600,
       onSurface: Colors.blue,
-      background: Colors.blue,
-      onBackground: Colors.blue,
     ),
     unselectedWidgetColor: Colors.blue.shade700,
 
@@ -45,10 +43,16 @@ class AppTheme {
       backgroundColor: Colors.blue,
       foregroundColor: Colors.white,
     ),
+    navigationBarTheme: NavigationBarThemeData(
+        height: 70,
+        indicatorShape: OutlineInputBorder(
+          borderSide: BorderSide.none,
+        )),
     bottomNavigationBarTheme: BottomNavigationBarThemeData(
-      selectedItemColor: Colors.blue.shade600,
-      unselectedItemColor: Colors.grey,
-    ),
+        selectedItemColor: Colors.red.shade600,
+        unselectedItemColor: Colors.grey,
+        backgroundColor: Colors.amber,
+        landscapeLayout: BottomNavigationBarLandscapeLayout.linear),
     // Дополнительные стили для других элементов UI
   );
 
@@ -119,7 +123,4 @@ class AppTheme {
     ),
     // Дополнительные стили для других элементов UI
   );
-
-   
-   
 }
