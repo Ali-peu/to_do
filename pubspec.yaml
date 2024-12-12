@@ -51,6 +51,8 @@ dependencies:
   provider: ^6.1.2
   drift: ^2.22.1
   drift_flutter: ^0.1.0
+  surf_lint_rules: ^3.1.0
+
  
   
   

@@ -14,14 +14,16 @@ class NoteModel {
   final DateTime createdTime;
   final DateTime? updatedTime;
   final DateTime? deletedTime;
+  final List<int>? subNoteIdList;
 
   NoteModel({
     required this.description,
     required this.id,
     required this.isDone,
-    this.deadlineTime,
     required this.category,
     required this.isThisStar,
+    this.deadlineTime,
+    this.subNoteIdList,
     this.remindTime,
     DateTime? createdTime,
     this.deletedTime,

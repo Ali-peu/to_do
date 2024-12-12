@@ -1,14 +1,13 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:to_do/domain/model/category_note.dart';
 
 import 'package:to_do/future/task_screens/add_task_bottom_sheet/add_task_bottom_sheet_model_view.dart';
+import 'package:to_do/future/widgets/star_note_icon.dart';
 import 'package:to_do/future/widgets/timer_frame.dart';
-import 'package:to_do/future/widgets/universal_text_field.dart';
 
 class AddTaskBottomSheet extends StatefulWidget {
-  final AddTaskBottomSheetModelView addTaskBottomSheetModelView;
-  const AddTaskBottomSheet(
-      {super.key, required this.addTaskBottomSheetModelView});
+  const AddTaskBottomSheet({super.key});
 
   @override
   State<AddTaskBottomSheet> createState() => _AddTaskBottomSheetState();
@@ -19,29 +18,35 @@ class _AddTaskBottomSheetState extends State<AddTaskBottomSheet> {
       ? DateTime.now()
       : MyCustomCalendar().replayTime!;
 
+  late final AddTaskBottomSheetModelView addTaskBottomSheetModelView;
+
+  @override
+  void initState() {
+    super.initState();
+    addTaskBottomSheetModelView =
+        Provider.of<AddTaskBottomSheetModelView>(context, listen: false);
+  }
+
   Widget createButton() {
     return ElevatedButton(
         onPressed: () async {
-          if (widget.addTaskBottomSheetModelView.subtitle.text.isEmpty) {
+          if (addTaskBottomSheetModelView.subtitle.text.isEmpty) {
             return Navigator.pop(context);
           } else {
-            widget.addTaskBottomSheetModelView.createNote();
+            await addTaskBottomSheetModelView.createNote();
           }
         },
         style: ElevatedButton.styleFrom(
             shape: const CircleBorder(),
             padding: const EdgeInsets.all(20),
             iconColor: Colors.blue),
-        child: const Icon(
-          Icons.keyboard_double_arrow_up_outlined
-        ));
+        child: const Icon(Icons.keyboard_double_arrow_up_outlined));
   }
 
   Widget subtiteWidget() {
     return TextField(
-      maxLines: 1,
       autofocus: true,
-      controller: widget.addTaskBottomSheetModelView.subtitle,
+      controller: addTaskBottomSheetModelView.subtitle,
       decoration: const InputDecoration(
         contentPadding: EdgeInsets.symmetric(horizontal: 15, vertical: 15),
         hintText: 'Введите здесь новую задачу',
@@ -60,9 +65,7 @@ class _AddTaskBottomSheetState extends State<AddTaskBottomSheet> {
       onTap: () {
         setState(() {
           if (categoryNote.category == 'No category') {
-            // firstValueCategory.category = 'All';
           }
-          // firstValueCategory = categoryNote;
         });
       },
     );
@@ -89,40 +92,54 @@ class _AddTaskBottomSheetState extends State<AddTaskBottomSheet> {
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding:
-          EdgeInsets.only(bottom: MediaQuery.of(context).viewInsets.bottom),
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Flexible(
-              child: Container(
-                  decoration:
-                      BoxDecoration(borderRadius: BorderRadius.circular(5)),
-                  child: Padding(
-                    padding: const EdgeInsets.all(8.0),
-                    child: subtiteWidget(),
-                  ))),
-          Row(
-            children: [
-              Expanded(
-                  child: Row(children: [
-                // testDropMenu(),
-                IconButton(
-                  icon: const Icon(Icons.edit_calendar_outlined),
-                  onPressed: () async {
-                    final data  = await MyCustomCalendar()
-                            .showCustomDatePickerPac(context);
+    return Consumer<AddTaskBottomSheetModelView>(
+        builder: (context, value, child) {
+      return Padding(
+        padding:
+            EdgeInsets.only(bottom: MediaQuery.of(context).viewInsets.bottom),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Container(
+                height: MediaQuery.of(context).size.height * 0.1,
+                width: MediaQuery.of(context).size.width,
+                decoration:
+                    BoxDecoration(borderRadius: BorderRadius.circular(5)),
+                child: Padding(
+                  padding: const EdgeInsets.all(8),
+                  child: Row(
+                    children: [
+                      Flexible(child: subtiteWidget()),
+                      StarNoteIcon(
+                          onPressed: () {
+                            addTaskBottomSheetModelView.setStarNote();
+                          },
+                          isNoteStar: addTaskBottomSheetModelView.isThisStar)
+                    ],
+                  ),
+                )),
+            Row(
+              children: [
+                Expanded(
+                    child: Row(children: [
+                  // testDropMenu(),
 
-                    widget.addTaskBottomSheetModelView.setNewNoteDate(data);
-                  },
-                ),
-              ])),
-              createButton(),
-            ],
-          )
-        ],
-      ),
-    );
+                  IconButton(
+                      icon: addTaskBottomSheetModelView.selectedDeadlineTime ==
+                              null
+                          ? const Icon(Icons.edit_calendar_outlined)
+                          : Text(addTaskBottomSheetModelView
+                              .selectedDeadlineTime
+                              .toString()),
+                      onPressed: () =>
+                          addTaskBottomSheetModelView.setNewNoteDate(context))
+                ])),
+                createButton(),
+              ],
+            )
+          ],
+        ),
+      );
+    });
   }
 }

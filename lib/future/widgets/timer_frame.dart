@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
 
 // НЕ ОБНАВЛЯЕТСЯ _selectedTime
-class MyCustomCalendar {
+class MyCustomCalendar extends ChangeNotifier {
+  // final DateTime Function() callbackDateTime;
+  MyCustomCalendar();
+
   DateTime weekdayOf(DateTime time, int weekday) =>
       time.add(Duration(days: weekday - time.weekday));
   DateTime _selectedTime = DateTime.now();
@@ -20,10 +23,9 @@ class MyCustomCalendar {
     return showDialog<DateTime>(
       context: context,
       builder: (context) {
-        return StatefulBuilder(builder: (context, StateSetter setStater) {
+        return Builder(builder: (context) {
           return AlertDialog(
             content: SizedBox(
-              // Задайте подходящий размер контейнера
               width: double.maxFinite,
               child: Column(
                 mainAxisSize: MainAxisSize.min,
@@ -41,18 +43,15 @@ class MyCustomCalendar {
                     children: <Widget>[
                       // Добавьте свои кнопки здесь
                       calendartextButton(
-                        setStater,
                         'Сегодня',
                         const Duration(days: 0),
                       ),
 
                       calendartextButton(
-                        setStater,
                         'Завтра',
                         const Duration(days: 1),
                       ),
                       calendartextButton(
-                        setStater,
                         'Через 3 дня',
                         const Duration(days: 3),
                       ),
@@ -63,12 +62,10 @@ class MyCustomCalendar {
                     children: <Widget>[
                       TextButton(
                         style: const ButtonStyle(
-                            backgroundColor: MaterialStatePropertyAll<Color>(
-                                Colors.black45)),
+                            backgroundColor:
+                                WidgetStatePropertyAll<Color>(Colors.black45)),
                         onPressed: () {
-                          setStater(() {
-                            _selectedTime = saturdayOf(DateTime.now());
-                          });
+                          _selectedTime = saturdayOf(DateTime.now());
                         },
                         child: Text(
                           'В эти выходные',
@@ -76,7 +73,6 @@ class MyCustomCalendar {
                         ),
                       ),
                       calendartextButton(
-                        setStater,
                         'Через неделю',
                         const Duration(days: 7),
                       ),
@@ -90,16 +86,13 @@ class MyCustomCalendar {
                           initialEntryMode: TimePickerEntryMode.dialOnly);
                       if (timeToPick == null) return;
 
-                      setStater(() {
-                        // починить что то сделал сам не понял
-                        replayTime = DateTime(
-                            _selectedTime.year,
-                            _selectedTime.month,
-                            _selectedTime.day,
-                            timeToPick.hour,
-                            timeToPick.minute);
-                        replayTime;
-                      });
+                      replayTime = DateTime(
+                          _selectedTime.year,
+                          _selectedTime.month,
+                          _selectedTime.day,
+                          timeToPick.hour,
+                          timeToPick.minute);
+
                     },
                     child: ListTile(
                         leading: const Icon(Icons.access_time_rounded),
@@ -115,11 +108,13 @@ class MyCustomCalendar {
             ),
             actions: <Widget>[
               TextButton(
-                child: const Text('ОТМЕНА'),
-                onPressed: () => Navigator.of(context).pop(),
+                child: Text('ОТМЕНА', style: TextStyle(color: Colors.red)),
+                onPressed: () {
+                  Navigator.of(context).pop();
+                },
               ),
               TextButton(
-                child: const Text('ОК'),
+                child: const Text('ОК', style: TextStyle(color: Colors.red)),
                 onPressed: () => Navigator.of(context).pop(_selectedTime),
               ),
             ],
@@ -129,16 +124,14 @@ class MyCustomCalendar {
     );
   }
 
-  TextButton calendartextButton(
-      StateSetter setStater, String label, Duration duration) {
+  TextButton calendartextButton(String label, Duration duration) {
     return TextButton(
       style: const ButtonStyle(
-          backgroundColor: MaterialStatePropertyAll<Color>(Colors.black45)),
+          backgroundColor: WidgetStatePropertyAll<Color>(Colors.black45)),
       child: Text(label, style: textStyle),
       onPressed: () {
-        setStater(() {
-          _selectedTime = DateTime.now().add(duration);
-        });
+        _selectedTime = DateTime.now().add(duration);
+        notifyListeners();
       },
     );
   }

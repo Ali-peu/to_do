@@ -152,9 +152,6 @@ class _TaskPageState extends State<TaskPage> {
 
   Widget buildExpansionTile(
       String title, List<NoteModel> taskList, int currentIndex1) {
-    setState(() {
-      taskList; //НАДО ли тут обновлять?
-    });
     return Visibility(
       visible: taskList.isNotEmpty,
       child: ExpansionTile(
@@ -291,10 +288,8 @@ class _TaskPageState extends State<TaskPage> {
             b.description.toLowerCase().compareTo(a.description.toLowerCase()));
         break;
       case 'Вручную(длинительное нажатие для сортировки)':
-        noteList;
         break;
       default:
-        noteList;
     }
   }
 

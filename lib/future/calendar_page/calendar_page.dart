@@ -21,7 +21,6 @@ class _CalendarPageState extends State<CalendarPage> {
   void initState() {
     super.initState();
 
-    listTask;
   }
 
   @override

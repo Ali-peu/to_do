@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:to_do/data/drift_datebase_providers/drift_database_provider_for_note.dart';
 import 'package:to_do/domain/model/note.dart';
+import 'package:to_do/future/widgets/timer_frame.dart';
 
 class AddTaskBottomSheetModelView extends ChangeNotifier {
   final subtitle = TextEditingController();
@@ -8,15 +9,24 @@ class AddTaskBottomSheetModelView extends ChangeNotifier {
 
   final DriftDatebaseProviderForNote datebaseProviderForNote;
 
-  DateTime? _selectedDeadlineTime = DateTime.now()..add(const Duration(minutes: 30));
+  DateTime? _selectedDeadlineTime;
+  DateTime? get selectedDeadlineTime => _selectedDeadlineTime;
+
   bool isDone = false;
   bool isThisStar = false;
 
   AddTaskBottomSheetModelView({required this.datebaseProviderForNote});
   int dropDownButtonValue = 1;
 
-  void setNewNoteDate(DateTime? newDateTime) {
-    _selectedDeadlineTime =  newDateTime ;
+  Future<void> setNewNoteDate(BuildContext context) async {
+    final data = await MyCustomCalendar().showCustomDatePickerPac(context);
+
+    _selectedDeadlineTime = data;
+    notifyListeners();
+  }
+
+  void setStarNote() {
+    isThisStar = !isThisStar;
     notifyListeners();
   }
 

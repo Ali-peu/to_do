@@ -57,7 +57,7 @@ class _EditcategoryState extends State<Editcategory> {
             actions: [
               TextButton(
                   onPressed: () {
-                    if (false) {
+                    if (context.mounted) {
                       showDialog(
                           context: context,
                           builder: (context) {

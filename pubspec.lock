@@ -986,6 +986,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "1.2.0"
+  surf_lint_rules:
+    dependency: "direct main"
+    description:
+      name: surf_lint_rules
+      sha256: cd74d9cd7acf8ae1855d08c27b0340cfa1b66bc7ded0fc76d73f3ae44575c6a2
+      url: "https://pub.dev"
+    source: hosted
+    version: "3.1.0"
   syncfusion_flutter_charts:
     dependency: "direct main"
     description:

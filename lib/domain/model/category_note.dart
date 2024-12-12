@@ -9,8 +9,8 @@ class CategoryNote {
 
   factory CategoryNote.fromJson(Map<String, dynamic> json) {
     return CategoryNote(
-      id: json['id'],
-      category: json['category'],
+      id: json['id'] as int? ?? 0,
+      category: json['category'] as String?  ?? '' ,
     );
   }
 }

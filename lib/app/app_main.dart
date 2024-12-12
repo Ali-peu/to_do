@@ -16,7 +16,7 @@ class AppMain extends StatelessWidget {
     );
   }
 
-  Future _displayBottomSheet(BuildContext context) {
+  Future<void> _displayBottomSheet(BuildContext context) {
     return showModalBottomSheet(
         context: context,
         shape: const RoundedRectangleBorder(
@@ -24,11 +24,13 @@ class AppMain extends StatelessWidget {
         ),
         builder: (context) {
           return SafeArea(
-              child: AddTaskBottomSheet(
-                  addTaskBottomSheetModelView: AddTaskBottomSheetModelView(
-                      datebaseProviderForNote:
-                          Provider.of<DriftDatebaseProviderForNote>(context,
-                              listen: false))));
+              child: ChangeNotifierProvider(
+                create: (context)=>  AddTaskBottomSheetModelView(
+                        datebaseProviderForNote:
+                            Provider.of<DriftDatebaseProviderForNote>(context,
+                                listen: false)),
+                child: const AddTaskBottomSheet(),
+              ));
         });
   }
 
