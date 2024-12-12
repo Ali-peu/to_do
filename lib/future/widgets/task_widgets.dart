@@ -89,11 +89,11 @@ class _TaskWidgetState extends State<TaskWidget> {
             padding: const EdgeInsets.symmetric(vertical: 8.0),
             child: noteTitleText(),
           ),
-          subtitle: boolCheckDeaadline(widget._note.time)
-              ? (widget._note.replayTime1 == widget._note.time
+          subtitle: boolCheckDeaadline(widget._note.deadlineTime)
+              ? (widget._note.remindTime == widget._note.deadlineTime
                   ? const Text('')
                   : Text(
-                      TimeOfDay.fromDateTime(widget._note.replayTime1)
+                      TimeOfDay.fromDateTime(widget._note.remindTime ?? DateTime.now())
                           .toString(),
                       // style: TextStyle(
                       //     color:
@@ -103,9 +103,9 @@ class _TaskWidgetState extends State<TaskWidget> {
                       //         Theme.of(context).colorScheme.error)
                     ))
               : Text(
-                  deadlineTask(widget._note.time.toString()),
+                  deadlineTask(widget._note.deadlineTime.toString()),
                   style: TextStyle(
-                      color: isThatDeadlineAsGone(widget._note.time)
+                      color: isThatDeadlineAsGone(widget._note.deadlineTime)
                           ? Colors.black
                           : Theme.of(context).colorScheme.error,
                       fontSize: 12),

@@ -62,7 +62,10 @@ String deadlineTask(String deadline) {
   return '${deadline.substring(5, 7)}-${deadline.substring(8, 11)}';
 }
 
-bool isThatDeadlineAsGone(DateTime dateTime) {
+bool isThatDeadlineAsGone(DateTime? dateTime) {
+  if(dateTime == null){
+    return false;
+  }
   if (dateTime.compareTo(DateTime.now()) == 0) {
     return true;
   }
@@ -84,7 +87,10 @@ String checkDeaadline(DateTime datetime) {
   }
 }
 
-bool boolCheckDeaadline(DateTime dateTime) {
+bool boolCheckDeaadline(DateTime? dateTime) {
+  if(dateTime == null){
+    return false;
+  }
   if (dateTime.day == DateTime.now().day &&
       dateTime.month == DateTime.now().month &&
       dateTime.year == DateTime.now().year) {
@@ -93,7 +99,10 @@ bool boolCheckDeaadline(DateTime dateTime) {
   return false;
 }
 
-bool checkThisIsPastTask(DateTime dateTime) {
+bool checkThisIsPastTask(DateTime? dateTime) {
+  if(dateTime == null){
+    return false;
+  }
   if (DateUtils.dateOnly(dateTime)
           .compareTo(DateUtils.dateOnly(DateTime.now())) ==
       -1) {

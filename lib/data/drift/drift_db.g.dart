@@ -49,20 +49,32 @@ class $NotesTable extends Notes with TableInfo<$NotesTable, Note> {
   static const VerificationMeta _timeMeta = const VerificationMeta('time');
   @override
   late final GeneratedColumn<DateTime> time = GeneratedColumn<DateTime>(
-      'time', aliasedName, false,
-      type: DriftSqlType.dateTime, requiredDuringInsert: true);
-  static const VerificationMeta _replayTime1Meta =
-      const VerificationMeta('replayTime1');
+      'time', aliasedName, true,
+      type: DriftSqlType.dateTime, requiredDuringInsert: false);
+  static const VerificationMeta _remindTimeMeta =
+      const VerificationMeta('remindTime');
   @override
-  late final GeneratedColumn<DateTime> replayTime1 = GeneratedColumn<DateTime>(
-      'replay_time1', aliasedName, false,
-      type: DriftSqlType.dateTime, requiredDuringInsert: true);
-  static const VerificationMeta _replayTime2Meta =
-      const VerificationMeta('replayTime2');
+  late final GeneratedColumn<DateTime> remindTime = GeneratedColumn<DateTime>(
+      'remind_time', aliasedName, true,
+      type: DriftSqlType.dateTime, requiredDuringInsert: false);
+  static const VerificationMeta _createdTimeMeta =
+      const VerificationMeta('createdTime');
   @override
-  late final GeneratedColumn<DateTime> replayTime2 = GeneratedColumn<DateTime>(
-      'replay_time2', aliasedName, false,
+  late final GeneratedColumn<DateTime> createdTime = GeneratedColumn<DateTime>(
+      'created_time', aliasedName, false,
       type: DriftSqlType.dateTime, requiredDuringInsert: true);
+  static const VerificationMeta _updatedTimeMeta =
+      const VerificationMeta('updatedTime');
+  @override
+  late final GeneratedColumn<DateTime> updatedTime = GeneratedColumn<DateTime>(
+      'updated_time', aliasedName, true,
+      type: DriftSqlType.dateTime, requiredDuringInsert: false);
+  static const VerificationMeta _deletedTimeMeta =
+      const VerificationMeta('deletedTime');
+  @override
+  late final GeneratedColumn<DateTime> deletedTime = GeneratedColumn<DateTime>(
+      'deleted_time', aliasedName, true,
+      type: DriftSqlType.dateTime, requiredDuringInsert: false);
   @override
   List<GeneratedColumn> get $columns => [
         id,
@@ -71,8 +83,10 @@ class $NotesTable extends Notes with TableInfo<$NotesTable, Note> {
         category,
         isThisStar,
         time,
-        replayTime1,
-        replayTime2
+        remindTime,
+        createdTime,
+        updatedTime,
+        deletedTime
       ];
   @override
   String get aliasedName => _alias ?? actualTableName;
@@ -118,24 +132,32 @@ class $NotesTable extends Notes with TableInfo<$NotesTable, Note> {
     if (data.containsKey('time')) {
       context.handle(
           _timeMeta, time.isAcceptableOrUnknown(data['time']!, _timeMeta));
-    } else if (isInserting) {
-      context.missing(_timeMeta);
     }
-    if (data.containsKey('replay_time1')) {
+    if (data.containsKey('remind_time')) {
       context.handle(
-          _replayTime1Meta,
-          replayTime1.isAcceptableOrUnknown(
-              data['replay_time1']!, _replayTime1Meta));
-    } else if (isInserting) {
-      context.missing(_replayTime1Meta);
+          _remindTimeMeta,
+          remindTime.isAcceptableOrUnknown(
+              data['remind_time']!, _remindTimeMeta));
     }
-    if (data.containsKey('replay_time2')) {
+    if (data.containsKey('created_time')) {
       context.handle(
-          _replayTime2Meta,
-          replayTime2.isAcceptableOrUnknown(
-              data['replay_time2']!, _replayTime2Meta));
+          _createdTimeMeta,
+          createdTime.isAcceptableOrUnknown(
+              data['created_time']!, _createdTimeMeta));
     } else if (isInserting) {
-      context.missing(_replayTime2Meta);
+      context.missing(_createdTimeMeta);
+    }
+    if (data.containsKey('updated_time')) {
+      context.handle(
+          _updatedTimeMeta,
+          updatedTime.isAcceptableOrUnknown(
+              data['updated_time']!, _updatedTimeMeta));
+    }
+    if (data.containsKey('deleted_time')) {
+      context.handle(
+          _deletedTimeMeta,
+          deletedTime.isAcceptableOrUnknown(
+              data['deleted_time']!, _deletedTimeMeta));
     }
     return context;
   }
@@ -157,11 +179,15 @@ class $NotesTable extends Notes with TableInfo<$NotesTable, Note> {
       isThisStar: attachedDatabase.typeMapping
           .read(DriftSqlType.bool, data['${effectivePrefix}is_this_star'])!,
       time: attachedDatabase.typeMapping
-          .read(DriftSqlType.dateTime, data['${effectivePrefix}time'])!,
-      replayTime1: attachedDatabase.typeMapping
-          .read(DriftSqlType.dateTime, data['${effectivePrefix}replay_time1'])!,
-      replayTime2: attachedDatabase.typeMapping
-          .read(DriftSqlType.dateTime, data['${effectivePrefix}replay_time2'])!,
+          .read(DriftSqlType.dateTime, data['${effectivePrefix}time']),
+      remindTime: attachedDatabase.typeMapping
+          .read(DriftSqlType.dateTime, data['${effectivePrefix}remind_time']),
+      createdTime: attachedDatabase.typeMapping
+          .read(DriftSqlType.dateTime, data['${effectivePrefix}created_time'])!,
+      updatedTime: attachedDatabase.typeMapping
+          .read(DriftSqlType.dateTime, data['${effectivePrefix}updated_time']),
+      deletedTime: attachedDatabase.typeMapping
+          .read(DriftSqlType.dateTime, data['${effectivePrefix}deleted_time']),
     );
   }
 
@@ -177,18 +203,22 @@ class Note extends DataClass implements Insertable<Note> {
   final bool isDone;
   final String category;
   final bool isThisStar;
-  final DateTime time;
-  final DateTime replayTime1;
-  final DateTime replayTime2;
+  final DateTime? time;
+  final DateTime? remindTime;
+  final DateTime createdTime;
+  final DateTime? updatedTime;
+  final DateTime? deletedTime;
   const Note(
       {required this.id,
       required this.description,
       required this.isDone,
       required this.category,
       required this.isThisStar,
-      required this.time,
-      required this.replayTime1,
-      required this.replayTime2});
+      this.time,
+      this.remindTime,
+      required this.createdTime,
+      this.updatedTime,
+      this.deletedTime});
   @override
   Map<String, Expression> toColumns(bool nullToAbsent) {
     final map = <String, Expression>{};
@@ -197,9 +227,19 @@ class Note extends DataClass implements Insertable<Note> {
     map['is_done'] = Variable<bool>(isDone);
     map['category'] = Variable<String>(category);
     map['is_this_star'] = Variable<bool>(isThisStar);
-    map['time'] = Variable<DateTime>(time);
-    map['replay_time1'] = Variable<DateTime>(replayTime1);
-    map['replay_time2'] = Variable<DateTime>(replayTime2);
+    if (!nullToAbsent || time != null) {
+      map['time'] = Variable<DateTime>(time);
+    }
+    if (!nullToAbsent || remindTime != null) {
+      map['remind_time'] = Variable<DateTime>(remindTime);
+    }
+    map['created_time'] = Variable<DateTime>(createdTime);
+    if (!nullToAbsent || updatedTime != null) {
+      map['updated_time'] = Variable<DateTime>(updatedTime);
+    }
+    if (!nullToAbsent || deletedTime != null) {
+      map['deleted_time'] = Variable<DateTime>(deletedTime);
+    }
     return map;
   }
 
@@ -210,9 +250,17 @@ class Note extends DataClass implements Insertable<Note> {
       isDone: Value(isDone),
       category: Value(category),
       isThisStar: Value(isThisStar),
-      time: Value(time),
-      replayTime1: Value(replayTime1),
-      replayTime2: Value(replayTime2),
+      time: time == null && nullToAbsent ? const Value.absent() : Value(time),
+      remindTime: remindTime == null && nullToAbsent
+          ? const Value.absent()
+          : Value(remindTime),
+      createdTime: Value(createdTime),
+      updatedTime: updatedTime == null && nullToAbsent
+          ? const Value.absent()
+          : Value(updatedTime),
+      deletedTime: deletedTime == null && nullToAbsent
+          ? const Value.absent()
+          : Value(deletedTime),
     );
   }
 
@@ -225,9 +273,11 @@ class Note extends DataClass implements Insertable<Note> {
       isDone: serializer.fromJson<bool>(json['isDone']),
       category: serializer.fromJson<String>(json['category']),
       isThisStar: serializer.fromJson<bool>(json['isThisStar']),
-      time: serializer.fromJson<DateTime>(json['time']),
-      replayTime1: serializer.fromJson<DateTime>(json['replayTime1']),
-      replayTime2: serializer.fromJson<DateTime>(json['replayTime2']),
+      time: serializer.fromJson<DateTime?>(json['time']),
+      remindTime: serializer.fromJson<DateTime?>(json['remindTime']),
+      createdTime: serializer.fromJson<DateTime>(json['createdTime']),
+      updatedTime: serializer.fromJson<DateTime?>(json['updatedTime']),
+      deletedTime: serializer.fromJson<DateTime?>(json['deletedTime']),
     );
   }
   @override
@@ -239,9 +289,11 @@ class Note extends DataClass implements Insertable<Note> {
       'isDone': serializer.toJson<bool>(isDone),
       'category': serializer.toJson<String>(category),
       'isThisStar': serializer.toJson<bool>(isThisStar),
-      'time': serializer.toJson<DateTime>(time),
-      'replayTime1': serializer.toJson<DateTime>(replayTime1),
-      'replayTime2': serializer.toJson<DateTime>(replayTime2),
+      'time': serializer.toJson<DateTime?>(time),
+      'remindTime': serializer.toJson<DateTime?>(remindTime),
+      'createdTime': serializer.toJson<DateTime>(createdTime),
+      'updatedTime': serializer.toJson<DateTime?>(updatedTime),
+      'deletedTime': serializer.toJson<DateTime?>(deletedTime),
     };
   }
 
@@ -251,18 +303,22 @@ class Note extends DataClass implements Insertable<Note> {
           bool? isDone,
           String? category,
           bool? isThisStar,
-          DateTime? time,
-          DateTime? replayTime1,
-          DateTime? replayTime2}) =>
+          Value<DateTime?> time = const Value.absent(),
+          Value<DateTime?> remindTime = const Value.absent(),
+          DateTime? createdTime,
+          Value<DateTime?> updatedTime = const Value.absent(),
+          Value<DateTime?> deletedTime = const Value.absent()}) =>
       Note(
         id: id ?? this.id,
         description: description ?? this.description,
         isDone: isDone ?? this.isDone,
         category: category ?? this.category,
         isThisStar: isThisStar ?? this.isThisStar,
-        time: time ?? this.time,
-        replayTime1: replayTime1 ?? this.replayTime1,
-        replayTime2: replayTime2 ?? this.replayTime2,
+        time: time.present ? time.value : this.time,
+        remindTime: remindTime.present ? remindTime.value : this.remindTime,
+        createdTime: createdTime ?? this.createdTime,
+        updatedTime: updatedTime.present ? updatedTime.value : this.updatedTime,
+        deletedTime: deletedTime.present ? deletedTime.value : this.deletedTime,
       );
   Note copyWithCompanion(NotesCompanion data) {
     return Note(
@@ -274,10 +330,14 @@ class Note extends DataClass implements Insertable<Note> {
       isThisStar:
           data.isThisStar.present ? data.isThisStar.value : this.isThisStar,
       time: data.time.present ? data.time.value : this.time,
-      replayTime1:
-          data.replayTime1.present ? data.replayTime1.value : this.replayTime1,
-      replayTime2:
-          data.replayTime2.present ? data.replayTime2.value : this.replayTime2,
+      remindTime:
+          data.remindTime.present ? data.remindTime.value : this.remindTime,
+      createdTime:
+          data.createdTime.present ? data.createdTime.value : this.createdTime,
+      updatedTime:
+          data.updatedTime.present ? data.updatedTime.value : this.updatedTime,
+      deletedTime:
+          data.deletedTime.present ? data.deletedTime.value : this.deletedTime,
     );
   }
 
@@ -290,15 +350,17 @@ class Note extends DataClass implements Insertable<Note> {
           ..write('category: $category, ')
           ..write('isThisStar: $isThisStar, ')
           ..write('time: $time, ')
-          ..write('replayTime1: $replayTime1, ')
-          ..write('replayTime2: $replayTime2')
+          ..write('remindTime: $remindTime, ')
+          ..write('createdTime: $createdTime, ')
+          ..write('updatedTime: $updatedTime, ')
+          ..write('deletedTime: $deletedTime')
           ..write(')'))
         .toString();
   }
 
   @override
   int get hashCode => Object.hash(id, description, isDone, category, isThisStar,
-      time, replayTime1, replayTime2);
+      time, remindTime, createdTime, updatedTime, deletedTime);
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
@@ -309,8 +371,10 @@ class Note extends DataClass implements Insertable<Note> {
           other.category == this.category &&
           other.isThisStar == this.isThisStar &&
           other.time == this.time &&
-          other.replayTime1 == this.replayTime1 &&
-          other.replayTime2 == this.replayTime2);
+          other.remindTime == this.remindTime &&
+          other.createdTime == this.createdTime &&
+          other.updatedTime == this.updatedTime &&
+          other.deletedTime == this.deletedTime);
 }
 
 class NotesCompanion extends UpdateCompanion<Note> {
@@ -319,9 +383,11 @@ class NotesCompanion extends UpdateCompanion<Note> {
   final Value<bool> isDone;
   final Value<String> category;
   final Value<bool> isThisStar;
-  final Value<DateTime> time;
-  final Value<DateTime> replayTime1;
-  final Value<DateTime> replayTime2;
+  final Value<DateTime?> time;
+  final Value<DateTime?> remindTime;
+  final Value<DateTime> createdTime;
+  final Value<DateTime?> updatedTime;
+  final Value<DateTime?> deletedTime;
   const NotesCompanion({
     this.id = const Value.absent(),
     this.description = const Value.absent(),
@@ -329,8 +395,10 @@ class NotesCompanion extends UpdateCompanion<Note> {
     this.category = const Value.absent(),
     this.isThisStar = const Value.absent(),
     this.time = const Value.absent(),
-    this.replayTime1 = const Value.absent(),
-    this.replayTime2 = const Value.absent(),
+    this.remindTime = const Value.absent(),
+    this.createdTime = const Value.absent(),
+    this.updatedTime = const Value.absent(),
+    this.deletedTime = const Value.absent(),
   });
   NotesCompanion.insert({
     this.id = const Value.absent(),
@@ -338,16 +406,16 @@ class NotesCompanion extends UpdateCompanion<Note> {
     required bool isDone,
     required String category,
     required bool isThisStar,
-    required DateTime time,
-    required DateTime replayTime1,
-    required DateTime replayTime2,
+    this.time = const Value.absent(),
+    this.remindTime = const Value.absent(),
+    required DateTime createdTime,
+    this.updatedTime = const Value.absent(),
+    this.deletedTime = const Value.absent(),
   })  : description = Value(description),
         isDone = Value(isDone),
         category = Value(category),
         isThisStar = Value(isThisStar),
-        time = Value(time),
-        replayTime1 = Value(replayTime1),
-        replayTime2 = Value(replayTime2);
+        createdTime = Value(createdTime);
   static Insertable<Note> custom({
     Expression<int>? id,
     Expression<String>? description,
@@ -355,8 +423,10 @@ class NotesCompanion extends UpdateCompanion<Note> {
     Expression<String>? category,
     Expression<bool>? isThisStar,
     Expression<DateTime>? time,
-    Expression<DateTime>? replayTime1,
-    Expression<DateTime>? replayTime2,
+    Expression<DateTime>? remindTime,
+    Expression<DateTime>? createdTime,
+    Expression<DateTime>? updatedTime,
+    Expression<DateTime>? deletedTime,
   }) {
     return RawValuesInsertable({
       if (id != null) 'id': id,
@@ -365,8 +435,10 @@ class NotesCompanion extends UpdateCompanion<Note> {
       if (category != null) 'category': category,
       if (isThisStar != null) 'is_this_star': isThisStar,
       if (time != null) 'time': time,
-      if (replayTime1 != null) 'replay_time1': replayTime1,
-      if (replayTime2 != null) 'replay_time2': replayTime2,
+      if (remindTime != null) 'remind_time': remindTime,
+      if (createdTime != null) 'created_time': createdTime,
+      if (updatedTime != null) 'updated_time': updatedTime,
+      if (deletedTime != null) 'deleted_time': deletedTime,
     });
   }
 
@@ -376,9 +448,11 @@ class NotesCompanion extends UpdateCompanion<Note> {
       Value<bool>? isDone,
       Value<String>? category,
       Value<bool>? isThisStar,
-      Value<DateTime>? time,
-      Value<DateTime>? replayTime1,
-      Value<DateTime>? replayTime2}) {
+      Value<DateTime?>? time,
+      Value<DateTime?>? remindTime,
+      Value<DateTime>? createdTime,
+      Value<DateTime?>? updatedTime,
+      Value<DateTime?>? deletedTime}) {
     return NotesCompanion(
       id: id ?? this.id,
       description: description ?? this.description,
@@ -386,8 +460,10 @@ class NotesCompanion extends UpdateCompanion<Note> {
       category: category ?? this.category,
       isThisStar: isThisStar ?? this.isThisStar,
       time: time ?? this.time,
-      replayTime1: replayTime1 ?? this.replayTime1,
-      replayTime2: replayTime2 ?? this.replayTime2,
+      remindTime: remindTime ?? this.remindTime,
+      createdTime: createdTime ?? this.createdTime,
+      updatedTime: updatedTime ?? this.updatedTime,
+      deletedTime: deletedTime ?? this.deletedTime,
     );
   }
 
@@ -412,11 +488,17 @@ class NotesCompanion extends UpdateCompanion<Note> {
     if (time.present) {
       map['time'] = Variable<DateTime>(time.value);
     }
-    if (replayTime1.present) {
-      map['replay_time1'] = Variable<DateTime>(replayTime1.value);
+    if (remindTime.present) {
+      map['remind_time'] = Variable<DateTime>(remindTime.value);
     }
-    if (replayTime2.present) {
-      map['replay_time2'] = Variable<DateTime>(replayTime2.value);
+    if (createdTime.present) {
+      map['created_time'] = Variable<DateTime>(createdTime.value);
+    }
+    if (updatedTime.present) {
+      map['updated_time'] = Variable<DateTime>(updatedTime.value);
+    }
+    if (deletedTime.present) {
+      map['deleted_time'] = Variable<DateTime>(deletedTime.value);
     }
     return map;
   }
@@ -430,8 +512,10 @@ class NotesCompanion extends UpdateCompanion<Note> {
           ..write('category: $category, ')
           ..write('isThisStar: $isThisStar, ')
           ..write('time: $time, ')
-          ..write('replayTime1: $replayTime1, ')
-          ..write('replayTime2: $replayTime2')
+          ..write('remindTime: $remindTime, ')
+          ..write('createdTime: $createdTime, ')
+          ..write('updatedTime: $updatedTime, ')
+          ..write('deletedTime: $deletedTime')
           ..write(')'))
         .toString();
   }
@@ -638,9 +722,11 @@ typedef $$NotesTableCreateCompanionBuilder = NotesCompanion Function({
   required bool isDone,
   required String category,
   required bool isThisStar,
-  required DateTime time,
-  required DateTime replayTime1,
-  required DateTime replayTime2,
+  Value<DateTime?> time,
+  Value<DateTime?> remindTime,
+  required DateTime createdTime,
+  Value<DateTime?> updatedTime,
+  Value<DateTime?> deletedTime,
 });
 typedef $$NotesTableUpdateCompanionBuilder = NotesCompanion Function({
   Value<int> id,
@@ -648,9 +734,11 @@ typedef $$NotesTableUpdateCompanionBuilder = NotesCompanion Function({
   Value<bool> isDone,
   Value<String> category,
   Value<bool> isThisStar,
-  Value<DateTime> time,
-  Value<DateTime> replayTime1,
-  Value<DateTime> replayTime2,
+  Value<DateTime?> time,
+  Value<DateTime?> remindTime,
+  Value<DateTime> createdTime,
+  Value<DateTime?> updatedTime,
+  Value<DateTime?> deletedTime,
 });
 
 class $$NotesTableFilterComposer extends Composer<_$AppDatabase, $NotesTable> {
@@ -679,11 +767,17 @@ class $$NotesTableFilterComposer extends Composer<_$AppDatabase, $NotesTable> {
   ColumnFilters<DateTime> get time => $composableBuilder(
       column: $table.time, builder: (column) => ColumnFilters(column));
 
-  ColumnFilters<DateTime> get replayTime1 => $composableBuilder(
-      column: $table.replayTime1, builder: (column) => ColumnFilters(column));
+  ColumnFilters<DateTime> get remindTime => $composableBuilder(
+      column: $table.remindTime, builder: (column) => ColumnFilters(column));
 
-  ColumnFilters<DateTime> get replayTime2 => $composableBuilder(
-      column: $table.replayTime2, builder: (column) => ColumnFilters(column));
+  ColumnFilters<DateTime> get createdTime => $composableBuilder(
+      column: $table.createdTime, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<DateTime> get updatedTime => $composableBuilder(
+      column: $table.updatedTime, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<DateTime> get deletedTime => $composableBuilder(
+      column: $table.deletedTime, builder: (column) => ColumnFilters(column));
 }
 
 class $$NotesTableOrderingComposer
@@ -713,11 +807,17 @@ class $$NotesTableOrderingComposer
   ColumnOrderings<DateTime> get time => $composableBuilder(
       column: $table.time, builder: (column) => ColumnOrderings(column));
 
-  ColumnOrderings<DateTime> get replayTime1 => $composableBuilder(
-      column: $table.replayTime1, builder: (column) => ColumnOrderings(column));
+  ColumnOrderings<DateTime> get remindTime => $composableBuilder(
+      column: $table.remindTime, builder: (column) => ColumnOrderings(column));
 
-  ColumnOrderings<DateTime> get replayTime2 => $composableBuilder(
-      column: $table.replayTime2, builder: (column) => ColumnOrderings(column));
+  ColumnOrderings<DateTime> get createdTime => $composableBuilder(
+      column: $table.createdTime, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<DateTime> get updatedTime => $composableBuilder(
+      column: $table.updatedTime, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<DateTime> get deletedTime => $composableBuilder(
+      column: $table.deletedTime, builder: (column) => ColumnOrderings(column));
 }
 
 class $$NotesTableAnnotationComposer
@@ -747,11 +847,17 @@ class $$NotesTableAnnotationComposer
   GeneratedColumn<DateTime> get time =>
       $composableBuilder(column: $table.time, builder: (column) => column);
 
-  GeneratedColumn<DateTime> get replayTime1 => $composableBuilder(
-      column: $table.replayTime1, builder: (column) => column);
+  GeneratedColumn<DateTime> get remindTime => $composableBuilder(
+      column: $table.remindTime, builder: (column) => column);
 
-  GeneratedColumn<DateTime> get replayTime2 => $composableBuilder(
-      column: $table.replayTime2, builder: (column) => column);
+  GeneratedColumn<DateTime> get createdTime => $composableBuilder(
+      column: $table.createdTime, builder: (column) => column);
+
+  GeneratedColumn<DateTime> get updatedTime => $composableBuilder(
+      column: $table.updatedTime, builder: (column) => column);
+
+  GeneratedColumn<DateTime> get deletedTime => $composableBuilder(
+      column: $table.deletedTime, builder: (column) => column);
 }
 
 class $$NotesTableTableManager extends RootTableManager<
@@ -782,9 +888,11 @@ class $$NotesTableTableManager extends RootTableManager<
             Value<bool> isDone = const Value.absent(),
             Value<String> category = const Value.absent(),
             Value<bool> isThisStar = const Value.absent(),
-            Value<DateTime> time = const Value.absent(),
-            Value<DateTime> replayTime1 = const Value.absent(),
-            Value<DateTime> replayTime2 = const Value.absent(),
+            Value<DateTime?> time = const Value.absent(),
+            Value<DateTime?> remindTime = const Value.absent(),
+            Value<DateTime> createdTime = const Value.absent(),
+            Value<DateTime?> updatedTime = const Value.absent(),
+            Value<DateTime?> deletedTime = const Value.absent(),
           }) =>
               NotesCompanion(
             id: id,
@@ -793,8 +901,10 @@ class $$NotesTableTableManager extends RootTableManager<
             category: category,
             isThisStar: isThisStar,
             time: time,
-            replayTime1: replayTime1,
-            replayTime2: replayTime2,
+            remindTime: remindTime,
+            createdTime: createdTime,
+            updatedTime: updatedTime,
+            deletedTime: deletedTime,
           ),
           createCompanionCallback: ({
             Value<int> id = const Value.absent(),
@@ -802,9 +912,11 @@ class $$NotesTableTableManager extends RootTableManager<
             required bool isDone,
             required String category,
             required bool isThisStar,
-            required DateTime time,
-            required DateTime replayTime1,
-            required DateTime replayTime2,
+            Value<DateTime?> time = const Value.absent(),
+            Value<DateTime?> remindTime = const Value.absent(),
+            required DateTime createdTime,
+            Value<DateTime?> updatedTime = const Value.absent(),
+            Value<DateTime?> deletedTime = const Value.absent(),
           }) =>
               NotesCompanion.insert(
             id: id,
@@ -813,8 +925,10 @@ class $$NotesTableTableManager extends RootTableManager<
             category: category,
             isThisStar: isThisStar,
             time: time,
-            replayTime1: replayTime1,
-            replayTime2: replayTime2,
+            remindTime: remindTime,
+            createdTime: createdTime,
+            updatedTime: updatedTime,
+            deletedTime: deletedTime,
           ),
           withReferenceMapper: (p0) => p0
               .map((e) => (e.readTable(table), BaseReferences(db, table, e)))

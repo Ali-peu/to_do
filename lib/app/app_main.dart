@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import 'package:to_do/future/another_futures/add_task_with_plus.dart';
+import 'package:provider/provider.dart';
+import 'package:to_do/data/drift_datebase_providers/drift_database_provider_for_note.dart';
+import 'package:to_do/future/task_screens/add_task_bottom_sheet/add_task_bottom_sheet.dart';
+import 'package:to_do/future/task_screens/add_task_bottom_sheet/add_task_bottom_sheet_model_view.dart';
 
 class AppMain extends StatelessWidget {
   final StatefulNavigationShell navigationShell;
@@ -20,7 +23,12 @@ class AppMain extends StatelessWidget {
           borderRadius: BorderRadius.vertical(top: Radius.circular(25)),
         ),
         builder: (context) {
-          return const SafeArea(child: AddTask());
+          return SafeArea(
+              child: AddTaskBottomSheet(
+                  addTaskBottomSheetModelView: AddTaskBottomSheetModelView(
+                      datebaseProviderForNote:
+                          Provider.of<DriftDatebaseProviderForNote>(context,
+                              listen: false))));
         });
   }
 

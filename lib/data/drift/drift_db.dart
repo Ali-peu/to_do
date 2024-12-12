@@ -13,9 +13,13 @@ class Notes extends Table {
   BoolColumn get isDone => boolean()();
   TextColumn get category => text()();
   BoolColumn get isThisStar => boolean()();
-  DateTimeColumn get time => dateTime()();
-  DateTimeColumn get replayTime1 => dateTime()();
-  DateTimeColumn get replayTime2 => dateTime()();
+  DateTimeColumn get time => dateTime().nullable()();
+  DateTimeColumn get remindTime => dateTime().nullable()();
+  DateTimeColumn get createdTime => dateTime()();
+  DateTimeColumn get updatedTime => dateTime().nullable()();
+  DateTimeColumn get deletedTime => dateTime().nullable()();
+
+
 }
 
 class CategoryNotes extends Table {
@@ -23,6 +27,7 @@ class CategoryNotes extends Table {
   TextColumn get category => text().withLength(min: 1, max: 50)();
 }
 
+@DriftDatabase(tables: [Notes, CategoryNotes])
 class AppDatabase extends _$AppDatabase {
   // After generating code, this class needs to define a `schemaVersion` getter
   // and a constructor telling drift where the database should be stored.

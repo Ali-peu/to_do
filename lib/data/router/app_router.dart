@@ -3,7 +3,7 @@ import 'package:go_router/go_router.dart';
 import 'package:to_do/app/app_main.dart';
 import 'package:to_do/future/account_page/account_page.dart';
 import 'package:to_do/future/calendar_page/calendar_page.dart';
-import 'package:to_do/future/task_page/task_page.dart';
+import 'package:to_do/future/task_screens/task_page.dart';
 
 final GlobalKey<NavigatorState> _rootNavigatorKey =
     GlobalKey<NavigatorState>(debugLabel: 'root');

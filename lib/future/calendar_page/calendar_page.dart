@@ -55,7 +55,7 @@ class _CalendarPageState extends State<CalendarPage> {
             child: FutureBuilder<List<NoteModel>>(
                 future: listTask,
                 initialData: const [],
-                builder: ( context,  snapshot) {
+                builder: (context, snapshot) {
                   if (snapshot.data == null || snapshot.data!.isEmpty) {
                     return const Center(
                       child: Text(
@@ -63,8 +63,10 @@ class _CalendarPageState extends State<CalendarPage> {
                       ),
                     );
                   } else {
-                    List<NoteModel> dateNotes = snapshot.data!.where((element) =>
-                            DateUtils.dateOnly(element.time) ==
+                    List<NoteModel> dateNotes = snapshot.data!
+                        .where((element) =>
+                            DateUtils.dateOnly(
+                                element.deadlineTime ?? DateTime.now()) ==
                             DateUtils.dateOnly(_focusedDay))
                         .toList();
 

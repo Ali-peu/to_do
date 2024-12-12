@@ -277,9 +277,10 @@ class _TaskPageState extends State<TaskPage> {
   }
 
   void sortingList(String sortValue, List<NoteModel> noteList) {
+    
     switch (sortValue) {
       case 'Срок и время':
-        noteList.sort((a, b) => a.time.compareTo(b.time));
+        noteList.sort((a, b) => a.deadlineTime?.compareTo(b.deadlineTime ?? DateTime.now()) ?? 0);
         break;
       case 'По алфавиту от А до Я':
         noteList.sort((a, b) =>
@@ -302,19 +303,19 @@ class _TaskPageState extends State<TaskPage> {
   }
 
   bool isToday(NoteModel note) {
-    return boolCheckDeaadline(note.time) && !note.isDone;
+    return boolCheckDeaadline(note.deadlineTime) && !note.isDone;
   }
 
   bool isPastTask(NoteModel note) {
-    return checkThisIsPastTask(note.time);
+    return checkThisIsPastTask(note.deadlineTime);
   }
 
   bool isFutureTask(NoteModel note) {
-    return note.time.isAfter(DateTime.now());
+    return note.deadlineTime?.isAfter(DateTime.now()) ?? false;
   }
 
   bool isTodayAndDone(NoteModel note) {
-    return boolCheckDeaadline(note.time) && note.isDone;
+    return boolCheckDeaadline(note.deadlineTime) && note.isDone;
   }
 }
 

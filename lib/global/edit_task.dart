@@ -70,7 +70,7 @@ class _EditTaskState extends State<EditTask> {
   void _showDatePicker() {
     showDatePicker(
       context: context,
-      initialDate: widget._note.time,
+      initialDate: widget._note.deadlineTime,
       firstDate: DateTime(2023, 01, 01),
       lastDate: DateTime(2025),
     ).then((value) {
@@ -103,10 +103,10 @@ class _EditTaskState extends State<EditTask> {
                 // editDate(),
                 const Divider(),
                 // rington(),
-                if (widget._note.replayTime1 != widget._note.time)
+                if (widget._note.remindTime != widget._note.deadlineTime)
                   Column(
                     children: [
-                      replayTime('напоминание в', widget._note.replayTime2),
+                      replayTime('напоминание в', widget._note.remindTime ?? DateTime.now()),
                       replayTime2('Тип напоминание', 'Уведомление')
                     ],
                   ),
