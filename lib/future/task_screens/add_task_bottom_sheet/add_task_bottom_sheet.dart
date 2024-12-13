@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:to_do/domain/model/category_note.dart';
+import 'package:to_do/domain/model/sub_note_model.dart';
 
 import 'package:to_do/future/task_screens/add_task_bottom_sheet/add_task_bottom_sheet_model_view.dart';
+import 'package:to_do/future/widgets/app_text_field.dart';
 import 'package:to_do/future/widgets/star_note_icon.dart';
 import 'package:to_do/future/widgets/timer_frame.dart';
 
@@ -64,8 +66,7 @@ class _AddTaskBottomSheetState extends State<AddTaskBottomSheet> {
       ),
       onTap: () {
         setState(() {
-          if (categoryNote.category == 'No category') {
-          }
+          if (categoryNote.category == 'No category') {}
         });
       },
     );
@@ -118,6 +119,24 @@ class _AddTaskBottomSheetState extends State<AddTaskBottomSheet> {
                     ],
                   ),
                 )),
+            ...List<SubNoteModel>.from(addTaskBottomSheetModelView.subNotesList)
+                .map((e) => AppTextField(
+                    controller: addTaskBottomSheetModelView
+                            .subNotesListTextControllers[
+                        addTaskBottomSheetModelView.subNotesList.indexOf(e)])),
+            Row(
+              children: [
+                IconButton(
+                    onPressed: () =>
+                        addTaskBottomSheetModelView.addNewSubNote(),
+                    icon: const Icon(Icons.add)),
+                if (addTaskBottomSheetModelView.subNotesList.isNotEmpty)
+                  IconButton(
+                      onPressed: () =>
+                          addTaskBottomSheetModelView.clearAllListForSubNotes(),
+                      icon: const Icon(Icons.delete_forever)),
+              ],
+            ),
             Row(
               children: [
                 Expanded(
