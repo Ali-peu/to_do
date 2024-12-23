@@ -7,7 +7,12 @@ class AddNoteScreenModelView extends ChangeNotifier {
   List<TextEditingController> controllers = [];
   final ScrollController scrollController = ScrollController();
 
-  void onTapUp(TapUpDetails? details) {
+  void updateTextPosition(Offset position, {required int updatedId}) {
+    positions[updatedId] = position;
+    notifyListeners();
+  }
+
+  Future<void> onTapUp(TapUpDetails? details) async {
     if (details == null) return;
 
     final scrollOffset = scrollController.offset;
@@ -19,13 +24,26 @@ class AddNoteScreenModelView extends ChangeNotifier {
     );
     log('onTapUp');
 
-    positions.add(adjustedPosition);
-    controllers.add(TextEditingController());
+    await addNewTextField(adjustedPosition);
     notifyListeners();
+  }
+
+  Future<void> addNewTextField(Offset position) async {
+    if (controllers.isNotEmpty && controllers.last.text.isEmpty) {
+      controllers.removeLast();
+      positions
+        ..removeLast()
+        ..add(position);
+      controllers.add(TextEditingController());
+    } else {
+      positions.add(position);
+      controllers.add(TextEditingController());
+    }
   }
 
   void onCloseScreen() {
     positions.clear();
     controllers.clear();
+    notifyListeners();
   }
 }

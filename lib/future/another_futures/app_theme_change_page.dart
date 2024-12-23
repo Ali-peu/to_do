@@ -24,8 +24,8 @@ class AppThemeChange extends StatelessWidget {
       ),
       body: Row(
         children: [
-          appThemeBox(context, AppTheme.pinkTheme, 'Light'),
-          appThemeBox(context, AppTheme.darkTheme, 'Dark'),
+          // appThemeBox(context, AppTheme.pinkTheme, 'Light'),
+          // appThemeBox(context, AppTheme.darkTheme, 'Dark'),
           appThemeBox(context, AppTheme.lightTheme, 'Blue'),
         ],
       ),

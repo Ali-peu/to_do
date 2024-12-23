@@ -50,8 +50,6 @@ class AppTextField extends StatelessWidget {
           hintStyle: hintTextStyle,
 
           contentPadding: contentPadding ?? EdgeInsets.zero,
-          focusedErrorBorder: const OutlineInputBorder(
-              borderSide: BorderSide(color: Colors.red)),
           border: UnderlineInputBorder(
               borderSide: BorderSide(
                   width: borderWidth ?? 1,
