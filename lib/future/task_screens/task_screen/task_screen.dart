@@ -1,18 +1,24 @@
-import 'dart:async';
 
-// import 'package:circle_checkbox/redev_checkbox.dart';
 import 'package:flutter/material.dart';
-
 import 'package:provider/provider.dart';
-import 'package:to_do/data/drift_datebase_providers/drift_database_provider_for_note.dart';
-import 'package:to_do/data/drift_datebase_providers/note_category_data.dart';
-import 'package:to_do/global/theme.dart';
 import 'package:to_do/configuration/validators/validador_text.dart';
 import 'package:to_do/domain/model/category_note.dart';
 import 'package:to_do/domain/model/note.dart';
 import 'package:to_do/future/another_futures/category_edit.dart';
-import 'package:to_do/future/another_futures/notifier.dart';
+import 'package:to_do/future/task_screens/task_screen/task_screen_model_view.dart';
 import 'package:to_do/future/widgets/task_widgets.dart';
+import 'package:to_do/global/theme.dart';
+
+class TaskScreen extends StatelessWidget {
+  const TaskScreen({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return ChangeNotifierProvider.value(
+        value: Provider.of<TaskScreenModelView>(context, listen: false),
+        child: const TaskPage());
+  }
+}
 
 class TaskPage extends StatefulWidget {
   const TaskPage({super.key});
@@ -26,6 +32,15 @@ enum PopUpMenu { search, sort, editCategory, deleteAll }
 class _TaskPageState extends State<TaskPage> {
   ThemeProvider notifier = ThemeProvider();
   // String chooseCategory = 'All';
+
+  late final TaskScreenModelView taskScreenModelView;
+
+  @override
+  void initState() {
+    super.initState();
+    taskScreenModelView =
+        Provider.of<TaskScreenModelView>(context, listen: false);
+  }
 
   List<CategoryNote> categoryListNote = [];
 
@@ -43,8 +58,6 @@ class _TaskPageState extends State<TaskPage> {
   }
 
   TextEditingController searchController = TextEditingController();
-
-  
 
   PopUpMenu? selectedMenu;
 
@@ -64,15 +77,15 @@ class _TaskPageState extends State<TaskPage> {
 
   @override
   Widget build(BuildContext context) {
-    return ChangeNotifierProvider(
-        create: (context) => ThemeProvider(),
-        child: Scaffold(appBar: buildAppBar(), body: buildTaskList()));
+    return buildTaskList();
+    // return ChangeNotifierProvider(
+    //     create: (context) => ThemeProvider(),
+    //     child: Scaffold(appBar: buildAppBar(), body: buildTaskList()));
   }
 
   AppBar buildAppBar() {
     return AppBar(
       title: SingleChildScrollView(
-        // Скролиться только в андроид
         primary: false,
         physics: const AlwaysScrollableScrollPhysics(),
         scrollDirection: Axis.horizontal,
@@ -90,7 +103,7 @@ class _TaskPageState extends State<TaskPage> {
 
   Widget buildCategoryButton(String category) {
     return Padding(
-      padding: const EdgeInsets.all(8.0),
+      padding: const EdgeInsets.all(8),
       child: ElevatedButton(
         onPressed: () {
           notifier.changeWord(category);
@@ -102,7 +115,7 @@ class _TaskPageState extends State<TaskPage> {
         style: ElevatedButton.styleFrom(
           backgroundColor: Theme.of(context).colorScheme.secondary,
           shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(30.0),
+            borderRadius: BorderRadius.circular(30),
           ),
           padding: const EdgeInsets.symmetric(vertical: 15, horizontal: 40),
         ),
@@ -112,42 +125,52 @@ class _TaskPageState extends State<TaskPage> {
   }
 
   Widget buildTaskList() {
-    List<NoteModel> taskList = []; 
+    // List<NoteModel> taskList = [];
     // Provider.of<DriftDatebaseProviderForNote>(context,listen: false).rea .values
     //     .where((element) => isTaskInCategory(element, notifier.category))
     //     .toList();
 
-    List<NoteModel> today = taskList.where((element) => isToday(element)).toList();
-    List<NoteModel> past = taskList.where((element) => isPastTask(element)).toList();
-    List<NoteModel> future =
-        taskList.where((element) => isFutureTask(element)).toList();
-    List<NoteModel> todayAndDone =
-        taskList.where((element) => isTodayAndDone(element)).toList();
+    // List<NoteModel> today =
+    //     taskList.where((element) => isToday(element)).toList();
+    // List<NoteModel> past =
+    //     taskList.where((element) => isPastTask(element)).toList();
+    // List<NoteModel> future =
+    //     taskList.where((element) => isFutureTask(element)).toList();
+    // List<NoteModel> todayAndDone =
+    //     taskList.where((element) => isTodayAndDone(element)).toList();
 
-    // setState(() { не нужен вроде
-    //   taskList;
-    //   today;
-    //   past;
-    //   future;
-    //   todayAndDone;
-    // });
-    sortingList(selectedSortValue, today);
-    sortingList(selectedSortValue, past);
-    sortingList(selectedSortValue, future);
-    sortingList(selectedSortValue, todayAndDone);
+    // // setState(() { не нужен вроде
+    // //   taskList;
+    // //   today;
+    // //   past;
+    // //   future;
+    // //   todayAndDone;
+    // // });
+    // sortingList(selectedSortValue, today);
+    // sortingList(selectedSortValue, past);
+    // sortingList(selectedSortValue, future);
+    // sortingList(selectedSortValue, todayAndDone);
 
-    if (taskList.isEmpty) {
-      return const Center(child: Text('Нет задач'));
-    } else {
-      return ListView(
-        children: [
-          buildExpansionTile('Past', past, currentIndex1),
-          buildExpansionTile('Today', today, currentIndex2),
-          buildExpansionTile('Future', future, currentIndex3),
-          buildExpansionTile('Tasks done today', todayAndDone, currentIndex4),
-        ],
-      );
-    }
+    return Consumer<TaskScreenModelView>(builder: (context, value, child) {
+      if (value.isLoading) {
+        return const CircularProgressIndicator();
+      }
+      final data = taskScreenModelView.listNoteModel ?? [];
+      return Column(children: data.map<Widget>(TaskWidget.new).toList());
+    });
+
+    // if (taskList.isEmpty) {
+    //   return const Center(child: Text('Нет задач'));
+    // } else {
+    //   return ListView(
+    //     children: [
+    //       buildExpansionTile('Past', past, currentIndex1),
+    //       buildExpansionTile('Today', today, currentIndex2),
+    //       buildExpansionTile('Future', future, currentIndex3),
+    //       buildExpansionTile('Tasks done today', todayAndDone, currentIndex4),
+    //     ],
+    //   );
+    // }
   }
 
   Widget buildExpansionTile(
@@ -157,9 +180,9 @@ class _TaskPageState extends State<TaskPage> {
       child: ExpansionTile(
         controller: ExpansionTileController(),
         initiallyExpanded: true,
-        onExpansionChanged: (bool value) {
+        onExpansionChanged: (value) {
           setState(() {
-            currentIndex1 = value ? 0 : 1; // Проверить работает ли?
+            // currentIndex1 = value ? 0 : 1; // Проверить работает ли?
           });
         },
         shape: const Border(),
@@ -168,7 +191,7 @@ class _TaskPageState extends State<TaskPage> {
           style: const TextStyle(color: Colors.black, fontSize: 25),
         ),
         // trailing: const Visibility(visible: false, child: Text('')),
-        children: taskList.map<Widget>((note) => TaskWidget(note)).toList(),
+        children: taskList.map<Widget>(TaskWidget.new).toList(),
       ),
     );
   }
@@ -178,12 +201,12 @@ class _TaskPageState extends State<TaskPage> {
       icon: const Icon(Icons.settings),
       initialValue: selectedMenu,
       // Callback that sets the selected popup menu item.
-      onSelected: (PopUpMenu item) {
+      onSelected: (item) {
         setState(() {
           selectedMenu = item;
         });
       },
-      itemBuilder: (BuildContext context) => <PopupMenuEntry<PopUpMenu>>[
+      itemBuilder: (context) => <PopupMenuEntry<PopUpMenu>>[
         PopupMenuItem<PopUpMenu>(
           value: PopUpMenu.search,
           onTap: () {
@@ -206,7 +229,7 @@ class _TaskPageState extends State<TaskPage> {
                               const Align(
                                 alignment: Alignment.topLeft,
                                 child: Padding(
-                                  padding: EdgeInsets.all(8.0),
+                                  padding: EdgeInsets.all(8),
                                   child: Text(
                                     'Задачи отсортированы по',
                                   ),
@@ -218,7 +241,7 @@ class _TaskPageState extends State<TaskPage> {
                                   itemBuilder: (context, index) {
                                     return ListTile(
                                       title: Padding(
-                                        padding: const EdgeInsets.all(8.0),
+                                        padding: const EdgeInsets.all(8),
                                         child: Text(sortVariable[index]),
                                       ),
                                       // leading:
@@ -239,7 +262,7 @@ class _TaskPageState extends State<TaskPage> {
                               Align(
                                 alignment: Alignment.bottomRight,
                                 child: Padding(
-                                  padding: const EdgeInsets.all(8.0),
+                                  padding: const EdgeInsets.all(8),
                                   child: TextButton(
                                     child: const Text(
                                       'Выбор',
@@ -274,19 +297,16 @@ class _TaskPageState extends State<TaskPage> {
   }
 
   void sortingList(String sortValue, List<NoteModel> noteList) {
-    
     switch (sortValue) {
       case 'Срок и время':
-        noteList.sort((a, b) => a.deadlineTime?.compareTo(b.deadlineTime ?? DateTime.now()) ?? 0);
-        break;
+        noteList.sort((a, b) =>
+            a.deadlineTime?.compareTo(b.deadlineTime ?? DateTime.now()) ?? 0);
       case 'По алфавиту от А до Я':
         noteList.sort((a, b) =>
             a.description.toLowerCase().compareTo(b.description.toLowerCase()));
-        break;
-      case "По алфавиту от Я-А":
+      case 'По алфавиту от Я-А':
         noteList.sort((a, b) =>
             b.description.toLowerCase().compareTo(a.description.toLowerCase()));
-        break;
       case 'Вручную(длинительное нажатие для сортировки)':
         break;
       default:
@@ -314,11 +334,10 @@ class _TaskPageState extends State<TaskPage> {
   }
 }
 
-class MySearchDelegate extends SearchDelegate {
-
+class MySearchDelegate extends SearchDelegate<String> {
   @override
   Widget buildLeading(BuildContext context) => IconButton(
-      onPressed: () => close(context, null),
+      onPressed: () => close(context, ''),
       icon: const Icon(
         Icons.arrow_back,
       ));
@@ -337,28 +356,26 @@ class MySearchDelegate extends SearchDelegate {
   @override
   Widget buildResults(BuildContext context) {
     return ListView(
-        //taskList.map<Widget>((note) => TaskWidget(note)).toList(),
-        children:  []
+        
         // box.values
         //     .where((element) =>
         //         element.description.toLowerCase().contains(query.toLowerCase()))
         //     .toList()
         //     .map<Widget>((note) => TaskWidget(note))
         //     .toList()
-            );
+        );
   }
 
   @override
   Widget buildSuggestions(BuildContext context) {
     return ListView(
-        //taskList.map<Widget>((note) => TaskWidget(note)).toList(),
-        children: []
+        
         //  box.values
         //     .where((element) =>
         //         element.description.toLowerCase().contains(query.toLowerCase()))
         //     .toList()
         //     .map<Widget>((note) => TaskWidget(note))
         //     .toList()
-            );
+        );
   }
 }

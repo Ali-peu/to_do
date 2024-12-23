@@ -11,6 +11,12 @@ class AppTextField extends StatelessWidget {
   final double? borderRadius;
   final TextStyle? style;
   final double? fontSize;
+  final bool? autofocus;
+  final TextStyle? hintTextStyle;
+  final EdgeInsetsGeometry? contentPadding;
+  final bool? isDense;
+  final int? maxLines;
+  final double? borderWidth;
 
   const AppTextField(
       {required this.controller,
@@ -21,39 +27,54 @@ class AppTextField extends StatelessWidget {
       this.borderColor,
       this.suffixIcon,
       this.borderRadius,
-      this.enabledBorderColor, this.style, this.fontSize});
+      this.enabledBorderColor,
+      this.style,
+      this.fontSize,
+      this.autofocus,
+      this.hintTextStyle,
+      this.contentPadding,
+      this.isDense,
+      this.maxLines,
+      this.borderWidth});
 
   @override
   Widget build(BuildContext context) {
-    return TextFormField(
+    return TextField(
         controller: controller,
-        style: style ??   TextStyle(fontSize: fontSize ?? 12),
+        // scrollPadding: EdgeInsets.zero,
+        style: style ?? TextStyle(fontSize: fontSize ?? 12),
+        minLines: 1, // Показывает одну строку, если текст отсутствует
+        maxLines: maxLines, // Указывает максимальное количество строк
         decoration: InputDecoration(
+          isDense: isDense ?? true,
+          hintStyle: hintTextStyle,
+
+          contentPadding: contentPadding ?? EdgeInsets.zero,
           focusedErrorBorder: const OutlineInputBorder(
               borderSide: BorderSide(color: Colors.red)),
-          border: OutlineInputBorder(
+          border: UnderlineInputBorder(
               borderSide: BorderSide(
+                  width: borderWidth ?? 1,
                   color: borderColor ?? Theme.of(context).primaryColor),
               borderRadius: BorderRadius.circular(borderRadius ?? 0)),
           prefixIcon: prefixIcon,
           suffixIcon: suffixIcon,
-          contentPadding:
-              const EdgeInsets.symmetric(horizontal: 15, vertical: 15),
+          // contentPadding:
+          //     const EdgeInsets.symmetric(horizontal: 15, vertical: 15),
           hintText: hintext,
           // enabledBorder: OutlineInputBorder(
           //     borderRadius: BorderRadius.circular(10),
           //     borderSide: BorderSide(
           //         width: 2,
           //         color: enabledBorderColor ?? Theme.of(context).primaryColor)),
-          focusedBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(10),
+          focusedBorder: UnderlineInputBorder(
+              borderRadius: BorderRadius.circular(borderRadius ?? 0),
               borderSide: BorderSide(
-                  width: 2,
+                  width: borderWidth ?? 1,
                   color: borderColor ?? Theme.of(context).primaryColor)),
         ));
   }
 }
-
 
 void showAlertDialog(
     BuildContext context, TextEditingController categoryContoller) {

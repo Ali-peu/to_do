@@ -1,9 +1,8 @@
+import 'dart:ui';
+
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import 'package:provider/provider.dart';
-import 'package:to_do/data/drift_datebase_providers/drift_database_provider_for_note.dart';
-import 'package:to_do/future/task_screens/add_task_bottom_sheet/add_task_bottom_sheet.dart';
-import 'package:to_do/future/task_screens/add_task_bottom_sheet/add_task_bottom_sheet_model_view.dart';
+import 'package:to_do/data/router/app_router.dart';
 
 class AppMain extends StatelessWidget {
   final StatefulNavigationShell navigationShell;
@@ -16,23 +15,26 @@ class AppMain extends StatelessWidget {
     );
   }
 
-  Future<void> _displayBottomSheet(BuildContext context) {
-    return showModalBottomSheet(
-        context: context,
-        shape: const RoundedRectangleBorder(
-          borderRadius: BorderRadius.vertical(top: Radius.circular(25)),
-        ),
-        builder: (context) {
-          return SafeArea(
-              child: ChangeNotifierProvider(
-                create: (context)=>  AddTaskBottomSheetModelView(
-                        datebaseProviderForNote:
-                            Provider.of<DriftDatebaseProviderForNote>(context,
-                                listen: false)),
-                child: const AddTaskBottomSheet(),
-              ));
-        });
-  }
+  // Future<void> _displayBottomSheet(BuildContext context) {
+  //   return showModalBottomSheet(
+  //       context: context,
+  //       shape: const RoundedRectangleBorder(
+  //         borderRadius: BorderRadius.vertical(top: Radius.circular(25)),
+  //       ),
+  //       builder: (context) {
+  //         // return SafeArea(
+  //         //     child: ChangeNotifierProvider(
+  //         //   create: (context) => AddTaskBottomSheetModelView(
+  //         //       datebaseProviderForSubNote:
+  //         //           Provider.of<DriftDatebaseProviderForSubNote>(context,
+  //         //               listen: false),
+  //         //       datebaseProviderForNote:
+  //         //           Provider.of<DriftDatebaseProviderForNote>(context,
+  //         //               listen: false)),
+  //         //   child: const AddTaskBottomSheet(),
+  //         // ));
+  //       });
+  // }
 
   @override
   Widget build(BuildContext context) {
@@ -40,28 +42,32 @@ class AppMain extends StatelessWidget {
       backgroundColor: Colors.white,
       body: SafeArea(child: navigationShell),
       floatingActionButton: Visibility(
-        visible: navigationShell.currentIndex == 2 ? false : true,
+        visible: router.routerDelegate.state?.path
+                ?.toLowerCase()
+                .compareTo(AppRouteNames.note.toLowerCase()) ==
+            0,
         child: FloatingActionButton(
           onPressed: () {
-            _displayBottomSheet(context);
+            context.pushNamed(AppRouteNames.createNote);
+            // _displayBottomSheet(context);
           },
           child: const Icon(Icons.add),
         ),
       ),
-      bottomNavigationBar: NavigationBar(
-        selectedIndex: navigationShell.currentIndex,
-        destinations: const [
-          NavigationDestination(
-              label: 'Tasks', icon: Icon(Icons.format_list_bulleted_add)),
-          NavigationDestination(
-              label: 'Calendar', icon: Icon(Icons.calendar_month_outlined)),
-          NavigationDestination(
-              label: 'Account', icon: Icon(Icons.account_box)),
-        ],
-        onDestinationSelected: (index) {
-          _goBranch(index, context);
-        },
-      ),
+      // bottomNavigationBar: NavigationBar(
+      //   selectedIndex: navigationShell.currentIndex,
+      //   destinations: const [
+      //     NavigationDestination(
+      //         label: 'Tasks', icon: Icon(Icons.format_list_bulleted_add)),
+      //     // NavigationDestination(
+      //     //     label: 'Calendar', icon: Icon(Icons.calendar_month_outlined)),
+      //     // NavigationDestination(
+      //     //     label: 'Account', icon: Icon(Icons.account_box)),
+      //   ],
+      //   onDestinationSelected: (index) {
+      //     _goBranch(index, context);
+      //   },
+      // ),
     );
   }
 }

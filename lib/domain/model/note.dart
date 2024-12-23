@@ -1,11 +1,10 @@
 import 'package:drift/drift.dart';
 import 'package:to_do/data/drift/drift_db.dart';
 
-final now = DateTime.now();
-
-class NoteModel {
+class NoteModel  {
   final String description;
   final int id;
+
   final DateTime? deadlineTime;
   final bool isDone;
   final String category;
@@ -33,7 +32,6 @@ class NoteModel {
 
   static NotesCompanion toCompanion(NoteModel note) {
     return NotesCompanion(
-        id: Value(note.id),
         description: Value(note.description),
         isDone: Value(note.isDone),
         category: Value(note.category),
@@ -45,17 +43,16 @@ class NoteModel {
         deletedTime: Value(note.deletedTime));
   }
 
-  static NoteModel fromCompanion(Note note) {
-    return NoteModel(
-        id: (note.id),
-        description: (note.description),
-        isDone: (note.isDone),
-        category: (note.category),
-        isThisStar: (note.isThisStar),
-        deadlineTime: (note.time),
-        remindTime: (note.remindTime),
-        createdTime: note.createdTime,
-        updatedTime: note.updatedTime,
-        deletedTime: note.deletedTime);
-  }
+  NoteModel.fromCompanion(Note note)
+      : isDone = note.isDone,
+        category = note.category,
+        isThisStar = note.isThisStar,
+        deadlineTime = note.time,
+        remindTime = note.remindTime,
+        createdTime = note.createdTime,
+        updatedTime = note.updatedTime,
+        deletedTime = note.deletedTime,
+        subNoteIdList = [],
+        description = note.description,
+        id = note.id;
 }

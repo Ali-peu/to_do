@@ -704,16 +704,328 @@ class CategoryNotesCompanion extends UpdateCompanion<CategoryNote> {
   }
 }
 
+class $SubNotesTable extends SubNotes with TableInfo<$SubNotesTable, SubNote> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $SubNotesTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _idMeta = const VerificationMeta('id');
+  @override
+  late final GeneratedColumn<int> id = GeneratedColumn<int>(
+      'id', aliasedName, false,
+      hasAutoIncrement: true,
+      type: DriftSqlType.int,
+      requiredDuringInsert: false,
+      defaultConstraints:
+          GeneratedColumn.constraintIsAlways('PRIMARY KEY AUTOINCREMENT'));
+  static const VerificationMeta _descriptionMeta =
+      const VerificationMeta('description');
+  @override
+  late final GeneratedColumn<String> description = GeneratedColumn<String>(
+      'description', aliasedName, false,
+      type: DriftSqlType.string, requiredDuringInsert: true);
+  static const VerificationMeta _parentIdMeta =
+      const VerificationMeta('parentId');
+  @override
+  late final GeneratedColumn<int> parentId = GeneratedColumn<int>(
+      'parent_id', aliasedName, false,
+      type: DriftSqlType.int, requiredDuringInsert: true);
+  static const VerificationMeta _commentMeta =
+      const VerificationMeta('comment');
+  @override
+  late final GeneratedColumn<String> comment = GeneratedColumn<String>(
+      'comment', aliasedName, true,
+      type: DriftSqlType.string, requiredDuringInsert: false);
+  static const VerificationMeta _importanceValueMeta =
+      const VerificationMeta('importanceValue');
+  @override
+  late final GeneratedColumn<int> importanceValue = GeneratedColumn<int>(
+      'importance_value', aliasedName, true,
+      type: DriftSqlType.int, requiredDuringInsert: false);
+  @override
+  List<GeneratedColumn> get $columns =>
+      [id, description, parentId, comment, importanceValue];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'sub_notes';
+  @override
+  VerificationContext validateIntegrity(Insertable<SubNote> instance,
+      {bool isInserting = false}) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('id')) {
+      context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
+    }
+    if (data.containsKey('description')) {
+      context.handle(
+          _descriptionMeta,
+          description.isAcceptableOrUnknown(
+              data['description']!, _descriptionMeta));
+    } else if (isInserting) {
+      context.missing(_descriptionMeta);
+    }
+    if (data.containsKey('parent_id')) {
+      context.handle(_parentIdMeta,
+          parentId.isAcceptableOrUnknown(data['parent_id']!, _parentIdMeta));
+    } else if (isInserting) {
+      context.missing(_parentIdMeta);
+    }
+    if (data.containsKey('comment')) {
+      context.handle(_commentMeta,
+          comment.isAcceptableOrUnknown(data['comment']!, _commentMeta));
+    }
+    if (data.containsKey('importance_value')) {
+      context.handle(
+          _importanceValueMeta,
+          importanceValue.isAcceptableOrUnknown(
+              data['importance_value']!, _importanceValueMeta));
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {id};
+  @override
+  SubNote map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return SubNote(
+      id: attachedDatabase.typeMapping
+          .read(DriftSqlType.int, data['${effectivePrefix}id'])!,
+      description: attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}description'])!,
+      parentId: attachedDatabase.typeMapping
+          .read(DriftSqlType.int, data['${effectivePrefix}parent_id'])!,
+      comment: attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}comment']),
+      importanceValue: attachedDatabase.typeMapping
+          .read(DriftSqlType.int, data['${effectivePrefix}importance_value']),
+    );
+  }
+
+  @override
+  $SubNotesTable createAlias(String alias) {
+    return $SubNotesTable(attachedDatabase, alias);
+  }
+}
+
+class SubNote extends DataClass implements Insertable<SubNote> {
+  final int id;
+  final String description;
+  final int parentId;
+  final String? comment;
+  final int? importanceValue;
+  const SubNote(
+      {required this.id,
+      required this.description,
+      required this.parentId,
+      this.comment,
+      this.importanceValue});
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['id'] = Variable<int>(id);
+    map['description'] = Variable<String>(description);
+    map['parent_id'] = Variable<int>(parentId);
+    if (!nullToAbsent || comment != null) {
+      map['comment'] = Variable<String>(comment);
+    }
+    if (!nullToAbsent || importanceValue != null) {
+      map['importance_value'] = Variable<int>(importanceValue);
+    }
+    return map;
+  }
+
+  SubNotesCompanion toCompanion(bool nullToAbsent) {
+    return SubNotesCompanion(
+      id: Value(id),
+      description: Value(description),
+      parentId: Value(parentId),
+      comment: comment == null && nullToAbsent
+          ? const Value.absent()
+          : Value(comment),
+      importanceValue: importanceValue == null && nullToAbsent
+          ? const Value.absent()
+          : Value(importanceValue),
+    );
+  }
+
+  factory SubNote.fromJson(Map<String, dynamic> json,
+      {ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return SubNote(
+      id: serializer.fromJson<int>(json['id']),
+      description: serializer.fromJson<String>(json['description']),
+      parentId: serializer.fromJson<int>(json['parentId']),
+      comment: serializer.fromJson<String?>(json['comment']),
+      importanceValue: serializer.fromJson<int?>(json['importanceValue']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'id': serializer.toJson<int>(id),
+      'description': serializer.toJson<String>(description),
+      'parentId': serializer.toJson<int>(parentId),
+      'comment': serializer.toJson<String?>(comment),
+      'importanceValue': serializer.toJson<int?>(importanceValue),
+    };
+  }
+
+  SubNote copyWith(
+          {int? id,
+          String? description,
+          int? parentId,
+          Value<String?> comment = const Value.absent(),
+          Value<int?> importanceValue = const Value.absent()}) =>
+      SubNote(
+        id: id ?? this.id,
+        description: description ?? this.description,
+        parentId: parentId ?? this.parentId,
+        comment: comment.present ? comment.value : this.comment,
+        importanceValue: importanceValue.present
+            ? importanceValue.value
+            : this.importanceValue,
+      );
+  SubNote copyWithCompanion(SubNotesCompanion data) {
+    return SubNote(
+      id: data.id.present ? data.id.value : this.id,
+      description:
+          data.description.present ? data.description.value : this.description,
+      parentId: data.parentId.present ? data.parentId.value : this.parentId,
+      comment: data.comment.present ? data.comment.value : this.comment,
+      importanceValue: data.importanceValue.present
+          ? data.importanceValue.value
+          : this.importanceValue,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('SubNote(')
+          ..write('id: $id, ')
+          ..write('description: $description, ')
+          ..write('parentId: $parentId, ')
+          ..write('comment: $comment, ')
+          ..write('importanceValue: $importanceValue')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode =>
+      Object.hash(id, description, parentId, comment, importanceValue);
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is SubNote &&
+          other.id == this.id &&
+          other.description == this.description &&
+          other.parentId == this.parentId &&
+          other.comment == this.comment &&
+          other.importanceValue == this.importanceValue);
+}
+
+class SubNotesCompanion extends UpdateCompanion<SubNote> {
+  final Value<int> id;
+  final Value<String> description;
+  final Value<int> parentId;
+  final Value<String?> comment;
+  final Value<int?> importanceValue;
+  const SubNotesCompanion({
+    this.id = const Value.absent(),
+    this.description = const Value.absent(),
+    this.parentId = const Value.absent(),
+    this.comment = const Value.absent(),
+    this.importanceValue = const Value.absent(),
+  });
+  SubNotesCompanion.insert({
+    this.id = const Value.absent(),
+    required String description,
+    required int parentId,
+    this.comment = const Value.absent(),
+    this.importanceValue = const Value.absent(),
+  })  : description = Value(description),
+        parentId = Value(parentId);
+  static Insertable<SubNote> custom({
+    Expression<int>? id,
+    Expression<String>? description,
+    Expression<int>? parentId,
+    Expression<String>? comment,
+    Expression<int>? importanceValue,
+  }) {
+    return RawValuesInsertable({
+      if (id != null) 'id': id,
+      if (description != null) 'description': description,
+      if (parentId != null) 'parent_id': parentId,
+      if (comment != null) 'comment': comment,
+      if (importanceValue != null) 'importance_value': importanceValue,
+    });
+  }
+
+  SubNotesCompanion copyWith(
+      {Value<int>? id,
+      Value<String>? description,
+      Value<int>? parentId,
+      Value<String?>? comment,
+      Value<int?>? importanceValue}) {
+    return SubNotesCompanion(
+      id: id ?? this.id,
+      description: description ?? this.description,
+      parentId: parentId ?? this.parentId,
+      comment: comment ?? this.comment,
+      importanceValue: importanceValue ?? this.importanceValue,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (id.present) {
+      map['id'] = Variable<int>(id.value);
+    }
+    if (description.present) {
+      map['description'] = Variable<String>(description.value);
+    }
+    if (parentId.present) {
+      map['parent_id'] = Variable<int>(parentId.value);
+    }
+    if (comment.present) {
+      map['comment'] = Variable<String>(comment.value);
+    }
+    if (importanceValue.present) {
+      map['importance_value'] = Variable<int>(importanceValue.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('SubNotesCompanion(')
+          ..write('id: $id, ')
+          ..write('description: $description, ')
+          ..write('parentId: $parentId, ')
+          ..write('comment: $comment, ')
+          ..write('importanceValue: $importanceValue')
+          ..write(')'))
+        .toString();
+  }
+}
+
 abstract class _$AppDatabase extends GeneratedDatabase {
   _$AppDatabase(QueryExecutor e) : super(e);
   $AppDatabaseManager get managers => $AppDatabaseManager(this);
   late final $NotesTable notes = $NotesTable(this);
   late final $CategoryNotesTable categoryNotes = $CategoryNotesTable(this);
+  late final $SubNotesTable subNotes = $SubNotesTable(this);
   @override
   Iterable<TableInfo<Table, Object?>> get allTables =>
       allSchemaEntities.whereType<TableInfo<Table, Object?>>();
   @override
-  List<DatabaseSchemaEntity> get allSchemaEntities => [notes, categoryNotes];
+  List<DatabaseSchemaEntity> get allSchemaEntities =>
+      [notes, categoryNotes, subNotes];
 }
 
 typedef $$NotesTableCreateCompanionBuilder = NotesCompanion Function({
@@ -1071,6 +1383,167 @@ typedef $$CategoryNotesTableProcessedTableManager = ProcessedTableManager<
     ),
     CategoryNote,
     PrefetchHooks Function()>;
+typedef $$SubNotesTableCreateCompanionBuilder = SubNotesCompanion Function({
+  Value<int> id,
+  required String description,
+  required int parentId,
+  Value<String?> comment,
+  Value<int?> importanceValue,
+});
+typedef $$SubNotesTableUpdateCompanionBuilder = SubNotesCompanion Function({
+  Value<int> id,
+  Value<String> description,
+  Value<int> parentId,
+  Value<String?> comment,
+  Value<int?> importanceValue,
+});
+
+class $$SubNotesTableFilterComposer
+    extends Composer<_$AppDatabase, $SubNotesTable> {
+  $$SubNotesTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<int> get id => $composableBuilder(
+      column: $table.id, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<String> get description => $composableBuilder(
+      column: $table.description, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<int> get parentId => $composableBuilder(
+      column: $table.parentId, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<String> get comment => $composableBuilder(
+      column: $table.comment, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<int> get importanceValue => $composableBuilder(
+      column: $table.importanceValue,
+      builder: (column) => ColumnFilters(column));
+}
+
+class $$SubNotesTableOrderingComposer
+    extends Composer<_$AppDatabase, $SubNotesTable> {
+  $$SubNotesTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<int> get id => $composableBuilder(
+      column: $table.id, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<String> get description => $composableBuilder(
+      column: $table.description, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<int> get parentId => $composableBuilder(
+      column: $table.parentId, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<String> get comment => $composableBuilder(
+      column: $table.comment, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<int> get importanceValue => $composableBuilder(
+      column: $table.importanceValue,
+      builder: (column) => ColumnOrderings(column));
+}
+
+class $$SubNotesTableAnnotationComposer
+    extends Composer<_$AppDatabase, $SubNotesTable> {
+  $$SubNotesTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<int> get id =>
+      $composableBuilder(column: $table.id, builder: (column) => column);
+
+  GeneratedColumn<String> get description => $composableBuilder(
+      column: $table.description, builder: (column) => column);
+
+  GeneratedColumn<int> get parentId =>
+      $composableBuilder(column: $table.parentId, builder: (column) => column);
+
+  GeneratedColumn<String> get comment =>
+      $composableBuilder(column: $table.comment, builder: (column) => column);
+
+  GeneratedColumn<int> get importanceValue => $composableBuilder(
+      column: $table.importanceValue, builder: (column) => column);
+}
+
+class $$SubNotesTableTableManager extends RootTableManager<
+    _$AppDatabase,
+    $SubNotesTable,
+    SubNote,
+    $$SubNotesTableFilterComposer,
+    $$SubNotesTableOrderingComposer,
+    $$SubNotesTableAnnotationComposer,
+    $$SubNotesTableCreateCompanionBuilder,
+    $$SubNotesTableUpdateCompanionBuilder,
+    (SubNote, BaseReferences<_$AppDatabase, $SubNotesTable, SubNote>),
+    SubNote,
+    PrefetchHooks Function()> {
+  $$SubNotesTableTableManager(_$AppDatabase db, $SubNotesTable table)
+      : super(TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$SubNotesTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$SubNotesTableOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $$SubNotesTableAnnotationComposer($db: db, $table: table),
+          updateCompanionCallback: ({
+            Value<int> id = const Value.absent(),
+            Value<String> description = const Value.absent(),
+            Value<int> parentId = const Value.absent(),
+            Value<String?> comment = const Value.absent(),
+            Value<int?> importanceValue = const Value.absent(),
+          }) =>
+              SubNotesCompanion(
+            id: id,
+            description: description,
+            parentId: parentId,
+            comment: comment,
+            importanceValue: importanceValue,
+          ),
+          createCompanionCallback: ({
+            Value<int> id = const Value.absent(),
+            required String description,
+            required int parentId,
+            Value<String?> comment = const Value.absent(),
+            Value<int?> importanceValue = const Value.absent(),
+          }) =>
+              SubNotesCompanion.insert(
+            id: id,
+            description: description,
+            parentId: parentId,
+            comment: comment,
+            importanceValue: importanceValue,
+          ),
+          withReferenceMapper: (p0) => p0
+              .map((e) => (e.readTable(table), BaseReferences(db, table, e)))
+              .toList(),
+          prefetchHooksCallback: null,
+        ));
+}
+
+typedef $$SubNotesTableProcessedTableManager = ProcessedTableManager<
+    _$AppDatabase,
+    $SubNotesTable,
+    SubNote,
+    $$SubNotesTableFilterComposer,
+    $$SubNotesTableOrderingComposer,
+    $$SubNotesTableAnnotationComposer,
+    $$SubNotesTableCreateCompanionBuilder,
+    $$SubNotesTableUpdateCompanionBuilder,
+    (SubNote, BaseReferences<_$AppDatabase, $SubNotesTable, SubNote>),
+    SubNote,
+    PrefetchHooks Function()>;
 
 class $AppDatabaseManager {
   final _$AppDatabase _db;
@@ -1079,4 +1552,6 @@ class $AppDatabaseManager {
       $$NotesTableTableManager(_db, _db.notes);
   $$CategoryNotesTableTableManager get categoryNotes =>
       $$CategoryNotesTableTableManager(_db, _db.categoryNotes);
+  $$SubNotesTableTableManager get subNotes =>
+      $$SubNotesTableTableManager(_db, _db.subNotes);
 }

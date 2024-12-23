@@ -46,14 +46,21 @@ class _AddTaskBottomSheetState extends State<AddTaskBottomSheet> {
   }
 
   Widget subtiteWidget() {
-    return TextField(
-      autofocus: true,
+    return AppTextField(
       controller: addTaskBottomSheetModelView.subtitle,
-      decoration: const InputDecoration(
-        contentPadding: EdgeInsets.symmetric(horizontal: 15, vertical: 15),
-        hintText: 'Введите здесь новую задачу',
-        border: InputBorder.none,
-      ),
+      hintext: ' Введите здесь новую задачу',
+      borderColor: Colors.blue,
+      isDense: false,
+      borderRadius: 20,
+      maxLines: 3,
+      style: const TextStyle(fontSize: 16),
+      hintTextStyle: const TextStyle(fontSize: 16),
+      contentPadding: const EdgeInsets.only(top: 14, left: 10),
+      suffixIcon: StarNoteIcon(
+          onPressed: () {
+            addTaskBottomSheetModelView.setStarNote();
+          },
+          isNoteStar: addTaskBottomSheetModelView.isThisStar),
     );
   }
 
@@ -101,35 +108,43 @@ class _AddTaskBottomSheetState extends State<AddTaskBottomSheet> {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Container(
-                height: MediaQuery.of(context).size.height * 0.1,
-                width: MediaQuery.of(context).size.width,
-                decoration:
-                    BoxDecoration(borderRadius: BorderRadius.circular(5)),
-                child: Padding(
-                  padding: const EdgeInsets.all(8),
-                  child: Row(
-                    children: [
-                      Flexible(child: subtiteWidget()),
-                      StarNoteIcon(
-                          onPressed: () {
-                            addTaskBottomSheetModelView.setStarNote();
-                          },
-                          isNoteStar: addTaskBottomSheetModelView.isThisStar)
-                    ],
-                  ),
-                )),
+            Padding(
+                padding: const EdgeInsets.only(top: 10, left: 10, right: 5),
+                child: subtiteWidget()),
             ...List<SubNoteModel>.from(addTaskBottomSheetModelView.subNotesList)
-                .map((e) => AppTextField(
-                    controller: addTaskBottomSheetModelView
-                            .subNotesListTextControllers[
-                        addTaskBottomSheetModelView.subNotesList.indexOf(e)])),
+                .map((e) => Padding(
+                      padding:
+                          const EdgeInsets.only(left: 10, top: 8, bottom: 8),
+                      child: Row(
+                        children: [
+                          Text(
+                            (addTaskBottomSheetModelView.subNotesList
+                                        .indexOf(e) +
+                                    1)
+                                .toString(),
+                            style: const TextStyle(
+                                fontWeight: FontWeight.w400, fontSize: 18),
+                          ),
+                          const SizedBox(width: 10),
+                          Expanded(
+                            child: AppTextField(
+                                borderColor: Colors.blue,
+                                style: const TextStyle(
+                                    fontWeight: FontWeight.w600, fontSize: 16),
+                                controller: addTaskBottomSheetModelView
+                                        .subNotesListTextControllers[
+                                    addTaskBottomSheetModelView.subNotesList
+                                        .indexOf(e)]),
+                          ),
+                        ],
+                      ),
+                    )),
             Row(
               children: [
                 IconButton(
-                    onPressed: () =>
-                        addTaskBottomSheetModelView.addNewSubNote(),
-                    icon: const Icon(Icons.add)),
+                  onPressed: () => addTaskBottomSheetModelView.addNewSubNote(),
+                  icon: const Text('Добавить подзадачу'),
+                ),
                 if (addTaskBottomSheetModelView.subNotesList.isNotEmpty)
                   IconButton(
                       onPressed: () =>
@@ -142,14 +157,18 @@ class _AddTaskBottomSheetState extends State<AddTaskBottomSheet> {
                 Expanded(
                     child: Row(children: [
                   // testDropMenu(),
-
                   IconButton(
                       icon: addTaskBottomSheetModelView.selectedDeadlineTime ==
                               null
-                          ? const Icon(Icons.edit_calendar_outlined)
-                          : Text(addTaskBottomSheetModelView
-                              .selectedDeadlineTime
-                              .toString()),
+                          ? const Row(
+                              children: [
+                                Text('Дата'),
+                                SizedBox(width: 5),
+                                Icon(Icons.edit_calendar_outlined, size: 20),
+                              ],
+                            )
+                          : Text(
+                              addTaskBottomSheetModelView.getDateTimeDDMMYY()),
                       onPressed: () =>
                           addTaskBottomSheetModelView.setNewNoteDate(context))
                 ])),

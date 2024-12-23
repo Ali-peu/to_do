@@ -4,14 +4,13 @@ import 'package:fluttertoast/fluttertoast.dart';
 import 'package:to_do/data/drift_datebase_providers/drift_database_provider_for_note.dart';
 
 import 'package:to_do/global/edit_task.dart';
-import 'package:to_do/configuration/validators/validador_text.dart';
 import 'package:to_do/domain/model/note.dart';
 
 import 'package:to_do/future/widgets/timer_frame.dart';
 
 class TaskWidget extends StatefulWidget {
-  final NoteModel _note;
-  const TaskWidget(this._note, {super.key});
+  final NoteModel note;
+  const TaskWidget(this.note, {super.key});
 
   @override
   State<TaskWidget> createState() => _TaskWidgetState();
@@ -42,7 +41,7 @@ class _TaskWidgetState extends State<TaskWidget> {
                 onPressed: (context) async {
                   DateTime? selectedTime =
                       await MyCustomCalendar().showCustomDatePickerPac(context);
-                  // HiveDataBase().updateDatetime(widget._note, selectedTime ?? DateTime.now());
+                  // HiveDataBase().updateDatetime(widget.note, selectedTime ?? DateTime.now());
                 },
                 backgroundColor: const Color.fromARGB(255, 66, 141, 232),
                 foregroundColor: Colors.white,
@@ -50,15 +49,15 @@ class _TaskWidgetState extends State<TaskWidget> {
                 label: 'Data',
               ),
               SlidableAction(
-                onPressed: (context) =>(){},
+                onPressed: (context) => () {},
                 //  (HiveDataBase().starNote(
-                  // widget._note,
-                  // widget._note.isThisStar,
+                // widget.note,
+                // widget.note.isThisStar,
                 // )),
-              
+
                 backgroundColor: const Color.fromARGB(255, 233, 242, 61),
                 foregroundColor: Colors.white,
-                icon: widget._note.isThisStar ? Icons.star : Icons.star_border,
+                icon: widget.note.isThisStar ? Icons.star : Icons.star_border,
                 label: 'Star',
               )
             ],
@@ -74,7 +73,7 @@ class _TaskWidgetState extends State<TaskWidget> {
             Navigator.push(
               context,
               MaterialPageRoute(
-                builder: (context) => EditTask(widget._note),
+                builder: (context) => EditTask(widget.note),
               ),
             );
           },
@@ -89,32 +88,34 @@ class _TaskWidgetState extends State<TaskWidget> {
             padding: const EdgeInsets.symmetric(vertical: 8.0),
             child: noteTitleText(),
           ),
-          subtitle: boolCheckDeaadline(widget._note.deadlineTime)
-              ? (widget._note.remindTime == widget._note.deadlineTime
-                  ? const Text('')
-                  : Text(
-                      TimeOfDay.fromDateTime(widget._note.remindTime ?? DateTime.now())
-                          .toString(),
-                      // style: TextStyle(
-                      //     color:
-                      //         // checkIsReplayTimeDeadline(widget._note.replayTime1)
-                      //         //     ? Colors.black
-                      //         //:
-                      //         Theme.of(context).colorScheme.error)
-                    ))
-              : Text(
-                  deadlineTask(widget._note.deadlineTime.toString()),
-                  style: TextStyle(
-                      color: isThatDeadlineAsGone(widget._note.deadlineTime)
-                          ? Colors.black
-                          : Theme.of(context).colorScheme.error,
-                      fontSize: 12),
-                ),
+          subtitle: Text('data'),
+          // boolCheckDeaadline(widget.note.deadlineTime)
+          //     ? (widget.note.remindTime == widget.note.deadlineTime
+          //         ? const Text('')
+          //         : Text(
+          //             TimeOfDay.fromDateTime(
+          //                     widget.note.remindTime ?? DateTime.now())
+          //                 .toString(),
+          //             // style: TextStyle(
+          //             //     color:
+          //             //         // checkIsReplayTimeDeadline(widget.note.replayTime1)
+          //             //         //     ? Colors.black
+          //             //         //:
+          //             //         Theme.of(context).colorScheme.error)
+          //           ))
+          //     : Text(
+          //         deadlineTask(widget.note.deadlineTime.toString()),
+          //         style: TextStyle(
+          //             color: isThatDeadlineAsGone(widget.note.deadlineTime)
+          //                 ? Colors.black
+          //                 : Theme.of(context).colorScheme.error,
+          //             fontSize: 12),
+          //       ),
           leading: IconButton(
               onPressed: () {
-                // HiveDataBase().isdone(widget._note, widget._note.isDone);
+                // HiveDataBase().isdone(widget.note, widget.note.isDone);
               },
-              icon: widget._note.isDone
+              icon: widget.note.isDone
                   ? const Icon(Icons.expand_circle_down_rounded)
                   : const Icon(Icons.expand_circle_down_outlined))),
     );
@@ -129,7 +130,7 @@ class _TaskWidgetState extends State<TaskWidget> {
             actions: [
               TextButton(
                   onPressed: () {
-                    // HiveDataBase().deleteNote(widget._note);
+                    // HiveDataBase().deleteNote(widget.note);
                     Navigator.of(context).pop(context);
                   },
                   child: const Text('Удалить',
@@ -147,14 +148,15 @@ class _TaskWidgetState extends State<TaskWidget> {
 
   Text noteTitleText() {
     return Text(
-      showCorrectTextInTaskContainer(widget._note.description),
+      // showCorrectTextInTaskContainer(widget.note.description),
+      widget.note.description,
       maxLines: 1,
       style: TextStyle(
           fontSize: 25,
-          decoration: widget._note.isDone
+          decoration: widget.note.isDone
               ? TextDecoration.lineThrough
               : TextDecoration.none,
-          color: widget._note.isDone ? Colors.grey : Colors.black),
+          color: widget.note.isDone ? Colors.grey : Colors.black),
     );
   }
 }

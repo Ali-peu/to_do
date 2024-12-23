@@ -5,7 +5,6 @@ import 'package:fluttertoast/fluttertoast.dart';
 import 'package:provider/provider.dart';
 import 'package:to_do/data/drift_datebase_providers/drift_database_provider_for_note.dart';
 
-
 import 'package:to_do/domain/model/note.dart';
 import 'package:to_do/future/another_futures/timer_in_edit_task.dart';
 import 'package:timezone/timezone.dart' as tz;
@@ -54,11 +53,13 @@ class _EditTaskState extends State<EditTask> {
   }
 
   void changeNoteStatus() {
-    unawaited(Provider.of<DriftDatebaseProviderForNote>(context,listen: false).updateNoteInDB(note: widget._note));
+    unawaited(Provider.of<DriftDatebaseProviderForNote>(context, listen: false)
+        .updateNoteInDB(model: widget._note));
   }
 
   void deleteNote() {
-    unawaited(Provider.of<DriftDatebaseProviderForNote>(context,listen: false).deleteNoteFromDB(id: widget._note.id));
+    unawaited(Provider.of<DriftDatebaseProviderForNote>(context, listen: false)
+        .deleteNoteFromDB(id: widget._note.id));
     Navigator.pop(context);
   }
 
@@ -106,7 +107,8 @@ class _EditTaskState extends State<EditTask> {
                 if (widget._note.remindTime != widget._note.deadlineTime)
                   Column(
                     children: [
-                      replayTime('напоминание в', widget._note.remindTime ?? DateTime.now()),
+                      replayTime('напоминание в',
+                          widget._note.remindTime ?? DateTime.now()),
                       replayTime2('Тип напоминание', 'Уведомление')
                     ],
                   ),
