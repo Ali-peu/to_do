@@ -1,19 +1,24 @@
 part of 'note_screen_bloc.dart';
 
-@immutable
-sealed class AddNoteState {}
+enum NoteScreenStatus { initial, loading, failure, drawing, success }
 
+class NoteScreenState extends Equatable {
+  final NoteScreenStatus noteScreenStatus;
+  final bool isFavourite;
 
+  const NoteScreenState(
+      {this.isFavourite = false,
+      this.noteScreenStatus = NoteScreenStatus.initial});
 
+  NoteScreenState copyWith({
+    NoteScreenStatus? noteScreenStatus,
+    bool? isFavourite,
+  }) {
+    return NoteScreenState(
+        noteScreenStatus: noteScreenStatus ?? this.noteScreenStatus,
+        isFavourite: isFavourite ?? this.isFavourite);
+  }
 
-final class AddNoteInitial extends AddNoteState {
-
+  @override
+  List<Object?> get props => [noteScreenStatus, isFavourite];
 }
-
-final class AddNoteWorkWithImagesState extends AddNoteState{
-
-}
-
-final class AddNoteDrawLinesState extends AddNoteState{
-
-} 

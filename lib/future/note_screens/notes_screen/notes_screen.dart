@@ -1,10 +1,10 @@
-
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:to_do/domain/model/category_note.dart';
 import 'package:to_do/domain/model/note.dart';
 import 'package:to_do/future/another_futures/category_edit.dart';
-import 'package:to_do/future/note_screens/notes_screen/tasks_screen_model_view.dart';
+import 'package:to_do/future/note_screens/notes_screen/notes_screen_model_view.dart';
+import 'package:to_do/future/widgets/task_widgets.dart';
 import 'package:to_do/global/theme.dart';
 
 class NotesScren extends StatelessWidget {
@@ -13,7 +13,7 @@ class NotesScren extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ChangeNotifierProvider.value(
-        value: Provider.of<TasksScreenModelView>(context, listen: false),
+        value: Provider.of<NotesScreenModelView>(context, listen: false),
         child: const _NotesScreen());
   }
 }
@@ -31,13 +31,13 @@ class _NotesScrenStatee extends State<_NotesScreen> {
   ThemeProvider notifier = ThemeProvider();
   // String chooseCategory = 'All';
 
-  late final TasksScreenModelView taskScreenModelView;
+  late final NotesScreenModelView taskScreenModelView;
 
   @override
   void initState() {
     super.initState();
     taskScreenModelView =
-        Provider.of<TasksScreenModelView>(context, listen: false);
+        Provider.of<NotesScreenModelView>(context, listen: false);
   }
 
   List<CategoryNote> categoryListNote = [];
@@ -149,12 +149,12 @@ class _NotesScrenStatee extends State<_NotesScreen> {
     // sortingList(selectedSortValue, future);
     // sortingList(selectedSortValue, todayAndDone);
 
-    return Consumer<TasksScreenModelView>(builder: (context, value, child) {
+    return Consumer<NotesScreenModelView>(builder: (context, value, child) {
       if (value.isLoading) {
-        return const CircularProgressIndicator();
+        return const Center(child: CircularProgressIndicator());
       }
       final data = taskScreenModelView.listNoteModel ?? [];
-      return Column(children: data.map<Widget>((e)=> Text(e.id.toString())).toList());
+      return Column(children: data.map<Widget>(TaskWidget.new).toList());
     });
 
     // if (taskList.isEmpty) {
@@ -189,7 +189,7 @@ class _NotesScrenStatee extends State<_NotesScreen> {
           style: const TextStyle(color: Colors.black, fontSize: 25),
         ),
         // trailing: const Visibility(visible: false, child: Text('')),
-        children: taskList.map<Widget>((e)=> Text(e.id.toString())).toList(),
+        children: taskList.map<Widget>((e) => Text(e.id.toString())).toList(),
       ),
     );
   }
@@ -354,7 +354,7 @@ class MySearchDelegate extends SearchDelegate<String> {
   @override
   Widget buildResults(BuildContext context) {
     return ListView(
-        
+
         // box.values
         //     .where((element) =>
         //         element.description.toLowerCase().contains(query.toLowerCase()))
@@ -367,7 +367,7 @@ class MySearchDelegate extends SearchDelegate<String> {
   @override
   Widget buildSuggestions(BuildContext context) {
     return ListView(
-        
+
         //  box.values
         //     .where((element) =>
         //         element.description.toLowerCase().contains(query.toLowerCase()))

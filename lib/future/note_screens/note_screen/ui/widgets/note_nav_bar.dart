@@ -10,7 +10,7 @@ class NoteNavBar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return BlocBuilder<AddNoteBloc, AddNoteState>(builder: (context, state) {
+    return BlocBuilder<NoteScreenBloc, NoteScreenState>(builder: (context, state) {
       return Padding(
         padding: const EdgeInsets.symmetric(horizontal: 25),
         child: Container(
@@ -22,12 +22,12 @@ class NoteNavBar extends StatelessWidget {
               Row(mainAxisAlignment: MainAxisAlignment.spaceAround, children: [
             GestureDetector(
                 onTap: () {
-                  context.read<AddNoteBloc>().add(DrawLines());
+                  context.read<NoteScreenBloc>().add(DrawLines());
                 },
                 child: DecoratedBox(
                     decoration: BoxDecoration(
                         color:
-                            state is AddNoteDrawLinesState ? Colors.red : null),
+                            state.noteScreenStatus == NoteScreenStatus.drawing ? Colors.red : null),
                     child: SvgPicture.asset(IconAssets.pen))),
             GestureDetector(
                 onTap: () {},
@@ -101,7 +101,7 @@ class NoteNavBar extends StatelessWidget {
                   // value.isFavor = !value.isFavor;
                 },
                 child: AddFavourite(
-                  isFavor: state is AddNoteDrawLinesState,
+                  isFavor: state.isFavourite,
                 )),
           ]),
         ),

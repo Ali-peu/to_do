@@ -3,7 +3,7 @@ import 'package:to_do/data/drift_datebase_providers/drift_database_provider_for_
 import 'package:to_do/data/drift_datebase_providers/note_repository.dart';
 import 'package:to_do/domain/model/note.dart';
 
-class TasksScreenModelView extends ChangeNotifier {
+class NotesScreenModelView extends ChangeNotifier {
   final NoteRepository datebaseProviderForNote;
   final DriftDatebaseProviderForSubNote driftDatebaseProviderForSubNote;
 
@@ -11,7 +11,7 @@ class TasksScreenModelView extends ChangeNotifier {
 
 
   List<NoteModel>? listNoteModel = [];
-  TasksScreenModelView(
+  NotesScreenModelView(
       {required this.datebaseProviderForNote,
       required this.driftDatebaseProviderForSubNote}){
         getNotes();

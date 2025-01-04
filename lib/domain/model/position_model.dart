@@ -48,8 +48,12 @@ class PositionModel {
     return PositionsCompanion(
         dx: Value(model.dx),
         dy: Value(model.dy),
+        rotate: Value(model.rotate),
+        scaleX: Value(model.scaleX),
+        scaleY: Value(model.scaleY),
+        opacity: Value(model.opacity),
         parentId: Value(model.parentId),
-        positionType: Value(model.positionType.toString()));
+        positionType: Value(model.positionType.name));
   }
 
   PositionModel.fromCompanion(Position position)

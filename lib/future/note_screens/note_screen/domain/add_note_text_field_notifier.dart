@@ -2,9 +2,9 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 
 class AddNoteTextFieldNotifier {
-
   final _positionsController = StreamController<List<Offset>>.broadcast();
-  final _controllersController = StreamController<List<TextEditingController>>.broadcast();
+  final _controllersController =
+      StreamController<List<TextEditingController>>.broadcast();
 
   List<Offset> positions = [];
   List<TextEditingController> controllers = [];
@@ -14,7 +14,18 @@ class AddNoteTextFieldNotifier {
   AddNoteTextFieldNotifier();
 
   Stream<List<Offset>> get positionsStream => _positionsController.stream;
-  Stream<List<TextEditingController>> get controllersStream => _controllersController.stream;
+  Stream<List<TextEditingController>> get controllersStream =>
+      _controllersController.stream;
+
+  Future<void> addTextListForStream(List<String> texts) async {
+    controllers = texts.map((e) => TextEditingController(text: e)).toList();
+    _controllersController.add(controllers);
+  }
+
+  Future<void> addTextPositions(List<Offset> positionsList) async {
+    positions = positionsList;
+    _positionsController.add(positionsList);
+  }
 
   // void moveToNextTextField() {
   //   if (positions.isNotEmpty) {
@@ -32,8 +43,8 @@ class AddNoteTextFieldNotifier {
   //   }
   // }
 
-  void updateTextPosition(Offset position, {required int updatedId,required double currentScrollOffset}) {
-
+  void updateTextPosition(Offset position,
+      {required int updatedId, required double currentScrollOffset}) {
     final adjustedPosition = Offset(
       position.dx,
       position.dy + currentScrollOffset,
@@ -60,9 +71,9 @@ class AddNoteTextFieldNotifier {
     _controllersController.add(List.from(controllers));
   }
 
-  Future<void> onTapUp(TapUpDetails? details,{required double currentScrollOffset }) async {
+  Future<void> onTapUp(TapUpDetails? details,
+      {required double currentScrollOffset}) async {
     if (details == null) return;
-
 
     // Вычисляем координаты с учетом прокрутки
     final adjustedPosition = Offset(

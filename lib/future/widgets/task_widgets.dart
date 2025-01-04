@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import 'package:go_router/go_router.dart';
+import 'package:to_do/data/router/app_router.dart';
 import 'package:to_do/domain/model/note.dart';
 import 'package:to_do/future/widgets/timer_frame.dart';
 
@@ -63,51 +65,46 @@ class _TaskWidgetState extends State<TaskWidget> {
 
   Widget noteListTile() {
     return Card(
-      child: ListTile(
-          onTap: () {
-            // Navigator.push(
-            //   context,
-            //   MaterialPageRoute(
-            //     builder: (context) => EditTask(widget.note),
-            //   ),
-            // );
-          },
-          onLongPress: () {
-            Fluttertoast.showToast(msg: 'LongPress');
-          },
-          // shape: RoundedRectangleBorder(
-          //   borderRadius: BorderRadius.circular(1),
-          //   side: const BorderSide(),
-          // ),
-          title: Padding(
-            padding: const EdgeInsets.symmetric(vertical: 8.0),
-            child: noteTitleText(),
-          ),
-          subtitle: const Text('data'),
-          // boolCheckDeaadline(widget.note.deadlineTime)
-          //     ? (widget.note.remindTime == widget.note.deadlineTime
-          //         ? const Text('')
-          //         : Text(
-          //             TimeOfDay.fromDateTime(
-          //                     widget.note.remindTime ?? DateTime.now())
-          //                 .toString(),
-          //             // style: TextStyle(
-          //             //     color:
-          //             //         // checkIsReplayTimeDeadline(widget.note.replayTime1)
-          //             //         //     ? Colors.black
-          //             //         //:
-          //             //         Theme.of(context).colorScheme.error)
-          //           ))
-          //     : Text(
-          //         deadlineTask(widget.note.deadlineTime.toString()),
-          //         style: TextStyle(
-          //             color: isThatDeadlineAsGone(widget.note.deadlineTime)
-          //                 ? Colors.black
-          //                 : Theme.of(context).colorScheme.error,
-          //             fontSize: 12),
-          //       ),),
-      )
-    );
+        child: ListTile(
+      onTap: () {
+        context.pushNamed(AppRouteNames.editNote,
+            pathParameters: {'id': widget.note.id.toString()});
+      },
+      onLongPress: () {
+        Fluttertoast.showToast(msg: 'LongPress');
+      },
+      // shape: RoundedRectangleBorder(
+      //   borderRadius: BorderRadius.circular(1),
+      //   side: const BorderSide(),
+      // ),
+      title: Padding(
+        padding: const EdgeInsets.symmetric(vertical: 8.0),
+        child: noteTitleText(),
+      ),
+      subtitle: const Text('data'),
+      // boolCheckDeaadline(widget.note.deadlineTime)
+      //     ? (widget.note.remindTime == widget.note.deadlineTime
+      //         ? const Text('')
+      //         : Text(
+      //             TimeOfDay.fromDateTime(
+      //                     widget.note.remindTime ?? DateTime.now())
+      //                 .toString(),
+      //             // style: TextStyle(
+      //             //     color:
+      //             //         // checkIsReplayTimeDeadline(widget.note.replayTime1)
+      //             //         //     ? Colors.black
+      //             //         //:
+      //             //         Theme.of(context).colorScheme.error)
+      //           ))
+      //     : Text(
+      //         deadlineTask(widget.note.deadlineTime.toString()),
+      //         style: TextStyle(
+      //             color: isThatDeadlineAsGone(widget.note.deadlineTime)
+      //                 ? Colors.black
+      //                 : Theme.of(context).colorScheme.error,
+      //             fontSize: 12),
+      //       ),),
+    ));
   }
 
   void showAlert() async {
@@ -140,8 +137,7 @@ class _TaskWidgetState extends State<TaskWidget> {
       // showCorrectTextInTaskContainer(widget.note.description),
       widget.note.id.toString(),
       maxLines: 1,
-      style: const TextStyle(
-          fontSize: 25),
+      style: const TextStyle(fontSize: 25),
     );
   }
 }

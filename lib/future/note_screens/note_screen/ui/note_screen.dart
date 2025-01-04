@@ -1,8 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:provider/provider.dart';
+import 'package:to_do/data/drift_datebase_providers/note_positions_repository.dart';
+import 'package:to_do/data/drift_datebase_providers/note_repository.dart';
+import 'package:to_do/data/drift_datebase_providers/note_text_repository.dart';
 
 import 'package:to_do/future/custom_painter/app_custom_painter.dart';
 import 'package:to_do/future/note_screens/note_screen/bloc/note_screen_bloc.dart';
+import 'package:to_do/future/note_screens/note_screen/data/save_note_repo.dart';
 import 'package:to_do/future/note_screens/note_screen/domain/add_note_text_field_notifier.dart';
 import 'package:to_do/future/note_screens/note_screen/domain/draw_note_notifier.dart';
 import 'package:to_do/future/note_screens/note_screen/ui/widgets/add_note_text_field.dart';
@@ -10,14 +15,22 @@ import 'package:to_do/future/note_screens/note_screen/ui/widgets/draggable_widge
 import 'package:to_do/future/note_screens/note_screen/ui/widgets/note_nav_bar.dart';
 
 class NoteScreen extends StatelessWidget {
-  const NoteScreen({super.key});
+  final int? noteId;
+  const NoteScreen({required this.noteId, super.key});
 
   @override
   Widget build(BuildContext context) {
     return BlocProvider(
-      create: (context) => AddNoteBloc(
+      create: (context) => NoteScreenBloc(
+          saveNoteRepo: SaveNoteRepo(
+            noteTextRepository:
+                Provider.of<NoteTextRepository>(context, listen: false),
+            noteRepository: Provider.of<NoteRepository>(context, listen: false),
+            notePositionsRepository:
+                Provider.of<NotePositionsRepository>(context, listen: false),
+          ),
           drawNoteNotifier: DrawNoteNotifier(),
-          addNoteTextFieldNotifier: AddNoteTextFieldNotifier()),
+          addNoteTextFieldNotifier: AddNoteTextFieldNotifier(), noteId: noteId)..add(FetchData(noteId: noteId )),
       child: const _NoteScreen(),
     );
   }
@@ -38,30 +51,44 @@ class _NoteScreenState extends State<_NoteScreen> {
       appBar: AppBar(
         leading: const BackButton(),
         title: const Text('Add Note'),
-        actions: [TextButton(onPressed: () {}, child: const Text('OK'))],
+        actions: [
+          TextButton(
+              onPressed: () {
+                if (context
+                    .read<NoteScreenBloc>()
+                    .addNoteTextFieldNotifier
+                    .controllers
+                    .isNotEmpty) {
+                  context.read<NoteScreenBloc>().add(SaveNote());
+                }
+              },
+              child: const Text('OK'))
+        ],
       ),
       floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
       floatingActionButton: const NoteNavBar(),
-      body: BlocBuilder<AddNoteBloc, AddNoteState>(
+      body: BlocBuilder<NoteScreenBloc, NoteScreenState>(
         builder: (context, state) {
-          final blocValue = context.read<AddNoteBloc>();
+          final blocValue = context.read<NoteScreenBloc>();
           return GestureDetector(
-              onPanUpdate: (details) => (state is AddNoteDrawLinesState)
-                  ? blocValue.drawNoteNotifier.onPanUpdate(details,
-                      currentScrollOffset: scrollController.offset)
-                  : null,
+              onPanUpdate: (details) =>
+                  (state.noteScreenStatus == NoteScreenStatus.drawing)
+                      ? blocValue.drawNoteNotifier.onPanUpdate(details,
+                          currentScrollOffset: scrollController.offset)
+                      : null,
               onPanEnd: (details) {
-                if (state is AddNoteDrawLinesState) {
+                if (state.noteScreenStatus == NoteScreenStatus.drawing) {
                   blocValue.drawNoteNotifier.finishLine();
                 }
               },
-              onTapUp: (details) => (state is! AddNoteDrawLinesState)
-                  ? blocValue.addNoteTextFieldNotifier.onTapUp(details,
-                      currentScrollOffset: scrollController.offset)
-                  : null,
+              onTapUp: (details) =>
+                  (state.noteScreenStatus != NoteScreenStatus.drawing)
+                      ? blocValue.addNoteTextFieldNotifier.onTapUp(details,
+                          currentScrollOffset: scrollController.offset)
+                      : null,
               child: SingleChildScrollView(
                 controller: scrollController,
-                physics: state is AddNoteDrawLinesState
+                physics: state.noteScreenStatus == NoteScreenStatus.drawing
                     ? const NeverScrollableScrollPhysics()
                     : const AlwaysScrollableScrollPhysics(),
                 child: Container(
@@ -77,7 +104,7 @@ class _NoteScreenState extends State<_NoteScreen> {
                         ),
                         StreamBuilder<List<List<Offset>>>(
                             stream: context
-                                .read<AddNoteBloc>()
+                                .read<NoteScreenBloc>()
                                 .drawNoteNotifier
                                 .positionsStreamController
                                 .stream,

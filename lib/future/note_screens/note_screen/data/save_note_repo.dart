@@ -20,14 +20,14 @@ class SaveNoteRepo {
 
   Future<void> saveNote(
       {required List<Offset> textPositions,
-      required List<String> text,
+      required List<String> texts,
       required bool isFavourite
       // required List<List<Offset>> linearPositions,
       // required List<String> linearColors
       }) async {
-    if (textPositions.length != text.length) {
+    if (textPositions.length != texts.length) {
       throw ArgumentError(
-        'Length of textPositions (${textPositions.length}) does not match length of text (${text.length})',
+        'Length of textPositions (${textPositions.length}) does not match length of text (${texts.length})',
       );
     }
     try {
@@ -36,7 +36,7 @@ class SaveNoteRepo {
       if (noteId != null) {
         for (var i = 0; i < textPositions.length; i++) {
           final id = await noteTextRepository.saveNoteTexts(
-              text: text[i], noteId: noteId);
+              text: texts[i], noteId: noteId);
           if (id != null) {
             await notePositionsRepository.savePosition(
                 dx: textPositions[i].dx,
