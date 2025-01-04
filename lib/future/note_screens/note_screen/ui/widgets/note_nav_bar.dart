@@ -1,16 +1,16 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/svg.dart';
-import 'package:provider/provider.dart';
 import 'package:to_do/configuration/assets/icon_assets.dart';
-import 'package:to_do/future/task_screens/add_note_screen/add_note_screen_model_view.dart';
-import 'package:to_do/future/task_screens/add_note_screen/widgets/add_favourite.dart';
+import 'package:to_do/future/note_screens/note_screen/bloc/note_screen_bloc.dart';
+import 'package:to_do/future/note_screens/note_screen/ui/widgets/add_favourite.dart';
 
 class NoteNavBar extends StatelessWidget {
   const NoteNavBar({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return Consumer<AddNoteScreenModelView>(builder: (context, value, child) {
+    return BlocBuilder<AddNoteBloc, AddNoteState>(builder: (context, state) {
       return Padding(
         padding: const EdgeInsets.symmetric(horizontal: 25),
         child: Container(
@@ -22,12 +22,12 @@ class NoteNavBar extends StatelessWidget {
               Row(mainAxisAlignment: MainAxisAlignment.spaceAround, children: [
             GestureDetector(
                 onTap: () {
-                  value.isChoisePencil = !value.isChoisePencil;
+                  context.read<AddNoteBloc>().add(DrawLines());
                 },
-                child: Container(
-                    // height: 30,
+                child: DecoratedBox(
                     decoration: BoxDecoration(
-                        color: value.isChoisePencil ? Colors.red : null),
+                        color:
+                            state is AddNoteDrawLinesState ? Colors.red : null),
                     child: SvgPicture.asset(IconAssets.pen))),
             GestureDetector(
                 onTap: () {},
@@ -48,7 +48,31 @@ class NoteNavBar extends StatelessWidget {
                       ?.copyWith(fontStyle: FontStyle.italic),
                 )),
             GestureDetector(
-              onLongPress: () {},
+              onPanDown: (details) {
+                // final overlay = Overlay.of(context);
+                // final boxPosition = details.globalPosition;
+
+                // if (overlay != null) {
+                //   final overlayEntry = OverlayEntry(
+                //     builder: (context) => Positioned(
+                //       top: boxPosition.dy, // Центрируем квадрат
+                //       left: boxPosition.dx,
+                //       child: const SizedBox(
+                //         height: 100,
+                //         width: 100,
+                //         child: ColoredBox(color: Colors.red),
+                //       ),
+                //     ),
+                //   );
+
+                //   overlay.insert(overlayEntry);
+
+                //   // Убираем квадрат через 2 секунды
+                //   Future.delayed(const Duration(seconds: 2), () {
+                //     overlayEntry.remove();
+                //   });
+                // }
+              },
               child: Container(
                 width: 25,
                 height: 25,
@@ -69,15 +93,15 @@ class NoteNavBar extends StatelessWidget {
                 onTap: () {}, child: SvgPicture.asset(IconAssets.image)),
             GestureDetector(
                 onTap: () {
-                  value.clearDrawing();
+                  // value.drawNoteNotifier.clearDrawing();
                 },
                 child: SvgPicture.asset(IconAssets.audio)),
             GestureDetector(
                 onTap: () {
-                  value.isFavor = !value.isFavor;
+                  // value.isFavor = !value.isFavor;
                 },
                 child: AddFavourite(
-                  isFavor: value.isFavor,
+                  isFavor: state is AddNoteDrawLinesState,
                 )),
           ]),
         ),

@@ -5,17 +5,17 @@ import 'package:to_do/configuration/validators/validador_text.dart';
 import 'package:to_do/domain/model/category_note.dart';
 import 'package:to_do/domain/model/note.dart';
 import 'package:to_do/future/another_futures/category_edit.dart';
-import 'package:to_do/future/task_screens/task_screen/task_screen_model_view.dart';
+import 'package:to_do/future/note_screens/tasks_screen/tasks_screen_model_view.dart';
 import 'package:to_do/future/widgets/task_widgets.dart';
 import 'package:to_do/global/theme.dart';
 
-class TaskScreen extends StatelessWidget {
-  const TaskScreen({super.key});
+class TasksScreen extends StatelessWidget {
+  const TasksScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
     return ChangeNotifierProvider.value(
-        value: Provider.of<TaskScreenModelView>(context, listen: false),
+        value: Provider.of<TasksScreenModelView>(context, listen: false),
         child: const TaskPage());
   }
 }
@@ -33,13 +33,13 @@ class _TaskPageState extends State<TaskPage> {
   ThemeProvider notifier = ThemeProvider();
   // String chooseCategory = 'All';
 
-  late final TaskScreenModelView taskScreenModelView;
+  late final TasksScreenModelView taskScreenModelView;
 
   @override
   void initState() {
     super.initState();
     taskScreenModelView =
-        Provider.of<TaskScreenModelView>(context, listen: false);
+        Provider.of<TasksScreenModelView>(context, listen: false);
   }
 
   List<CategoryNote> categoryListNote = [];
@@ -151,12 +151,12 @@ class _TaskPageState extends State<TaskPage> {
     // sortingList(selectedSortValue, future);
     // sortingList(selectedSortValue, todayAndDone);
 
-    return Consumer<TaskScreenModelView>(builder: (context, value, child) {
+    return Consumer<TasksScreenModelView>(builder: (context, value, child) {
       if (value.isLoading) {
         return const CircularProgressIndicator();
       }
       final data = taskScreenModelView.listNoteModel ?? [];
-      return Column(children: data.map<Widget>(TaskWidget.new).toList());
+      return Column(children: data.map<Widget>((e)=> Text(e.id.toString())).toList());
     });
 
     // if (taskList.isEmpty) {
@@ -191,7 +191,7 @@ class _TaskPageState extends State<TaskPage> {
           style: const TextStyle(color: Colors.black, fontSize: 25),
         ),
         // trailing: const Visibility(visible: false, child: Text('')),
-        children: taskList.map<Widget>(TaskWidget.new).toList(),
+        children: taskList.map<Widget>((e)=> Text(e.id.toString())).toList(),
       ),
     );
   }
@@ -297,41 +297,41 @@ class _TaskPageState extends State<TaskPage> {
   }
 
   void sortingList(String sortValue, List<NoteModel> noteList) {
-    switch (sortValue) {
-      case 'Срок и время':
-        noteList.sort((a, b) =>
-            a.deadlineTime?.compareTo(b.deadlineTime ?? DateTime.now()) ?? 0);
-      case 'По алфавиту от А до Я':
-        noteList.sort((a, b) =>
-            a.description.toLowerCase().compareTo(b.description.toLowerCase()));
-      case 'По алфавиту от Я-А':
-        noteList.sort((a, b) =>
-            b.description.toLowerCase().compareTo(a.description.toLowerCase()));
-      case 'Вручную(длинительное нажатие для сортировки)':
-        break;
-      default:
-    }
+    // switch (sortValue) {
+    //   case 'Срок и время':
+    //     noteList.sort((a, b) =>
+    //         a.deadlineTime?.compareTo(b.deadlineTime ?? DateTime.now()) ?? 0);
+    //   case 'По алфавиту от А до Я':
+    //     noteList.sort((a, b) =>
+    //         a.description.toLowerCase().compareTo(b.description.toLowerCase()));
+    //   case 'По алфавиту от Я-А':
+    //     noteList.sort((a, b) =>
+    //         b.description.toLowerCase().compareTo(a.description.toLowerCase()));
+    //   case 'Вручную(длинительное нажатие для сортировки)':
+    //     break;
+    //   default:
+    // }
   }
 
   bool isTaskInCategory(NoteModel note, String category) {
     return category == 'All' || note.category == category;
   }
 
-  bool isToday(NoteModel note) {
-    return boolCheckDeaadline(note.deadlineTime) && !note.isDone;
-  }
+  // bool isToday(NoteModel note) {
+  //   return boolCheckDeaadline(note.deadlineTime) && !note.isDone;
+  // }
 
-  bool isPastTask(NoteModel note) {
-    return checkThisIsPastTask(note.deadlineTime);
-  }
+  // bool isPastTask(NoteModel note) {
+  //   return checkThisIsPastTask(note.deadlineTime);
+  // }
 
-  bool isFutureTask(NoteModel note) {
-    return note.deadlineTime?.isAfter(DateTime.now()) ?? false;
-  }
+  // bool isFutureTask(NoteModel note) {
+  //   return note.deadlineTime?.isAfter(DateTime.now()) ?? false;
+  // }
 
-  bool isTodayAndDone(NoteModel note) {
-    return boolCheckDeaadline(note.deadlineTime) && note.isDone;
-  }
+  // bool isTodayAndDone(NoteModel note) {
+  //   return boolCheckDeaadline(note.deadlineTime) && note.isDone;
+  // }
 }
 
 class MySearchDelegate extends SearchDelegate<String> {

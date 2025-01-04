@@ -1,44 +1,54 @@
+import 'package:drift/drift.dart';
+import 'package:to_do/data/drift/drift_db.dart';
+
 class NoteTextModel {
   final int id;
-  final String text;
+  final String description;
   final int noteId;
-  final double positionX;
-  final double positionY;
-  final int textStyle; // 1=курсив, 2=жирный, 3=перечеркнутый
-  final int colorID;
+  final int textStyle; // 1=курсив, 2=жирный
+  final String colorHex;
 
   NoteTextModel({
     required this.id,
-    required this.text,
+    required this.description,
     required this.noteId,
-    required this.positionX,
-    required this.positionY,
     required this.textStyle,
-    required this.colorID,
+    required this.colorHex,
   });
 
   // Пример методов для преобразования в/из JSON:
   factory NoteTextModel.fromJson(Map<String, dynamic> json) {
     return NoteTextModel(
       id: json['id'] as int? ?? 0,
-      text: json['text'] as String? ?? '',
+      description: json['text'] as String? ?? '',
       noteId: json['noteId'] as int? ?? 0,
-      positionX: json['positionX'] as double? ?? 0,
-      positionY: json['positionY'] as double? ?? 0,
       textStyle: json['textStyle'] as int? ?? 0,
-      colorID: json['colorID'] as int? ?? 0,
+      colorHex: json['colorID'] as String? ?? '',
     );
   }
 
   Map<String, dynamic> toJson() {
     return {
       'id': id,
-      'text': text,
+      'description': description,
       'noteId': noteId,
-      'positionX': positionX,
-      'positionY': positionY,
       'textStyle': textStyle,
-      'colorID': colorID,
+      'colorID': colorHex,
     };
   }
+
+  static NoteTextsCompanion toCompanion(NoteTextModel noteTextModel) {
+    return NoteTextsCompanion(
+        description: Value(noteTextModel.description),
+        colorHex: Value(noteTextModel.colorHex),
+        noteId: Value(noteTextModel.noteId),
+        textStyle: Value(noteTextModel.textStyle));
+  }
+
+  NoteTextModel.fromComponion(NoteText noteText)
+      : description = noteText.description,
+        id = noteText.id,
+        colorHex = noteText.colorHex,
+        noteId = noteText.noteId,
+        textStyle = noteText.textStyle;
 }

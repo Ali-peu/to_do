@@ -1,17 +1,17 @@
 import 'dart:async';
 
 import 'package:to_do/data/database_provider/database_provider.dart';
-import 'package:to_do/data/drift/drift_db.dart';
+import 'package:to_do/data/drift/drift_tables/note_drift_table.dart';
 import 'package:to_do/domain/model/note.dart';
 
-class DriftDatebaseProviderForNote extends DatabaseProvider<NoteModel> {
-  final NoteDriftProvider noteDriftProvider;
+class NoteRepository extends DatabaseProvider<NoteModel> {
+  final NoteDriftTable noteDriftProvider;
 
-  DriftDatebaseProviderForNote({required this.noteDriftProvider});
+  NoteRepository({required this.noteDriftProvider});
 
   @override
-  Future<int?> createNoteForDB(NoteModel note) async {
-    final id = await noteDriftProvider.insertNote(note);
+  Future<int?> createNoteForDB(NoteModel model) async {
+    final id = await noteDriftProvider.insertNote(model);
     return id;
   }
 

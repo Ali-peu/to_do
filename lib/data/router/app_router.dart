@@ -3,13 +3,11 @@ import 'package:go_router/go_router.dart';
 import 'package:to_do/app/app_main.dart';
 // import 'package:to_do/future/account_page/account_page.dart';
 // import 'package:to_do/future/calendar_page/calendar_page.dart';
-import 'package:to_do/future/task_screens/add_note_screen/add_note_screen.dart';
-import 'package:to_do/future/task_screens/task_screen/task_screen.dart';
+import 'package:to_do/future/note_screens/note_screen/ui/note_screen.dart';
+import 'package:to_do/future/note_screens/tasks_screen/tasks_screen.dart';
 
 final GlobalKey<NavigatorState> _rootNavigatorKey =
     GlobalKey<NavigatorState>(debugLabel: 'root');
-final GlobalKey<NavigatorState> _sectionANavigatorKey =
-    GlobalKey<NavigatorState>(debugLabel: 'sectionANav');
 
 abstract class AppRouteNames {
   static String note = '/note';
@@ -31,12 +29,12 @@ final GoRouter router = GoRouter(
       branches: <StatefulShellBranch>[
         statefulShellBranch(
             path: AppRouteNames.note,
-            builder: const TaskScreen(),
+            builder: const TasksScreen(),
             routes: [
               GoRoute(
                 path: AppRouteNames.createNote,
                 name: AppRouteNames.createNote,
-                builder: (context, state) => const AddNoteScreen(),
+                builder: (context, state) => const NoteScreen(),
               )
             ]),
         // statefulShellBranch(

@@ -3,11 +3,5 @@ class ImageModel {
   final String? urlPath;
   final String? localPath;
 
-  const ImageModel(
-    this.urlPath,
-    this.localPath,
-
-    {
-    required this.id
-  });
+  const ImageModel(this.urlPath, this.localPath, {required this.id});
 }

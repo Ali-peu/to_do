@@ -1,17 +1,17 @@
 import 'package:flutter/material.dart';
-import 'package:to_do/data/drift_datebase_providers/drift_database_provider_for_note.dart';
 import 'package:to_do/data/drift_datebase_providers/drift_database_provider_for_sub_note.dart';
+import 'package:to_do/data/drift_datebase_providers/note_repository.dart';
 import 'package:to_do/domain/model/note.dart';
 
-class TaskScreenModelView extends ChangeNotifier {
-  final DriftDatebaseProviderForNote datebaseProviderForNote;
+class TasksScreenModelView extends ChangeNotifier {
+  final NoteRepository datebaseProviderForNote;
   final DriftDatebaseProviderForSubNote driftDatebaseProviderForSubNote;
 
   bool isLoading = true;
 
 
   List<NoteModel>? listNoteModel = [];
-  TaskScreenModelView(
+  TasksScreenModelView(
       {required this.datebaseProviderForNote,
       required this.driftDatebaseProviderForSubNote}){
         getNotes();

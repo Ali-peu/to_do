@@ -2,24 +2,16 @@ import 'dart:developer';
 
 import 'package:drift/drift.dart';
 import 'package:drift_flutter/drift_flutter.dart';
-import 'package:to_do/data/drift/const_drift_instanse.dart';
-import 'package:to_do/domain/model/note.dart';
-import 'package:to_do/domain/model/sub_note_model.dart';
 
 part 'drift_db.g.dart';
 
 class Notes extends Table {
   IntColumn get id => integer().autoIncrement()(); // id в вашем классе - строка
-  TextColumn get description => text()();
-  BoolColumn get isDone => boolean()();
   TextColumn get category => text()();
-  BoolColumn get isThisStar => boolean()();
-  DateTimeColumn get time => dateTime().nullable()();
-  DateTimeColumn get remindTime => dateTime().nullable()();
-  DateTimeColumn get createdTime => dateTime()();
+  BoolColumn get isFavourite => boolean()();
+  DateTimeColumn get createdTime => dateTime().clientDefault(DateTime.now)();
   DateTimeColumn get updatedTime => dateTime().nullable()();
   DateTimeColumn get deletedTime => dateTime().nullable()();
-  
 }
 
 class SubNotes extends Table {
@@ -30,12 +22,56 @@ class SubNotes extends Table {
   IntColumn get importanceValue => integer().nullable()();
 }
 
+class NoteTexts extends Table {
+  IntColumn get id => integer().autoIncrement()();
+  IntColumn get noteId => integer()(); // ID родительской заметки
+  TextColumn get description => text()();
+  IntColumn get textStyle => integer()(); // 1=курсив, 2=жирный и т.д.
+  TextColumn get colorHex => text()(); // HEX цвет текста
+}
+
+class NoteLinear extends Table {
+  IntColumn get id => integer().autoIncrement()();
+  IntColumn get strokeWidth => integer()(); // Толщина линии
+  TextColumn get colorHex => text()(); // HEX цвет линии
+  IntColumn get noteId => integer()(); // ID родительской заметки
+}
+
+class Images extends Table {
+  IntColumn get id => integer().autoIncrement()();
+  TextColumn get urlPath => text().nullable()(); // Ссылка на изображение
+  TextColumn get localPath => text().nullable()(); // Локальный путь
+}
+
+class Positions extends Table {
+  IntColumn get id => integer().autoIncrement()();
+  IntColumn get parentId =>
+      integer()(); // ID родительского объекта (текст, линия, изображение)
+  TextColumn get positionType => text().nullable()();
+  RealColumn get dx => real()(); // X-координата
+  RealColumn get dy => real()(); // Y-координата
+  RealColumn get rotate => real()(); // Угол поворота
+  RealColumn get scaleX => real()(); // Масштаб по X
+  RealColumn get scaleY => real()(); // Масштаб по Y
+  RealColumn get opacity => real()(); // Прозрачность
+  DateTimeColumn get createdAt => dateTime().clientDefault(DateTime.now)();
+  DateTimeColumn get updatedAt => dateTime().clientDefault(DateTime.now)();
+}
+
 class CategoryNotes extends Table {
   IntColumn get id => integer().autoIncrement()();
   TextColumn get category => text().withLength(min: 1, max: 50)();
 }
 
-@DriftDatabase(tables: [Notes, CategoryNotes,SubNotes])
+@DriftDatabase(tables: [
+  Notes,
+  CategoryNotes,
+  SubNotes,
+  NoteTexts,
+  NoteLinear,
+  Images,
+  Positions
+])
 class AppDatabase extends _$AppDatabase {
   // After generating code, this class needs to define a `schemaVersion` getter
   // and a constructor telling drift where the database should be stored.
@@ -52,138 +88,7 @@ class AppDatabase extends _$AppDatabase {
   }
 }
 
-class NoteDriftProvider extends AppDatabase {
-  Future<int?> insertNote(NoteModel note) async {
-    try {
-      final id = await database.into(notes).insert(NoteModel.toCompanion(note));
-      return id;
-    } on Exception catch (e) {
-      logError(e, 'insertNote');
-    }
-    return null;
-  }
-
-  Future<NoteModel?> readNote({required int id}) async {
-    try {
-      final note = await (select(notes)..where((tbl) => tbl.id.equals(id)))
-          .getSingleOrNull();
-      if (note != null) {
-        return NoteModel.fromCompanion(note);
-      }
-    } on Exception catch (e) {
-      logError(e, 'insertNote');
-    }
-    return null;
-  }
-  Future<List<NoteModel>?> readAllNote() async {
-    try {
-      final listNotes = await select(notes)
-          .get();
-      if (listNotes.isNotEmpty) {
-        return listNotes.map(NoteModel.fromCompanion).toList();
-        // return list; 
-        // NoteModel.fromCompanion(note);
-      }
-    } on Exception catch (e) {
-      logError(e, 'insertNote');
-    }
-    return null;
-  }
-
-  Future<void> deleteNote({required int id}) async {
-    try {
-      await (delete(notes)..where((tbl) => tbl.id.equals(id))).go();
-    } on Exception catch (e) {
-      logError(e, 'insertNote');
-    }
-  }
-
-  Future<void> deleteNotes() async {
-    try {
-      await delete(notes).go();
-    } on Exception catch (e) {
-      logError(e, 'insertNote');
-    }
-  }
-
-  Future<NoteModel?> updateNote(NoteModel note) async {
-    try {
-      await (update(notes)..where((tbl) => tbl.id.equals(note.id)))
-          .write(NoteModel.toCompanion(note));
-    } on Exception catch (e) {
-      logError(e, 'insertNote');
-    }
-    return null;
-  }
-}
 
 void logError(Object e, String name) {
   log(e.toString(), name: name);
-}
-
-
-class SubNoteDriftProvider extends AppDatabase {
-  Future<int?> insertNote(SubNoteModel subnote) async {
-    try {
-      final id = await database.into(subNotes).insert(SubNoteModel.toCompanion(subnote));
-      return id;
-    } on Exception catch (e) {
-      logError(e, 'insertNote');
-    }
-    return null;
-  }
-
-  Future<SubNoteModel?> readNote({required int id}) async {
-    try {
-      final note = await (select(subNotes)..where((tbl) => tbl.id.equals(id)))
-          .getSingleOrNull();
-      if (note != null) {
-        return SubNoteModel.fromCompanion(note);
-      }
-    } on Exception catch (e) {
-      logError(e, 'insertNote');
-    }
-    return null;
-  }
-
-  Future<List<SubNoteModel>?> readAllNote() async {
-    try {
-      final listNotes = await select(subNotes)
-          .get();
-      if (listNotes.isNotEmpty) {
-        return listNotes.map(SubNoteModel.fromCompanion).toList();
-        
-      }
-    } on Exception catch (e) {
-      logError(e, 'insertNote');
-    }
-    return null;
-  }
-
-
-  Future<void> deleteNote({required int id}) async {
-    try {
-      await (delete(subNotes)..where((tbl) => tbl.id.equals(id))).go();
-    } on Exception catch (e) {
-      logError(e, 'insertNote');
-    }
-  }
-
-  Future<void> deleteNotes() async {
-    try {
-      await delete(subNotes).go();
-    } on Exception catch (e) {
-      logError(e, 'insertNote');
-    }
-  }
-
-  Future<SubNoteModel?> updateNote(SubNoteModel subNote) async {
-    try {
-      await (update(subNotes)..where((tbl) => tbl.id.equals(subNote.id)))
-          .write(SubNoteModel.toCompanion(subNote));
-    } on Exception catch (e) {
-      logError(e, 'insertNote');
-    }
-    return null;
-  }
 }

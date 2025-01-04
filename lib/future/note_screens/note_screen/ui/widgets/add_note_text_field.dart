@@ -11,6 +11,7 @@ class AddNoteTextField extends StatelessWidget {
     return TextField(
         controller: controller,
         maxLines: null,
+        autofocus: true,
         decoration: InputDecoration(
             contentPadding: const EdgeInsets.only(left: 4),
             hintText: hintext,

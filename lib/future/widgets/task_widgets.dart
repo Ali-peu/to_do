@@ -1,11 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:fluttertoast/fluttertoast.dart';
-import 'package:to_do/data/drift_datebase_providers/drift_database_provider_for_note.dart';
-
-import 'package:to_do/global/edit_task.dart';
 import 'package:to_do/domain/model/note.dart';
-
 import 'package:to_do/future/widgets/timer_frame.dart';
 
 class TaskWidget extends StatefulWidget {
@@ -57,7 +53,6 @@ class _TaskWidgetState extends State<TaskWidget> {
 
                 backgroundColor: const Color.fromARGB(255, 233, 242, 61),
                 foregroundColor: Colors.white,
-                icon: widget.note.isThisStar ? Icons.star : Icons.star_border,
                 label: 'Star',
               )
             ],
@@ -70,12 +65,12 @@ class _TaskWidgetState extends State<TaskWidget> {
     return Card(
       child: ListTile(
           onTap: () {
-            Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (context) => EditTask(widget.note),
-              ),
-            );
+            // Navigator.push(
+            //   context,
+            //   MaterialPageRoute(
+            //     builder: (context) => EditTask(widget.note),
+            //   ),
+            // );
           },
           onLongPress: () {
             Fluttertoast.showToast(msg: 'LongPress');
@@ -88,7 +83,7 @@ class _TaskWidgetState extends State<TaskWidget> {
             padding: const EdgeInsets.symmetric(vertical: 8.0),
             child: noteTitleText(),
           ),
-          subtitle: Text('data'),
+          subtitle: const Text('data'),
           // boolCheckDeaadline(widget.note.deadlineTime)
           //     ? (widget.note.remindTime == widget.note.deadlineTime
           //         ? const Text('')
@@ -110,14 +105,8 @@ class _TaskWidgetState extends State<TaskWidget> {
           //                 ? Colors.black
           //                 : Theme.of(context).colorScheme.error,
           //             fontSize: 12),
-          //       ),
-          leading: IconButton(
-              onPressed: () {
-                // HiveDataBase().isdone(widget.note, widget.note.isDone);
-              },
-              icon: widget.note.isDone
-                  ? const Icon(Icons.expand_circle_down_rounded)
-                  : const Icon(Icons.expand_circle_down_outlined))),
+          //       ),),
+      )
     );
   }
 
@@ -149,14 +138,10 @@ class _TaskWidgetState extends State<TaskWidget> {
   Text noteTitleText() {
     return Text(
       // showCorrectTextInTaskContainer(widget.note.description),
-      widget.note.description,
+      widget.note.id.toString(),
       maxLines: 1,
-      style: TextStyle(
-          fontSize: 25,
-          decoration: widget.note.isDone
-              ? TextDecoration.lineThrough
-              : TextDecoration.none,
-          color: widget.note.isDone ? Colors.grey : Colors.black),
+      style: const TextStyle(
+          fontSize: 25),
     );
   }
 }
