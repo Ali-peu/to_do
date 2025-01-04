@@ -1,35 +1,33 @@
 
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:to_do/configuration/validators/validador_text.dart';
 import 'package:to_do/domain/model/category_note.dart';
 import 'package:to_do/domain/model/note.dart';
 import 'package:to_do/future/another_futures/category_edit.dart';
-import 'package:to_do/future/note_screens/tasks_screen/tasks_screen_model_view.dart';
-import 'package:to_do/future/widgets/task_widgets.dart';
+import 'package:to_do/future/note_screens/notes_screen/tasks_screen_model_view.dart';
 import 'package:to_do/global/theme.dart';
 
-class TasksScreen extends StatelessWidget {
-  const TasksScreen({super.key});
+class NotesScren extends StatelessWidget {
+  const NotesScren({super.key});
 
   @override
   Widget build(BuildContext context) {
     return ChangeNotifierProvider.value(
         value: Provider.of<TasksScreenModelView>(context, listen: false),
-        child: const TaskPage());
+        child: const _NotesScreen());
   }
 }
 
-class TaskPage extends StatefulWidget {
-  const TaskPage({super.key});
+class _NotesScreen extends StatefulWidget {
+  const _NotesScreen({super.key});
 
   @override
-  State<TaskPage> createState() => _TaskPageState();
+  State<_NotesScreen> createState() => _NotesScrenStatee();
 }
 
 enum PopUpMenu { search, sort, editCategory, deleteAll }
 
-class _TaskPageState extends State<TaskPage> {
+class _NotesScrenStatee extends State<_NotesScreen> {
   ThemeProvider notifier = ThemeProvider();
   // String chooseCategory = 'All';
 

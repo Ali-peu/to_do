@@ -4,7 +4,7 @@ import 'package:to_do/app/app_main.dart';
 // import 'package:to_do/future/account_page/account_page.dart';
 // import 'package:to_do/future/calendar_page/calendar_page.dart';
 import 'package:to_do/future/note_screens/note_screen/ui/note_screen.dart';
-import 'package:to_do/future/note_screens/tasks_screen/tasks_screen.dart';
+import 'package:to_do/future/note_screens/notes_screen/tasks_screen.dart';
 
 final GlobalKey<NavigatorState> _rootNavigatorKey =
     GlobalKey<NavigatorState>(debugLabel: 'root');
@@ -29,7 +29,7 @@ final GoRouter router = GoRouter(
       branches: <StatefulShellBranch>[
         statefulShellBranch(
             path: AppRouteNames.note,
-            builder: const TasksScreen(),
+            builder: const NoteScreen(),
             routes: [
               GoRoute(
                 path: AppRouteNames.createNote,
