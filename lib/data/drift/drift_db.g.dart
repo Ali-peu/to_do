@@ -1167,9 +1167,9 @@ class $NoteLinearTable extends NoteLinear
   static const VerificationMeta _strokeWidthMeta =
       const VerificationMeta('strokeWidth');
   @override
-  late final GeneratedColumn<double> strokeWidth = GeneratedColumn<double>(
+  late final GeneratedColumn<int> strokeWidth = GeneratedColumn<int>(
       'stroke_width', aliasedName, false,
-      type: DriftSqlType.double, requiredDuringInsert: true);
+      type: DriftSqlType.int, requiredDuringInsert: true);
   static const VerificationMeta _colorHexMeta =
       const VerificationMeta('colorHex');
   @override
@@ -1253,7 +1253,7 @@ class $NoteLinearTable extends NoteLinear
       id: attachedDatabase.typeMapping
           .read(DriftSqlType.int, data['${effectivePrefix}id'])!,
       strokeWidth: attachedDatabase.typeMapping
-          .read(DriftSqlType.double, data['${effectivePrefix}stroke_width'])!,
+          .read(DriftSqlType.int, data['${effectivePrefix}stroke_width'])!,
       colorHex: attachedDatabase.typeMapping
           .read(DriftSqlType.string, data['${effectivePrefix}color_hex'])!,
       noteId: attachedDatabase.typeMapping
@@ -1273,7 +1273,7 @@ class $NoteLinearTable extends NoteLinear
 
 class NoteLinearData extends DataClass implements Insertable<NoteLinearData> {
   final int id;
-  final double strokeWidth;
+  final int strokeWidth;
   final String colorHex;
   final int noteId;
   final String? dxPositions;
@@ -1289,7 +1289,7 @@ class NoteLinearData extends DataClass implements Insertable<NoteLinearData> {
   Map<String, Expression> toColumns(bool nullToAbsent) {
     final map = <String, Expression>{};
     map['id'] = Variable<int>(id);
-    map['stroke_width'] = Variable<double>(strokeWidth);
+    map['stroke_width'] = Variable<int>(strokeWidth);
     map['color_hex'] = Variable<String>(colorHex);
     map['note_id'] = Variable<int>(noteId);
     if (!nullToAbsent || dxPositions != null) {
@@ -1321,7 +1321,7 @@ class NoteLinearData extends DataClass implements Insertable<NoteLinearData> {
     serializer ??= driftRuntimeOptions.defaultSerializer;
     return NoteLinearData(
       id: serializer.fromJson<int>(json['id']),
-      strokeWidth: serializer.fromJson<double>(json['strokeWidth']),
+      strokeWidth: serializer.fromJson<int>(json['strokeWidth']),
       colorHex: serializer.fromJson<String>(json['colorHex']),
       noteId: serializer.fromJson<int>(json['noteId']),
       dxPositions: serializer.fromJson<String?>(json['dxPositions']),
@@ -1333,7 +1333,7 @@ class NoteLinearData extends DataClass implements Insertable<NoteLinearData> {
     serializer ??= driftRuntimeOptions.defaultSerializer;
     return <String, dynamic>{
       'id': serializer.toJson<int>(id),
-      'strokeWidth': serializer.toJson<double>(strokeWidth),
+      'strokeWidth': serializer.toJson<int>(strokeWidth),
       'colorHex': serializer.toJson<String>(colorHex),
       'noteId': serializer.toJson<int>(noteId),
       'dxPositions': serializer.toJson<String?>(dxPositions),
@@ -1343,7 +1343,7 @@ class NoteLinearData extends DataClass implements Insertable<NoteLinearData> {
 
   NoteLinearData copyWith(
           {int? id,
-          double? strokeWidth,
+          int? strokeWidth,
           String? colorHex,
           int? noteId,
           Value<String?> dxPositions = const Value.absent(),
@@ -1400,7 +1400,7 @@ class NoteLinearData extends DataClass implements Insertable<NoteLinearData> {
 
 class NoteLinearCompanion extends UpdateCompanion<NoteLinearData> {
   final Value<int> id;
-  final Value<double> strokeWidth;
+  final Value<int> strokeWidth;
   final Value<String> colorHex;
   final Value<int> noteId;
   final Value<String?> dxPositions;
@@ -1415,7 +1415,7 @@ class NoteLinearCompanion extends UpdateCompanion<NoteLinearData> {
   });
   NoteLinearCompanion.insert({
     this.id = const Value.absent(),
-    required double strokeWidth,
+    required int strokeWidth,
     required String colorHex,
     required int noteId,
     this.dxPositions = const Value.absent(),
@@ -1425,7 +1425,7 @@ class NoteLinearCompanion extends UpdateCompanion<NoteLinearData> {
         noteId = Value(noteId);
   static Insertable<NoteLinearData> custom({
     Expression<int>? id,
-    Expression<double>? strokeWidth,
+    Expression<int>? strokeWidth,
     Expression<String>? colorHex,
     Expression<int>? noteId,
     Expression<String>? dxPositions,
@@ -1443,7 +1443,7 @@ class NoteLinearCompanion extends UpdateCompanion<NoteLinearData> {
 
   NoteLinearCompanion copyWith(
       {Value<int>? id,
-      Value<double>? strokeWidth,
+      Value<int>? strokeWidth,
       Value<String>? colorHex,
       Value<int>? noteId,
       Value<String?>? dxPositions,
@@ -1465,7 +1465,7 @@ class NoteLinearCompanion extends UpdateCompanion<NoteLinearData> {
       map['id'] = Variable<int>(id.value);
     }
     if (strokeWidth.present) {
-      map['stroke_width'] = Variable<double>(strokeWidth.value);
+      map['stroke_width'] = Variable<int>(strokeWidth.value);
     }
     if (colorHex.present) {
       map['color_hex'] = Variable<String>(colorHex.value);
@@ -2889,7 +2889,7 @@ typedef $$NoteTextsTableProcessedTableManager = ProcessedTableManager<
     PrefetchHooks Function()>;
 typedef $$NoteLinearTableCreateCompanionBuilder = NoteLinearCompanion Function({
   Value<int> id,
-  required double strokeWidth,
+  required int strokeWidth,
   required String colorHex,
   required int noteId,
   Value<String?> dxPositions,
@@ -2897,7 +2897,7 @@ typedef $$NoteLinearTableCreateCompanionBuilder = NoteLinearCompanion Function({
 });
 typedef $$NoteLinearTableUpdateCompanionBuilder = NoteLinearCompanion Function({
   Value<int> id,
-  Value<double> strokeWidth,
+  Value<int> strokeWidth,
   Value<String> colorHex,
   Value<int> noteId,
   Value<String?> dxPositions,
@@ -2916,7 +2916,7 @@ class $$NoteLinearTableFilterComposer
   ColumnFilters<int> get id => $composableBuilder(
       column: $table.id, builder: (column) => ColumnFilters(column));
 
-  ColumnFilters<double> get strokeWidth => $composableBuilder(
+  ColumnFilters<int> get strokeWidth => $composableBuilder(
       column: $table.strokeWidth, builder: (column) => ColumnFilters(column));
 
   ColumnFilters<String> get colorHex => $composableBuilder(
@@ -2944,7 +2944,7 @@ class $$NoteLinearTableOrderingComposer
   ColumnOrderings<int> get id => $composableBuilder(
       column: $table.id, builder: (column) => ColumnOrderings(column));
 
-  ColumnOrderings<double> get strokeWidth => $composableBuilder(
+  ColumnOrderings<int> get strokeWidth => $composableBuilder(
       column: $table.strokeWidth, builder: (column) => ColumnOrderings(column));
 
   ColumnOrderings<String> get colorHex => $composableBuilder(
@@ -2972,7 +2972,7 @@ class $$NoteLinearTableAnnotationComposer
   GeneratedColumn<int> get id =>
       $composableBuilder(column: $table.id, builder: (column) => column);
 
-  GeneratedColumn<double> get strokeWidth => $composableBuilder(
+  GeneratedColumn<int> get strokeWidth => $composableBuilder(
       column: $table.strokeWidth, builder: (column) => column);
 
   GeneratedColumn<String> get colorHex =>
@@ -3015,7 +3015,7 @@ class $$NoteLinearTableTableManager extends RootTableManager<
               $$NoteLinearTableAnnotationComposer($db: db, $table: table),
           updateCompanionCallback: ({
             Value<int> id = const Value.absent(),
-            Value<double> strokeWidth = const Value.absent(),
+            Value<int> strokeWidth = const Value.absent(),
             Value<String> colorHex = const Value.absent(),
             Value<int> noteId = const Value.absent(),
             Value<String?> dxPositions = const Value.absent(),
@@ -3031,7 +3031,7 @@ class $$NoteLinearTableTableManager extends RootTableManager<
           ),
           createCompanionCallback: ({
             Value<int> id = const Value.absent(),
-            required double strokeWidth,
+            required int strokeWidth,
             required String colorHex,
             required int noteId,
             Value<String?> dxPositions = const Value.absent(),

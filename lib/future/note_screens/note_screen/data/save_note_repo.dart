@@ -24,13 +24,12 @@ class SaveNoteRepo {
     required this.noteLinearRepository,
   });
 
-  Future<void> saveNote({
-    required List<Offset> textPositions,
-    required List<String> texts,
-    required bool isFavourite,
-    required List<List<Offset>> linearPositions,
-    required List<Paint> paints,
-  }) async {
+  Future<void> saveNote(
+      {required List<Offset> textPositions,
+      required List<String> texts,
+      required bool isFavourite,
+      required List<List<Offset>> linearPositions,
+      required List<String> linearColors}) async {
     if (textPositions.length != texts.length) {
       throw ArgumentError(
         'Length of textPositions (${textPositions.length}) does not match length of text (${texts.length})',
@@ -40,51 +39,26 @@ class SaveNoteRepo {
       final noteId = await noteRepository.createNoteForDB(
           NoteModel(id: 0, category: 'NO', isFavourite: isFavourite));
       if (noteId != null) {
-        if (textPositions.isNotEmpty) {
-          for (var i = 0; i < textPositions.length; i++) {
-            final id = await noteTextRepository.saveNoteTexts(
-                text: texts[i], noteId: noteId);
-            if (id != null) {
-              await notePositionsRepository.savePosition(
-                  dx: textPositions[i].dx,
-                  dy: textPositions[i].dy,
-                  parentId: id,
-                  positionType: PositionType.text);
-            }
+        for (var i = 0; i < textPositions.length; i++) {
+          final id = await noteTextRepository.saveNoteTexts(
+              text: texts[i], noteId: noteId);
+          if (id != null) {
+            await notePositionsRepository.savePosition(
+                dx: textPositions[i].dx,
+                dy: textPositions[i].dy,
+                parentId: id,
+                positionType: PositionType.text);
           }
         }
 
-        List<List<Offset>> result = [];
-        int maxLength = 0;
-        List<Offset> currentMaxSublist = [];
-
-        for (var sublist in linearPositions) {
-          if (sublist.length > maxLength) {
-            maxLength = sublist.length;
-            currentMaxSublist = sublist;
-          } else if (sublist.length < maxLength) {
-            if (currentMaxSublist.isNotEmpty) {
-              result.add(currentMaxSublist);
-              currentMaxSublist = [];
-            }
-            maxLength = sublist.length;
-          }
-        }
-
-        if (currentMaxSublist.isNotEmpty) {
-          result.add(currentMaxSublist);
-        }
-
-        log(result.toString());
-
-        for (var i = 0; i < result.length; i++) {
-          await noteLinearRepository.saveLinearModel(LinearModel(
+        for (var i = 0; i < linearPositions.length; i++) {
+           await noteLinearRepository.saveLinearModel(LinearModel(
             noteId: noteId,
             id: 0,
-            strokeWidth: paints[result[i].length].strokeWidth,
-            colorHex: paints[result[i].length].color.toHexString(),
-            dxPositions: result[i].map((e) => e.dx).toList(),
-            dyPositions: result[i].map((e) => e.dy).toList(),
+            strokeWidth: 2,
+            colorHex: Colors.blue.toHexString(),
+            dxPositions: linearPositions[i].map((e) => e.dx).toList(),
+            dyPositions: linearPositions[i].map((e) => e.dy).toList(),
           ));
         }
       }

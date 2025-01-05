@@ -7,7 +7,7 @@ import 'package:to_do/data/drift/drift_db.dart';
 class LinearModel {
   final int id;
   final int noteId;
-  final double strokeWidth;
+  final int strokeWidth;
   final String colorHex;
   final List<double> dxPositions;
   final List<double> dyPositions;

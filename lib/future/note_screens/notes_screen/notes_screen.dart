@@ -154,7 +154,7 @@ class _NotesScrenStatee extends State<_NotesScreen> {
         return const Center(child: CircularProgressIndicator());
       }
       final data = taskScreenModelView.listNoteModel ?? [];
-      return ListView(children: data.map<Widget>(TaskWidget.new).toList());
+      return Column(children: data.map<Widget>(TaskWidget.new).toList());
     });
 
     // if (taskList.isEmpty) {

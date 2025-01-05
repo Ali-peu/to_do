@@ -1,6 +1,7 @@
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
 import 'package:flutter/material.dart';
+import 'package:to_do/configuration/extension/color_extension.dart';
 import 'package:to_do/future/note_screens/note_screen/data/save_note_repo.dart';
 import 'package:to_do/future/note_screens/note_screen/domain/add_note_text_field_notifier.dart';
 import 'package:to_do/future/note_screens/note_screen/domain/draw_note_notifier.dart';
@@ -31,7 +32,7 @@ class NoteScreenBloc extends Bloc<NoteScreenEvent, NoteScreenState> {
     on<SaveNote>((event, emit) {
       _saveNoteRepo.saveNote(
           linearPositions: drawNoteNotifier.points,
-          paints: drawNoteNotifier.paints,
+          linearColors: [Colors.blue.toHexString()],
           textPositions: addNoteTextFieldNotifier.positions,
           texts:
               addNoteTextFieldNotifier.controllers.map((e) => e.text).toList(),
@@ -62,7 +63,6 @@ class NoteScreenBloc extends Bloc<NoteScreenEvent, NoteScreenState> {
 
         await drawNoteNotifier
             .addValueForStream(linear.map((e) => e.toOffset()).toList());
-        await drawNoteNotifier.createPaints(linear);
 
         await addNoteTextFieldNotifier
             .addTextListForStream(textsList.map((e) => e.description).toList());
