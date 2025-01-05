@@ -10,8 +10,7 @@ class NoteNavBar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return BlocBuilder<NoteScreenBloc, NoteScreenState>(
-        builder: (context, state) {
+    return BlocBuilder<NoteScreenBloc, NoteScreenState>(builder: (context, state) {
       return Padding(
         padding: const EdgeInsets.symmetric(horizontal: 25),
         child: Container(
@@ -28,9 +27,7 @@ class NoteNavBar extends StatelessWidget {
                 child: DecoratedBox(
                     decoration: BoxDecoration(
                         color:
-                            state.noteScreenStatus == NoteScreenStatus.drawing
-                                ? Colors.red
-                                : null),
+                            state.noteScreenStatus == NoteScreenStatus.drawing ? Colors.red : null),
                     child: SvgPicture.asset(IconAssets.pen))),
             GestureDetector(
                 onTap: () {},
@@ -97,9 +94,6 @@ class NoteNavBar extends StatelessWidget {
             GestureDetector(
                 onTap: () {
                   // value.drawNoteNotifier.clearDrawing();
-                  context
-                      .read<NoteScreenBloc>()
-                      .add(const ChangeDrawColor(color: Colors.red));
                 },
                 child: SvgPicture.asset(IconAssets.audio)),
             GestureDetector(

@@ -1,20 +1,21 @@
 import 'package:flutter/material.dart';
 
 class AppCustomPainter extends CustomPainter {
-  final List<List<Offset?>> lines; // Список всех линий
-  final List<Paint> paints; // Список параметров для каждой линии
+  final List<List<Offset?>> lines;  // Список всех линий
 
-  AppCustomPainter(this.lines, this.paints);
+  AppCustomPainter(this.lines);
 
   @override
   void paint(Canvas canvas, Size size) {
-    for (int i = 0; i < lines.length; i++) {
-      final line = lines[i];
-      final paint = paints[i];
+    final paint = Paint()
+      ..color = Colors.blue
+      ..strokeWidth = 2.0
+      ..strokeCap = StrokeCap.round;
 
+    for (var line in lines) {
       Offset? previousPoint;
-
-      for (final point in line) {
+      
+      for (var point in line) {
         if (point != null) {
           if (previousPoint != null) {
             canvas.drawLine(previousPoint, point, paint);
@@ -27,6 +28,6 @@ class AppCustomPainter extends CustomPainter {
 
   @override
   bool shouldRepaint(covariant CustomPainter oldDelegate) {
-    return true; // Перерисовываем, если данные изменились
+    return true;
   }
 }
