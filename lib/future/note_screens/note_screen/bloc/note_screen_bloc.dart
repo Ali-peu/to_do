@@ -41,6 +41,9 @@ class NoteScreenBloc extends Bloc<NoteScreenEvent, NoteScreenState> {
     on<NoteFavourite>((event, emit) {
       emit(state.copyWith(isFavourite: !state.isFavourite));
     });
+    on<ChangeDrawColor>((event, emit) async {
+      drawNoteNotifier.color = event.color;
+    });
 
     on<FetchData>((event, emit) async {
       if (event.noteId != null) {

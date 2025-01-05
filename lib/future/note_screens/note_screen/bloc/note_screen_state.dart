@@ -8,7 +8,8 @@ class NoteScreenState extends Equatable {
 
   const NoteScreenState(
       {this.isFavourite = false,
-      this.noteScreenStatus = NoteScreenStatus.initial});
+      this.noteScreenStatus = NoteScreenStatus.initial,
+      });
 
   NoteScreenState copyWith({
     NoteScreenStatus? noteScreenStatus,

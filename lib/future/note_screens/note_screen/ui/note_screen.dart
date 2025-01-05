@@ -7,6 +7,7 @@ import 'package:to_do/data/drift_datebase_providers/note_repository.dart';
 import 'package:to_do/data/drift_datebase_providers/note_text_repository.dart';
 
 import 'package:to_do/future/custom_painter/app_custom_painter.dart';
+import 'package:to_do/future/custom_painter/painter_controller.dart';
 import 'package:to_do/future/note_screens/note_screen/bloc/note_screen_bloc.dart';
 import 'package:to_do/future/note_screens/note_screen/data/save_note_repo.dart';
 import 'package:to_do/future/note_screens/note_screen/domain/add_note_text_field_notifier.dart';
@@ -32,7 +33,8 @@ class NoteScreen extends StatelessWidget {
                   Provider.of<NotePositionsRepository>(context, listen: false),
               noteLinearRepository:
                   Provider.of<NoteLinearRepository>(context, listen: false)),
-          drawNoteNotifier: DrawNoteNotifier(),
+          drawNoteNotifier: DrawNoteNotifier(
+              painterController: PainterController(color: Colors.green)),
           addNoteTextFieldNotifier: AddNoteTextFieldNotifier(),
           noteId: noteId)
         ..add(FetchData(noteId: noteId)),
@@ -50,6 +52,7 @@ class _NoteScreen extends StatefulWidget {
 
 class _NoteScreenState extends State<_NoteScreen> {
   final scrollController = ScrollController();
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -121,7 +124,11 @@ class _NoteScreenState extends State<_NoteScreen> {
                             builder: (context, snapshot) {
                               return CustomPaint(
                                 painter: AppCustomPainter(
-                                    snapshot.data ?? []), // Для рисования
+                                    snapshot.data ?? [],
+                                    context
+                                        .read<NoteScreenBloc>()
+                                        .drawNoteNotifier
+                                        .paints), // Для рисования
                                 size: Size.infinite,
                               );
                             }),
