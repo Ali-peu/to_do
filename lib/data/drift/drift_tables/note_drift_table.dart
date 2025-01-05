@@ -1,11 +1,14 @@
-import 'package:to_do/data/drift/const_drift_instanse.dart';
 import 'package:to_do/data/drift/drift_db.dart';
 import 'package:to_do/domain/model/note.dart';
 
-class NoteDriftTable extends AppDatabase {
+class NoteDriftTable  {
+
+  final AppDatabase appDatabase;
+
+  NoteDriftTable({required this.appDatabase});
   Future<int?> insertNote(NoteModel note) async {
     try {
-      final id = await database.into(notes).insert(NoteModel.toCompanion(note));
+      final id = await appDatabase.into(appDatabase.notes).insert(NoteModel.toCompanion(note));
       return id;
     } on Exception catch (e) {
       logError(e, 'insertNote');
@@ -15,7 +18,7 @@ class NoteDriftTable extends AppDatabase {
 
   Future<NoteModel?> readNote({required int id}) async {
     try {
-      final note = await (select(notes)..where((tbl) => tbl.id.equals(id)))
+      final note = await (appDatabase.select(appDatabase.notes)..where((tbl) => tbl.id.equals(id)))
           .getSingleOrNull();
       if (note != null) {
         return NoteModel.fromCompanion(note);
@@ -28,7 +31,7 @@ class NoteDriftTable extends AppDatabase {
 
   Future<List<NoteModel>?> readAllNote() async {
     try {
-      final listNotes = await select(notes).get();
+      final listNotes = await appDatabase.select(appDatabase.notes).get();
       if (listNotes.isNotEmpty) {
         return listNotes.map(NoteModel.fromCompanion).toList();
         // return list;
@@ -42,7 +45,7 @@ class NoteDriftTable extends AppDatabase {
 
   Future<void> deleteNote({required int id}) async {
     try {
-      await (delete(notes)..where((tbl) => tbl.id.equals(id))).go();
+      await (appDatabase.delete(appDatabase.notes)..where((tbl) => tbl.id.equals(id))).go();
     } on Exception catch (e) {
       logError(e, 'insertNote');
     }
@@ -50,7 +53,7 @@ class NoteDriftTable extends AppDatabase {
 
   Future<void> deleteNotes() async {
     try {
-      await delete(notes).go();
+      await appDatabase.delete(appDatabase.notes).go();
     } on Exception catch (e) {
       logError(e, 'insertNote');
     }
@@ -58,7 +61,7 @@ class NoteDriftTable extends AppDatabase {
 
   Future<NoteModel?> updateNote(NoteModel note) async {
     try {
-      await (update(notes)..where((tbl) => tbl.id.equals(note.id)))
+      await (appDatabase.update(appDatabase.notes)..where((tbl) => tbl.id.equals(note.id)))
           .write(NoteModel.toCompanion(note));
     } on Exception catch (e) {
       logError(e, 'insertNote');

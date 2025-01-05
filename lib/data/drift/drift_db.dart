@@ -35,6 +35,8 @@ class NoteLinear extends Table {
   IntColumn get strokeWidth => integer()(); // Толщина линии
   TextColumn get colorHex => text()(); // HEX цвет линии
   IntColumn get noteId => integer()(); // ID родительской заметки
+  TextColumn get dxPositions => text().nullable()(); // Сериализованный список dx
+  TextColumn get dyPositions => text().nullable()(); // Сериализованный список dy
 }
 
 class Images extends Table {

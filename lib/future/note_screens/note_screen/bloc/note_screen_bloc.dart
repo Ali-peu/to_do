@@ -1,7 +1,7 @@
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
 import 'package:flutter/material.dart';
-import 'package:meta/meta.dart';
+import 'package:to_do/configuration/extension/color_extension.dart';
 import 'package:to_do/future/note_screens/note_screen/data/save_note_repo.dart';
 import 'package:to_do/future/note_screens/note_screen/domain/add_note_text_field_notifier.dart';
 import 'package:to_do/future/note_screens/note_screen/domain/draw_note_notifier.dart';
@@ -31,6 +31,8 @@ class NoteScreenBloc extends Bloc<NoteScreenEvent, NoteScreenState> {
     });
     on<SaveNote>((event, emit) {
       _saveNoteRepo.saveNote(
+          linearPositions: drawNoteNotifier.points,
+          linearColors: [Colors.blue.toHexString()],
           textPositions: addNoteTextFieldNotifier.positions,
           texts:
               addNoteTextFieldNotifier.controllers.map((e) => e.text).toList(),
@@ -39,7 +41,7 @@ class NoteScreenBloc extends Bloc<NoteScreenEvent, NoteScreenState> {
     on<NoteFavourite>((event, emit) {
       emit(state.copyWith(isFavourite: !state.isFavourite));
     });
-    
+
     on<FetchData>((event, emit) async {
       if (event.noteId != null) {
         final textsList = await saveNoteRepo.getNoteTexts(event.noteId!);
@@ -53,6 +55,12 @@ class NoteScreenBloc extends Bloc<NoteScreenEvent, NoteScreenState> {
             'Length of textPositions (${textPositionsList.length}) does not match length of text (${textsList.length})',
           );
         }
+
+        final linear = await saveNoteRepo.getNoteLinear(event.noteId!);
+
+        await drawNoteNotifier
+            .addValueForStream(linear.map((e) => e.toOffset()).toList());
+
         await addNoteTextFieldNotifier
             .addTextListForStream(textsList.map((e) => e.description).toList());
         await addNoteTextFieldNotifier.addTextPositions(

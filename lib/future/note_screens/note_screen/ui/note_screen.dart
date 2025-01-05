@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:provider/provider.dart';
+import 'package:to_do/data/drift_datebase_providers/note_linear_repository.dart';
 import 'package:to_do/data/drift_datebase_providers/note_positions_repository.dart';
 import 'package:to_do/data/drift_datebase_providers/note_repository.dart';
 import 'package:to_do/data/drift_datebase_providers/note_text_repository.dart';
@@ -23,14 +24,18 @@ class NoteScreen extends StatelessWidget {
     return BlocProvider(
       create: (context) => NoteScreenBloc(
           saveNoteRepo: SaveNoteRepo(
-            noteTextRepository:
-                Provider.of<NoteTextRepository>(context, listen: false),
-            noteRepository: Provider.of<NoteRepository>(context, listen: false),
-            notePositionsRepository:
-                Provider.of<NotePositionsRepository>(context, listen: false),
-          ),
+              noteTextRepository:
+                  Provider.of<NoteTextRepository>(context, listen: false),
+              noteRepository:
+                  Provider.of<NoteRepository>(context, listen: false),
+              notePositionsRepository:
+                  Provider.of<NotePositionsRepository>(context, listen: false),
+              noteLinearRepository:
+                  Provider.of<NoteLinearRepository>(context, listen: false)),
           drawNoteNotifier: DrawNoteNotifier(),
-          addNoteTextFieldNotifier: AddNoteTextFieldNotifier(), noteId: noteId)..add(FetchData(noteId: noteId )),
+          addNoteTextFieldNotifier: AddNoteTextFieldNotifier(),
+          noteId: noteId)
+        ..add(FetchData(noteId: noteId)),
       child: const _NoteScreen(),
     );
   }
@@ -55,10 +60,15 @@ class _NoteScreenState extends State<_NoteScreen> {
           TextButton(
               onPressed: () {
                 if (context
-                    .read<NoteScreenBloc>()
-                    .addNoteTextFieldNotifier
-                    .controllers
-                    .isNotEmpty) {
+                        .read<NoteScreenBloc>()
+                        .addNoteTextFieldNotifier
+                        .controllers
+                        .isNotEmpty ||
+                    context
+                        .read<NoteScreenBloc>()
+                        .drawNoteNotifier
+                        .points
+                        .isNotEmpty) {
                   context.read<NoteScreenBloc>().add(SaveNote());
                 }
               },

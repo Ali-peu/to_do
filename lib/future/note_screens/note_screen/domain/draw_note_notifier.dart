@@ -9,6 +9,10 @@ class DrawNoteNotifier {
 
   DrawNoteNotifier();
 
+  Future<void> addValueForStream(List<List<Offset>> list) async{
+    positionsStreamController.add(list);
+  }
+
   Future<void> onPanUpdate(DragUpdateDetails details,{required double currentScrollOffset}) async {
 
     final localPosition = Offset(

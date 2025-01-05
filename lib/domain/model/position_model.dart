@@ -27,7 +27,7 @@ class PositionModel {
   final int parentId;
   final DateTime createdAt;
   final DateTime updatedAt;
-  final PositionType positionType;
+  final String positionType;
 
   PositionModel({
     required this.dx,
@@ -44,6 +44,19 @@ class PositionModel {
   })  : createdAt = createdAt ?? DateTime.now(),
         updatedAt = updatedAt ?? DateTime.now();
 
+  PositionModel.linear({
+    required double dx,
+    required double dy,
+    required int id,
+    required int parentId,
+  }) : this(
+          dx: dx,
+          dy: dy,
+          id: id,
+          parentId: parentId,
+          positionType: PositionType.linear.name,
+        ) ;
+
   static PositionsCompanion toCompanion(PositionModel model) {
     return PositionsCompanion(
         dx: Value(model.dx),
@@ -53,7 +66,7 @@ class PositionModel {
         scaleY: Value(model.scaleY),
         opacity: Value(model.opacity),
         parentId: Value(model.parentId),
-        positionType: Value(model.positionType.name));
+        positionType: Value(model.positionType));
   }
 
   PositionModel.fromCompanion(Position position)
@@ -61,7 +74,7 @@ class PositionModel {
         dy = position.dy,
         parentId = position.parentId,
         id = position.id,
-        positionType = getPositionTypeFromString(position.positionType ?? ''),
+        positionType = position.positionType ?? '',
         rotate = position.rotate,
         scaleX = position.scaleX,
         scaleY = position.scaleY,

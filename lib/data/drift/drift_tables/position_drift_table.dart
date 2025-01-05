@@ -2,7 +2,11 @@ import 'package:drift/drift.dart';
 import 'package:to_do/data/drift/drift_db.dart';
 import 'package:to_do/domain/model/position_model.dart';
 
-class PositionDriftTable extends AppDatabase {
+class PositionDriftTable  {
+
+  final AppDatabase appDatabase;
+
+  PositionDriftTable({required this.appDatabase});
   // Сохранение позиции
   Future<int> savePosition({
     required double dx,
@@ -15,11 +19,11 @@ class PositionDriftTable extends AppDatabase {
       dy: dy,
       id: 0, // id не используется при вставке, так как генерируется базой данных
       parentId: parentId,
-      positionType: positionType,
+      positionType: positionType.name,
     );
 
     // Конвертация модели в Companion
-    final id = await into(positions).insert(PositionModel.toCompanion(model));
+    final id = await appDatabase.into(appDatabase.positions).insert(PositionModel.toCompanion(model));
     return id;
   }
 
@@ -28,7 +32,7 @@ class PositionDriftTable extends AppDatabase {
     required PositionType positionType,
     required int parentId,
   }) async {
-    final query = select(positions)
+    final query = appDatabase.select(appDatabase.positions)
       ..where((tbl) {
         return Expression.and([
           tbl.parentId.equals(parentId),

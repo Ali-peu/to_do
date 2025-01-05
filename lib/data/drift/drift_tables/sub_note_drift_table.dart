@@ -1,13 +1,15 @@
 
-import 'package:to_do/data/drift/const_drift_instanse.dart';
 import 'package:to_do/data/drift/drift_db.dart';
 import 'package:to_do/domain/model/sub_note_model.dart';
 
-class SubNoteDriftProvider extends AppDatabase {
+class SubNoteDriftProvider  {
+  final AppDatabase appDatabase;
+
+  SubNoteDriftProvider({required this.appDatabase});
   Future<int?> insertNote(SubNoteModel subnote) async {
     try {
-      final id = await database
-          .into(subNotes)
+      final id = await appDatabase
+          .into(appDatabase.subNotes)
           .insert(SubNoteModel.toCompanion(subnote));
       return id;
     } on Exception catch (e) {
@@ -18,7 +20,7 @@ class SubNoteDriftProvider extends AppDatabase {
 
   Future<SubNoteModel?> readNote({required int id}) async {
     try {
-      final note = await (select(subNotes)..where((tbl) => tbl.id.equals(id)))
+      final note = await (appDatabase.select(appDatabase.subNotes)..where((tbl) => tbl.id.equals(id)))
           .getSingleOrNull();
       if (note != null) {
         return SubNoteModel.fromCompanion(note);
@@ -31,7 +33,7 @@ class SubNoteDriftProvider extends AppDatabase {
 
   Future<List<SubNoteModel>?> readAllNote() async {
     try {
-      final listNotes = await select(subNotes).get();
+      final listNotes = await appDatabase.select(appDatabase.subNotes).get();
       if (listNotes.isNotEmpty) {
         return listNotes.map(SubNoteModel.fromCompanion).toList();
       }
@@ -43,7 +45,7 @@ class SubNoteDriftProvider extends AppDatabase {
 
   Future<void> deleteNote({required int id}) async {
     try {
-      await (delete(subNotes)..where((tbl) => tbl.id.equals(id))).go();
+      await (appDatabase.delete(appDatabase.subNotes)..where((tbl) => tbl.id.equals(id))).go();
     } on Exception catch (e) {
       logError(e, 'insertNote');
     }
@@ -51,7 +53,7 @@ class SubNoteDriftProvider extends AppDatabase {
 
   Future<void> deleteNotes() async {
     try {
-      await delete(subNotes).go();
+      await appDatabase.delete(appDatabase.subNotes).go();
     } on Exception catch (e) {
       logError(e, 'insertNote');
     }
@@ -59,7 +61,7 @@ class SubNoteDriftProvider extends AppDatabase {
 
   Future<SubNoteModel?> updateNote(SubNoteModel subNote) async {
     try {
-      await (update(subNotes)..where((tbl) => tbl.id.equals(subNote.id)))
+      await (appDatabase.update(appDatabase.subNotes)..where((tbl) => tbl.id.equals(subNote.id)))
           .write(SubNoteModel.toCompanion(subNote));
     } on Exception catch (e) {
       logError(e, 'insertNote');
