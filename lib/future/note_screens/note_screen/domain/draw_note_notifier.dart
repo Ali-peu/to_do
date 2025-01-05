@@ -1,5 +1,7 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
+import 'package:to_do/configuration/extension/color_extension.dart';
+import 'package:to_do/domain/model/linear_model.dart';
 import 'package:to_do/future/custom_painter/painter_controller.dart';
 
 class DrawNoteNotifier extends ChangeNotifier {
@@ -35,6 +37,16 @@ class DrawNoteNotifier extends ChangeNotifier {
     positionsStreamController.add(list);
   }
 
+  Future<void> createPaints(List<LinearModel> list) async {
+    paints = list
+        .map((e) => Paint()
+          ..color = e.colorHex.toColor()
+          ..strokeWidth = e.strokeWidth
+          ..strokeCap = StrokeCap.round)
+        .toList();
+    notifyListeners();
+  }
+
   Future<void> onPanUpdate(DragUpdateDetails details,
       {required double currentScrollOffset}) async {
     final localPosition = Offset(
@@ -48,7 +60,7 @@ class DrawNoteNotifier extends ChangeNotifier {
   void addPoint(Offset point) {
     currentLine.add(point);
     points.add(List.from(currentLine));
-      paints.add(Paint()
+    paints.add(Paint()
       ..color = painterController.color ?? Colors.black
       ..strokeWidth = painterController.strokeWidth ?? 2
       ..strokeCap = painterController.strokeCap ?? StrokeCap.round);

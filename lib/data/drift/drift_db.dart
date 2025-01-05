@@ -32,7 +32,7 @@ class NoteTexts extends Table {
 
 class NoteLinear extends Table {
   IntColumn get id => integer().autoIncrement()();
-  IntColumn get strokeWidth => integer()(); // Толщина линии
+  RealColumn get strokeWidth => real()(); // Толщина линии
   TextColumn get colorHex => text()(); // HEX цвет линии
   IntColumn get noteId => integer()(); // ID родительской заметки
   TextColumn get dxPositions => text().nullable()(); // Сериализованный список dx

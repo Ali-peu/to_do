@@ -1,4 +1,3 @@
-
 import 'package:flutter/material.dart';
 
 extension StringToColorExtension on String {
@@ -14,9 +13,16 @@ extension StringToColorExtension on String {
   }
 }
 
-extension ColorToStringExtension on MaterialColor {
+extension MaterialColorToStringExtension on MaterialColor {
   String toHexString() {
-    final primaryValue = value ;
+    final primaryValue = value;
+    return '#${primaryValue.toRadixString(16).padLeft(8, '0').toUpperCase()}';
+  }
+}
+
+extension ColorToStringExtension on Color {
+  String toHexString() {
+    final primaryValue = value;
     return '#${primaryValue.toRadixString(16).padLeft(8, '0').toUpperCase()}';
   }
 }
