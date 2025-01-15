@@ -7,15 +7,9 @@ import 'package:to_do/data/router/app_router.dart';
 import 'package:to_do/global/notification_app.dart';
 import 'package:to_do/global/theme.dart';
 
-import 'package:to_do/data/drift_datebase_providers/note_category_data.dart';
-
-import 'package:timezone/data/latest.dart' as tz;
-
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await NotificationApi.init();
-
-  tz.initializeTimeZones();
 
   await NotificationApi.init();
 

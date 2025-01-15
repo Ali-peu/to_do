@@ -1,50 +1,75 @@
-import 'dart:async';
 import 'package:flutter/material.dart';
+import 'package:to_do/configuration/extension/color_extension.dart';
+import 'package:to_do/domain/model/linear_model.dart';
+import 'package:to_do/future/custom_painter/drawing_points_model.dart';
+import 'package:to_do/future/note_screens/note_screen/bloc/note_screen_bloc.dart';
 
-class DrawNoteNotifier {
-  final positionsStreamController = StreamController<List<List<Offset>>>.broadcast();
+class DrawNoteNotifier extends ChangeNotifier {
+  List<DrawingPoints?> _drawingPoints = [];
 
-  List<List<Offset>> points = [];
-  List<Offset> currentLine = [];
-
-  DrawNoteNotifier();
-
-  Future<void> addValueForStream(List<List<Offset>> list) async{
-    positionsStreamController.add(list);
+  List<DrawingPoints?> get drawingPoints => _drawingPoints;
+  set drawingPoints(List<DrawingPoints?> value) {
+    _drawingPoints = value;
+    notifyListeners();
   }
 
-  Future<void> onPanUpdate(DragUpdateDetails details,{required double currentScrollOffset}) async {
-
-    final localPosition = Offset(
-      details.localPosition.dx,
-      details.localPosition.dy + currentScrollOffset,
-    );
-
-    addPoint(localPosition);
+  void setDrawingPointsFromLinearModelList(List<LinearModel> data) {
+    _drawingPoints = data
+        .map((e) => e.strokeWidth == 0
+            ? null
+            : DrawingPoints(
+                points: e.position,
+                paint: Paint()
+                  ..color = e.colorHex.toColor()
+                  ..strokeWidth = e.strokeWidth
+                  ..strokeCap = StrokeCap.round))
+        .toList();
+    notifyListeners();
   }
 
-  void addPoint(Offset point) {
-    currentLine.add(point);
-    points.add(List.from(currentLine));
-
-    // Отправляем полное состояние
-    positionsStreamController.add(List.from(points));
+  void onPanEnd(
+      NoteScreenStatus noteScreenStatus, void Function() blockFunction) {
+    if (noteScreenStatus == NoteScreenStatus.drawing) {
+      blockFunction();
+    }
   }
 
-  void finishLine() {
-    currentLine.clear();
-    // Отправляем обновление
-    positionsStreamController.add(List.from(points));
+  void onPanStart(
+      {required NoteScreenStatus noteScreenStatus,
+      required void Function(DrawingPoints) blockFunction,
+      required Offset pointPosition,
+      required StrokeCap strokeCap,
+      required Color currentColor,
+      required double currentStrokeWidth}) {
+    if (noteScreenStatus == NoteScreenStatus.drawing) {
+      final data = DrawingPoints(
+          points: pointPosition,
+          paint: Paint()
+            ..strokeCap = strokeCap
+            ..isAntiAlias = true
+            ..color = currentColor
+            ..strokeWidth = currentStrokeWidth);
+      blockFunction(data);
+    }
   }
 
-  void clearDrawing() {
-    points.clear();
-    currentLine.clear();
-    // Отправляем обновление
-    positionsStreamController.add(List.from(points));
-  }
+  void onPanUpdate(
+      {required NoteScreenStatus noteScreenStatus,
+      required void Function(DrawingPoints) blockFunction,
+      required Offset pointPosition,
+      required StrokeCap strokeCap,
+      required Color currentColor,
+      required double currentStrokeWidth}) {
+    if (noteScreenStatus == NoteScreenStatus.drawing) {
+      final data = DrawingPoints(
+          points: pointPosition,
+          paint: Paint()
+            ..strokeCap = strokeCap
+            ..isAntiAlias = true
+            ..color = currentColor
+            ..strokeWidth = currentStrokeWidth);
 
-  void closeStreamController() {
-    positionsStreamController.close();
+      blockFunction(data);
+    }
   }
 }

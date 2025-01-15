@@ -1,4 +1,5 @@
 import 'package:drift/drift.dart';
+import 'package:flutter/material.dart';
 import 'package:to_do/data/drift/drift_db.dart';
 
 enum PositionType { linear, text, image, undefined }
@@ -81,4 +82,8 @@ class PositionModel {
         opacity = position.opacity,
         createdAt = position.createdAt,
         updatedAt = position.updatedAt;
+
+  Offset toOffset(){
+    return Offset(dx, dy);
+  }
 }

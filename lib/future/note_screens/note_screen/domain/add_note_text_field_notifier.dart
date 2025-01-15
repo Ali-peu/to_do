@@ -1,47 +1,107 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
+import 'package:to_do/configuration/extension/color_extension.dart';
+import 'package:to_do/domain/model/note_text_model.dart';
+import 'package:to_do/domain/model/position_model.dart';
 
-class AddNoteTextFieldNotifier {
-  final _positionsController = StreamController<List<Offset>>.broadcast();
-  final _controllersController =
-      StreamController<List<TextEditingController>>.broadcast();
+class NoteTextFieldModel {
+  final Offset position;
+  final TextEditingController textController;
+  final TextStyle textStyle;
+  const NoteTextFieldModel(
+      {required this.position,
+      required this.textController,
+      required this.textStyle});
 
-  List<Offset> positions = [];
-  List<TextEditingController> controllers = [];
+  NoteTextFieldModel copyWith(
+      {Offset? position,
+      TextEditingController? textController,
+      TextStyle? textStyle}) {
+    return NoteTextFieldModel(
+        position: position ?? this.position,
+        textController: textController ?? this.textController,
+        textStyle: textStyle ?? this.textStyle);
+  }
+
+  NoteTextFieldModel.newValue(Offset newPosition)
+      : position = newPosition,
+        textController = TextEditingController(),
+        textStyle = const TextStyle();
+}
+
+class AddNoteTextFieldNotifier extends ChangeNotifier {
+  AddNoteTextFieldNotifier();
+
+  final _textController =
+      StreamController<List<NoteTextFieldModel>>.broadcast();
+  List<NoteTextFieldModel> _noteTextFieldModelList = [];
+
+  List<NoteTextFieldModel> get noteTextFieldModel => _noteTextFieldModelList;
+
+  set noteTextFieldModel(List<NoteTextFieldModel> value) {
+    _noteTextFieldModelList = value;
+    notifyListeners();
+  }
 
   int currentTextField = 0;
 
-  AddNoteTextFieldNotifier();
+  Stream<List<NoteTextFieldModel>> get textController => _textController.stream;
 
-  Stream<List<Offset>> get positionsStream => _positionsController.stream;
-  Stream<List<TextEditingController>> get controllersStream =>
-      _controllersController.stream;
+  Future<void> increaseSize({required int index}) async {
+    if (index < 0 || index >= _noteTextFieldModelList.length) {
+      throw IndexError.withLength(index, _noteTextFieldModelList.length);
+    }
 
-  Future<void> addTextListForStream(List<String> texts) async {
-    controllers = texts.map((e) => TextEditingController(text: e)).toList();
-    _controllersController.add(controllers);
+    final currentModel = _noteTextFieldModelList[index];
+    final currentFontSize = currentModel.textStyle.fontSize ?? 8;
+
+    _noteTextFieldModelList[index] = currentModel.copyWith(
+      textStyle: currentModel.textStyle.copyWith(
+        fontSize: currentFontSize + 1,
+      ),
+    );
+    _textController.add(List.from(_noteTextFieldModelList));
+    notifyListeners();
   }
 
-  Future<void> addTextPositions(List<Offset> positionsList) async {
-    positions = positionsList;
-    _positionsController.add(positionsList);
+  Future<void> decreaseSize({required int index}) async {
+    if (index < 0 || index >= _noteTextFieldModelList.length) {
+      throw IndexError.withLength(index, _noteTextFieldModelList.length);
+    }
+
+    final currentModel = _noteTextFieldModelList[index];
+    final currentFontSize = currentModel.textStyle.fontSize ?? 8;
+
+    _noteTextFieldModelList[index] = currentModel.copyWith(
+      textStyle: currentModel.textStyle.copyWith(
+        fontSize: currentFontSize - 1,
+      ),
+    );
+    _textController.add(List.from(_noteTextFieldModelList));
+
+    notifyListeners();
   }
 
-  // void moveToNextTextField() {
-  //   if (positions.isNotEmpty) {
-  //     currentTextField = (currentTextField + 1) % positions.length;
-
-  //     // Анимация к следующей позиции
-  //     scrollController.animateTo(
-  //       positions[currentTextField].dy,
-  //       duration: const Duration(milliseconds: 500),
-  //       curve: Curves.easeInOut,
-  //     );
-
-  //     // Обновляем состояние позиций
-  //     _positionsController.add(List.from(positions));
-  //   }
-  // }
+  Future<void> addTextListForStream(
+      List<NoteTextModel> texts, List<PositionModel> positions) async {
+    _noteTextFieldModelList = texts
+        .map((e) => NoteTextFieldModel(
+            textController: TextEditingController(text: e.text),
+            position: positions
+                .firstWhere((data) => data.parentId == e.id,
+                    orElse: () => PositionModel(
+                        dx: 0,
+                        dy: 0,
+                        id: 0,
+                        parentId: 0,
+                        positionType: PositionType.text.name))
+                .toOffset(),
+            textStyle: TextStyle(
+              color: e.colorHex.toColor(),
+            )))
+        .toList();
+    _textController.add(_noteTextFieldModelList);
+  }
 
   void updateTextPosition(Offset position,
       {required int updatedId, required double currentScrollOffset}) {
@@ -49,43 +109,40 @@ class AddNoteTextFieldNotifier {
       position.dx,
       position.dy + currentScrollOffset,
     );
-
-    positions[updatedId] = adjustedPosition;
-    _positionsController.add(List.from(positions));
+    _noteTextFieldModelList[updatedId] =
+        _noteTextFieldModelList[updatedId].copyWith(position: adjustedPosition);
+    _textController.add(List.from(_noteTextFieldModelList));
   }
 
-  Future<void> addNewTextField(Offset position) async {
-    if (controllers.isNotEmpty && controllers.last.text.isEmpty) {
-      controllers.removeLast();
-      positions
-        ..removeLast()
-        ..add(position);
-      controllers.add(TextEditingController());
-    } else {
-      positions.add(position);
-      controllers.add(TextEditingController());
+  Future<int> addNewTextField(Offset position) async {
+    if (_noteTextFieldModelList.isNotEmpty &&
+        _noteTextFieldModelList.last.textController.text.isEmpty) {
+      _noteTextFieldModelList.removeLast();
     }
-
-    // Обновляем состояние позиций и контроллеров
-    _positionsController.add(List.from(positions));
-    _controllersController.add(List.from(controllers));
+    _noteTextFieldModelList.add(NoteTextFieldModel.newValue(position));
+    _textController.add(List.from(_noteTextFieldModelList));
+    return _noteTextFieldModelList.indexOf(_noteTextFieldModelList.last);
   }
 
-  Future<void> onTapUp(TapUpDetails? details,
+  Future<int> onTapUp(TapUpDetails? details,
       {required double currentScrollOffset}) async {
-    if (details == null) return;
+    if (details == null) return 0;
 
-    // Вычисляем координаты с учетом прокрутки
     final adjustedPosition = Offset(
       details.localPosition.dx,
       details.localPosition.dy + currentScrollOffset,
     );
-
-    await addNewTextField(adjustedPosition);
+    final index = await addNewTextField(adjustedPosition);
+    return index;
   }
 
+  void clearData() {
+    _noteTextFieldModelList.clear();
+  }
+
+  @override
   void dispose() {
-    _positionsController.close();
-    _controllersController.close();
+    super.dispose();
+    _textController.close();
   }
 }

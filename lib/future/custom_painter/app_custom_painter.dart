@@ -1,33 +1,31 @@
+import 'dart:ui';
+
 import 'package:flutter/material.dart';
+import 'package:to_do/future/custom_painter/drawing_points_model.dart';
 
-class AppCustomPainter extends CustomPainter {
-  final List<List<Offset?>> lines;  // Список всех линий
-
-  AppCustomPainter(this.lines);
-
+class DrawingPainter extends CustomPainter {
+  DrawingPainter({required this.pointsList});
+  List<DrawingPoints?> pointsList;
+  List<Offset> offsetPoints = [];
   @override
   void paint(Canvas canvas, Size size) {
-    final paint = Paint()
-      ..color = Colors.blue
-      ..strokeWidth = 2.0
-      ..strokeCap = StrokeCap.round;
-
-    for (var line in lines) {
-      Offset? previousPoint;
-      
-      for (var point in line) {
-        if (point != null) {
-          if (previousPoint != null) {
-            canvas.drawLine(previousPoint, point, paint);
-          }
-          previousPoint = point;
-        }
+    for (int i = 0; i < pointsList.length - 1; i++) {
+      if (pointsList[i] != null && pointsList[i + 1] != null) {
+        canvas.drawLine(pointsList[i]?.points ?? Offset.zero, pointsList[i + 1]?.points ?? Offset.zero,
+            pointsList[i]?.paint ?? Paint());
+      } else if (pointsList[i] != null && pointsList[i + 1] == null) {
+        offsetPoints..clear()
+        ..add(pointsList[i]?.points ?? Offset.zero)
+        ..add(Offset(
+            (pointsList[i]?.points.dx  ?? Offset.zero.dx)+ 0.1, (pointsList[i]?.points.dy  ?? Offset.zero.dy) + 0.1));
+        canvas.drawPoints(PointMode.points, offsetPoints, pointsList[i]?.paint ?? Paint());
       }
     }
   }
 
   @override
-  bool shouldRepaint(covariant CustomPainter oldDelegate) {
-    return true;
-  }
+  bool shouldRepaint(DrawingPainter oldDelegate) => true;
 }
+
+
+enum SelectedMode { StrokeWidth, Opacity, Color }

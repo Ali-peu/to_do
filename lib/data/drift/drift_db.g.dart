@@ -868,27 +868,42 @@ class $NoteTextsTable extends NoteTexts
   late final GeneratedColumn<int> noteId = GeneratedColumn<int>(
       'note_id', aliasedName, false,
       type: DriftSqlType.int, requiredDuringInsert: true);
-  static const VerificationMeta _descriptionMeta =
-      const VerificationMeta('description');
+  static const VerificationMeta _textValueMeta =
+      const VerificationMeta('textValue');
   @override
-  late final GeneratedColumn<String> description = GeneratedColumn<String>(
-      'description', aliasedName, false,
+  late final GeneratedColumn<String> textValue = GeneratedColumn<String>(
+      'text_value', aliasedName, false,
       type: DriftSqlType.string, requiredDuringInsert: true);
-  static const VerificationMeta _textStyleMeta =
-      const VerificationMeta('textStyle');
+  static const VerificationMeta _weightValueMeta =
+      const VerificationMeta('weightValue');
   @override
-  late final GeneratedColumn<int> textStyle = GeneratedColumn<int>(
-      'text_style', aliasedName, false,
-      type: DriftSqlType.int, requiredDuringInsert: true);
+  late final GeneratedColumn<int> weightValue = GeneratedColumn<int>(
+      'weight_value', aliasedName, true,
+      type: DriftSqlType.int, requiredDuringInsert: false);
   static const VerificationMeta _colorHexMeta =
       const VerificationMeta('colorHex');
   @override
   late final GeneratedColumn<String> colorHex = GeneratedColumn<String>(
       'color_hex', aliasedName, false,
       type: DriftSqlType.string, requiredDuringInsert: true);
+  static const VerificationMeta _isCursivMeta =
+      const VerificationMeta('isCursiv');
+  @override
+  late final GeneratedColumn<bool> isCursiv = GeneratedColumn<bool>(
+      'is_cursiv', aliasedName, false,
+      type: DriftSqlType.bool,
+      requiredDuringInsert: true,
+      defaultConstraints:
+          GeneratedColumn.constraintIsAlways('CHECK ("is_cursiv" IN (0, 1))'));
+  static const VerificationMeta _textSizeMeta =
+      const VerificationMeta('textSize');
+  @override
+  late final GeneratedColumn<double> textSize = GeneratedColumn<double>(
+      'text_size', aliasedName, true,
+      type: DriftSqlType.double, requiredDuringInsert: false);
   @override
   List<GeneratedColumn> get $columns =>
-      [id, noteId, description, textStyle, colorHex];
+      [id, noteId, textValue, weightValue, colorHex, isCursiv, textSize];
   @override
   String get aliasedName => _alias ?? actualTableName;
   @override
@@ -908,25 +923,33 @@ class $NoteTextsTable extends NoteTexts
     } else if (isInserting) {
       context.missing(_noteIdMeta);
     }
-    if (data.containsKey('description')) {
-      context.handle(
-          _descriptionMeta,
-          description.isAcceptableOrUnknown(
-              data['description']!, _descriptionMeta));
+    if (data.containsKey('text_value')) {
+      context.handle(_textValueMeta,
+          textValue.isAcceptableOrUnknown(data['text_value']!, _textValueMeta));
     } else if (isInserting) {
-      context.missing(_descriptionMeta);
+      context.missing(_textValueMeta);
     }
-    if (data.containsKey('text_style')) {
-      context.handle(_textStyleMeta,
-          textStyle.isAcceptableOrUnknown(data['text_style']!, _textStyleMeta));
-    } else if (isInserting) {
-      context.missing(_textStyleMeta);
+    if (data.containsKey('weight_value')) {
+      context.handle(
+          _weightValueMeta,
+          weightValue.isAcceptableOrUnknown(
+              data['weight_value']!, _weightValueMeta));
     }
     if (data.containsKey('color_hex')) {
       context.handle(_colorHexMeta,
           colorHex.isAcceptableOrUnknown(data['color_hex']!, _colorHexMeta));
     } else if (isInserting) {
       context.missing(_colorHexMeta);
+    }
+    if (data.containsKey('is_cursiv')) {
+      context.handle(_isCursivMeta,
+          isCursiv.isAcceptableOrUnknown(data['is_cursiv']!, _isCursivMeta));
+    } else if (isInserting) {
+      context.missing(_isCursivMeta);
+    }
+    if (data.containsKey('text_size')) {
+      context.handle(_textSizeMeta,
+          textSize.isAcceptableOrUnknown(data['text_size']!, _textSizeMeta));
     }
     return context;
   }
@@ -941,12 +964,16 @@ class $NoteTextsTable extends NoteTexts
           .read(DriftSqlType.int, data['${effectivePrefix}id'])!,
       noteId: attachedDatabase.typeMapping
           .read(DriftSqlType.int, data['${effectivePrefix}note_id'])!,
-      description: attachedDatabase.typeMapping
-          .read(DriftSqlType.string, data['${effectivePrefix}description'])!,
-      textStyle: attachedDatabase.typeMapping
-          .read(DriftSqlType.int, data['${effectivePrefix}text_style'])!,
+      textValue: attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}text_value'])!,
+      weightValue: attachedDatabase.typeMapping
+          .read(DriftSqlType.int, data['${effectivePrefix}weight_value']),
       colorHex: attachedDatabase.typeMapping
           .read(DriftSqlType.string, data['${effectivePrefix}color_hex'])!,
+      isCursiv: attachedDatabase.typeMapping
+          .read(DriftSqlType.bool, data['${effectivePrefix}is_cursiv'])!,
+      textSize: attachedDatabase.typeMapping
+          .read(DriftSqlType.double, data['${effectivePrefix}text_size']),
     );
   }
 
@@ -959,23 +986,33 @@ class $NoteTextsTable extends NoteTexts
 class NoteText extends DataClass implements Insertable<NoteText> {
   final int id;
   final int noteId;
-  final String description;
-  final int textStyle;
+  final String textValue;
+  final int? weightValue;
   final String colorHex;
+  final bool isCursiv;
+  final double? textSize;
   const NoteText(
       {required this.id,
       required this.noteId,
-      required this.description,
-      required this.textStyle,
-      required this.colorHex});
+      required this.textValue,
+      this.weightValue,
+      required this.colorHex,
+      required this.isCursiv,
+      this.textSize});
   @override
   Map<String, Expression> toColumns(bool nullToAbsent) {
     final map = <String, Expression>{};
     map['id'] = Variable<int>(id);
     map['note_id'] = Variable<int>(noteId);
-    map['description'] = Variable<String>(description);
-    map['text_style'] = Variable<int>(textStyle);
+    map['text_value'] = Variable<String>(textValue);
+    if (!nullToAbsent || weightValue != null) {
+      map['weight_value'] = Variable<int>(weightValue);
+    }
     map['color_hex'] = Variable<String>(colorHex);
+    map['is_cursiv'] = Variable<bool>(isCursiv);
+    if (!nullToAbsent || textSize != null) {
+      map['text_size'] = Variable<double>(textSize);
+    }
     return map;
   }
 
@@ -983,9 +1020,15 @@ class NoteText extends DataClass implements Insertable<NoteText> {
     return NoteTextsCompanion(
       id: Value(id),
       noteId: Value(noteId),
-      description: Value(description),
-      textStyle: Value(textStyle),
+      textValue: Value(textValue),
+      weightValue: weightValue == null && nullToAbsent
+          ? const Value.absent()
+          : Value(weightValue),
       colorHex: Value(colorHex),
+      isCursiv: Value(isCursiv),
+      textSize: textSize == null && nullToAbsent
+          ? const Value.absent()
+          : Value(textSize),
     );
   }
 
@@ -995,9 +1038,11 @@ class NoteText extends DataClass implements Insertable<NoteText> {
     return NoteText(
       id: serializer.fromJson<int>(json['id']),
       noteId: serializer.fromJson<int>(json['noteId']),
-      description: serializer.fromJson<String>(json['description']),
-      textStyle: serializer.fromJson<int>(json['textStyle']),
+      textValue: serializer.fromJson<String>(json['textValue']),
+      weightValue: serializer.fromJson<int?>(json['weightValue']),
       colorHex: serializer.fromJson<String>(json['colorHex']),
+      isCursiv: serializer.fromJson<bool>(json['isCursiv']),
+      textSize: serializer.fromJson<double?>(json['textSize']),
     );
   }
   @override
@@ -1006,33 +1051,41 @@ class NoteText extends DataClass implements Insertable<NoteText> {
     return <String, dynamic>{
       'id': serializer.toJson<int>(id),
       'noteId': serializer.toJson<int>(noteId),
-      'description': serializer.toJson<String>(description),
-      'textStyle': serializer.toJson<int>(textStyle),
+      'textValue': serializer.toJson<String>(textValue),
+      'weightValue': serializer.toJson<int?>(weightValue),
       'colorHex': serializer.toJson<String>(colorHex),
+      'isCursiv': serializer.toJson<bool>(isCursiv),
+      'textSize': serializer.toJson<double?>(textSize),
     };
   }
 
   NoteText copyWith(
           {int? id,
           int? noteId,
-          String? description,
-          int? textStyle,
-          String? colorHex}) =>
+          String? textValue,
+          Value<int?> weightValue = const Value.absent(),
+          String? colorHex,
+          bool? isCursiv,
+          Value<double?> textSize = const Value.absent()}) =>
       NoteText(
         id: id ?? this.id,
         noteId: noteId ?? this.noteId,
-        description: description ?? this.description,
-        textStyle: textStyle ?? this.textStyle,
+        textValue: textValue ?? this.textValue,
+        weightValue: weightValue.present ? weightValue.value : this.weightValue,
         colorHex: colorHex ?? this.colorHex,
+        isCursiv: isCursiv ?? this.isCursiv,
+        textSize: textSize.present ? textSize.value : this.textSize,
       );
   NoteText copyWithCompanion(NoteTextsCompanion data) {
     return NoteText(
       id: data.id.present ? data.id.value : this.id,
       noteId: data.noteId.present ? data.noteId.value : this.noteId,
-      description:
-          data.description.present ? data.description.value : this.description,
-      textStyle: data.textStyle.present ? data.textStyle.value : this.textStyle,
+      textValue: data.textValue.present ? data.textValue.value : this.textValue,
+      weightValue:
+          data.weightValue.present ? data.weightValue.value : this.weightValue,
       colorHex: data.colorHex.present ? data.colorHex.value : this.colorHex,
+      isCursiv: data.isCursiv.present ? data.isCursiv.value : this.isCursiv,
+      textSize: data.textSize.present ? data.textSize.value : this.textSize,
     );
   }
 
@@ -1041,77 +1094,96 @@ class NoteText extends DataClass implements Insertable<NoteText> {
     return (StringBuffer('NoteText(')
           ..write('id: $id, ')
           ..write('noteId: $noteId, ')
-          ..write('description: $description, ')
-          ..write('textStyle: $textStyle, ')
-          ..write('colorHex: $colorHex')
+          ..write('textValue: $textValue, ')
+          ..write('weightValue: $weightValue, ')
+          ..write('colorHex: $colorHex, ')
+          ..write('isCursiv: $isCursiv, ')
+          ..write('textSize: $textSize')
           ..write(')'))
         .toString();
   }
 
   @override
-  int get hashCode => Object.hash(id, noteId, description, textStyle, colorHex);
+  int get hashCode => Object.hash(
+      id, noteId, textValue, weightValue, colorHex, isCursiv, textSize);
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
       (other is NoteText &&
           other.id == this.id &&
           other.noteId == this.noteId &&
-          other.description == this.description &&
-          other.textStyle == this.textStyle &&
-          other.colorHex == this.colorHex);
+          other.textValue == this.textValue &&
+          other.weightValue == this.weightValue &&
+          other.colorHex == this.colorHex &&
+          other.isCursiv == this.isCursiv &&
+          other.textSize == this.textSize);
 }
 
 class NoteTextsCompanion extends UpdateCompanion<NoteText> {
   final Value<int> id;
   final Value<int> noteId;
-  final Value<String> description;
-  final Value<int> textStyle;
+  final Value<String> textValue;
+  final Value<int?> weightValue;
   final Value<String> colorHex;
+  final Value<bool> isCursiv;
+  final Value<double?> textSize;
   const NoteTextsCompanion({
     this.id = const Value.absent(),
     this.noteId = const Value.absent(),
-    this.description = const Value.absent(),
-    this.textStyle = const Value.absent(),
+    this.textValue = const Value.absent(),
+    this.weightValue = const Value.absent(),
     this.colorHex = const Value.absent(),
+    this.isCursiv = const Value.absent(),
+    this.textSize = const Value.absent(),
   });
   NoteTextsCompanion.insert({
     this.id = const Value.absent(),
     required int noteId,
-    required String description,
-    required int textStyle,
+    required String textValue,
+    this.weightValue = const Value.absent(),
     required String colorHex,
+    required bool isCursiv,
+    this.textSize = const Value.absent(),
   })  : noteId = Value(noteId),
-        description = Value(description),
-        textStyle = Value(textStyle),
-        colorHex = Value(colorHex);
+        textValue = Value(textValue),
+        colorHex = Value(colorHex),
+        isCursiv = Value(isCursiv);
   static Insertable<NoteText> custom({
     Expression<int>? id,
     Expression<int>? noteId,
-    Expression<String>? description,
-    Expression<int>? textStyle,
+    Expression<String>? textValue,
+    Expression<int>? weightValue,
     Expression<String>? colorHex,
+    Expression<bool>? isCursiv,
+    Expression<double>? textSize,
   }) {
     return RawValuesInsertable({
       if (id != null) 'id': id,
       if (noteId != null) 'note_id': noteId,
-      if (description != null) 'description': description,
-      if (textStyle != null) 'text_style': textStyle,
+      if (textValue != null) 'text_value': textValue,
+      if (weightValue != null) 'weight_value': weightValue,
       if (colorHex != null) 'color_hex': colorHex,
+      if (isCursiv != null) 'is_cursiv': isCursiv,
+      if (textSize != null) 'text_size': textSize,
     });
   }
 
   NoteTextsCompanion copyWith(
       {Value<int>? id,
       Value<int>? noteId,
-      Value<String>? description,
-      Value<int>? textStyle,
-      Value<String>? colorHex}) {
+      Value<String>? textValue,
+      Value<int?>? weightValue,
+      Value<String>? colorHex,
+      Value<bool>? isCursiv,
+      Value<double?>? textSize}) {
     return NoteTextsCompanion(
       id: id ?? this.id,
       noteId: noteId ?? this.noteId,
-      description: description ?? this.description,
-      textStyle: textStyle ?? this.textStyle,
+      textValue: textValue ?? this.textValue,
+      weightValue: weightValue ?? this.weightValue,
       colorHex: colorHex ?? this.colorHex,
+      isCursiv: isCursiv ?? this.isCursiv,
+      textSize: textSize ?? this.textSize,
     );
   }
 
@@ -1124,14 +1196,20 @@ class NoteTextsCompanion extends UpdateCompanion<NoteText> {
     if (noteId.present) {
       map['note_id'] = Variable<int>(noteId.value);
     }
-    if (description.present) {
-      map['description'] = Variable<String>(description.value);
+    if (textValue.present) {
+      map['text_value'] = Variable<String>(textValue.value);
     }
-    if (textStyle.present) {
-      map['text_style'] = Variable<int>(textStyle.value);
+    if (weightValue.present) {
+      map['weight_value'] = Variable<int>(weightValue.value);
     }
     if (colorHex.present) {
       map['color_hex'] = Variable<String>(colorHex.value);
+    }
+    if (isCursiv.present) {
+      map['is_cursiv'] = Variable<bool>(isCursiv.value);
+    }
+    if (textSize.present) {
+      map['text_size'] = Variable<double>(textSize.value);
     }
     return map;
   }
@@ -1141,9 +1219,11 @@ class NoteTextsCompanion extends UpdateCompanion<NoteText> {
     return (StringBuffer('NoteTextsCompanion(')
           ..write('id: $id, ')
           ..write('noteId: $noteId, ')
-          ..write('description: $description, ')
-          ..write('textStyle: $textStyle, ')
-          ..write('colorHex: $colorHex')
+          ..write('textValue: $textValue, ')
+          ..write('weightValue: $weightValue, ')
+          ..write('colorHex: $colorHex, ')
+          ..write('isCursiv: $isCursiv, ')
+          ..write('textSize: $textSize')
           ..write(')'))
         .toString();
   }
@@ -1167,9 +1247,9 @@ class $NoteLinearTable extends NoteLinear
   static const VerificationMeta _strokeWidthMeta =
       const VerificationMeta('strokeWidth');
   @override
-  late final GeneratedColumn<int> strokeWidth = GeneratedColumn<int>(
+  late final GeneratedColumn<double> strokeWidth = GeneratedColumn<double>(
       'stroke_width', aliasedName, false,
-      type: DriftSqlType.int, requiredDuringInsert: true);
+      type: DriftSqlType.double, requiredDuringInsert: true);
   static const VerificationMeta _colorHexMeta =
       const VerificationMeta('colorHex');
   @override
@@ -1181,21 +1261,21 @@ class $NoteLinearTable extends NoteLinear
   late final GeneratedColumn<int> noteId = GeneratedColumn<int>(
       'note_id', aliasedName, false,
       type: DriftSqlType.int, requiredDuringInsert: true);
-  static const VerificationMeta _dxPositionsMeta =
-      const VerificationMeta('dxPositions');
+  static const VerificationMeta _dxPositionMeta =
+      const VerificationMeta('dxPosition');
   @override
-  late final GeneratedColumn<String> dxPositions = GeneratedColumn<String>(
-      'dx_positions', aliasedName, true,
-      type: DriftSqlType.string, requiredDuringInsert: false);
-  static const VerificationMeta _dyPositionsMeta =
-      const VerificationMeta('dyPositions');
+  late final GeneratedColumn<double> dxPosition = GeneratedColumn<double>(
+      'dx_position', aliasedName, false,
+      type: DriftSqlType.double, requiredDuringInsert: true);
+  static const VerificationMeta _dyPositionMeta =
+      const VerificationMeta('dyPosition');
   @override
-  late final GeneratedColumn<String> dyPositions = GeneratedColumn<String>(
-      'dy_positions', aliasedName, true,
-      type: DriftSqlType.string, requiredDuringInsert: false);
+  late final GeneratedColumn<double> dyPosition = GeneratedColumn<double>(
+      'dy_position', aliasedName, false,
+      type: DriftSqlType.double, requiredDuringInsert: true);
   @override
   List<GeneratedColumn> get $columns =>
-      [id, strokeWidth, colorHex, noteId, dxPositions, dyPositions];
+      [id, strokeWidth, colorHex, noteId, dxPosition, dyPosition];
   @override
   String get aliasedName => _alias ?? actualTableName;
   @override
@@ -1229,17 +1309,21 @@ class $NoteLinearTable extends NoteLinear
     } else if (isInserting) {
       context.missing(_noteIdMeta);
     }
-    if (data.containsKey('dx_positions')) {
+    if (data.containsKey('dx_position')) {
       context.handle(
-          _dxPositionsMeta,
-          dxPositions.isAcceptableOrUnknown(
-              data['dx_positions']!, _dxPositionsMeta));
+          _dxPositionMeta,
+          dxPosition.isAcceptableOrUnknown(
+              data['dx_position']!, _dxPositionMeta));
+    } else if (isInserting) {
+      context.missing(_dxPositionMeta);
     }
-    if (data.containsKey('dy_positions')) {
+    if (data.containsKey('dy_position')) {
       context.handle(
-          _dyPositionsMeta,
-          dyPositions.isAcceptableOrUnknown(
-              data['dy_positions']!, _dyPositionsMeta));
+          _dyPositionMeta,
+          dyPosition.isAcceptableOrUnknown(
+              data['dy_position']!, _dyPositionMeta));
+    } else if (isInserting) {
+      context.missing(_dyPositionMeta);
     }
     return context;
   }
@@ -1253,15 +1337,15 @@ class $NoteLinearTable extends NoteLinear
       id: attachedDatabase.typeMapping
           .read(DriftSqlType.int, data['${effectivePrefix}id'])!,
       strokeWidth: attachedDatabase.typeMapping
-          .read(DriftSqlType.int, data['${effectivePrefix}stroke_width'])!,
+          .read(DriftSqlType.double, data['${effectivePrefix}stroke_width'])!,
       colorHex: attachedDatabase.typeMapping
           .read(DriftSqlType.string, data['${effectivePrefix}color_hex'])!,
       noteId: attachedDatabase.typeMapping
           .read(DriftSqlType.int, data['${effectivePrefix}note_id'])!,
-      dxPositions: attachedDatabase.typeMapping
-          .read(DriftSqlType.string, data['${effectivePrefix}dx_positions']),
-      dyPositions: attachedDatabase.typeMapping
-          .read(DriftSqlType.string, data['${effectivePrefix}dy_positions']),
+      dxPosition: attachedDatabase.typeMapping
+          .read(DriftSqlType.double, data['${effectivePrefix}dx_position'])!,
+      dyPosition: attachedDatabase.typeMapping
+          .read(DriftSqlType.double, data['${effectivePrefix}dy_position'])!,
     );
   }
 
@@ -1273,31 +1357,27 @@ class $NoteLinearTable extends NoteLinear
 
 class NoteLinearData extends DataClass implements Insertable<NoteLinearData> {
   final int id;
-  final int strokeWidth;
+  final double strokeWidth;
   final String colorHex;
   final int noteId;
-  final String? dxPositions;
-  final String? dyPositions;
+  final double dxPosition;
+  final double dyPosition;
   const NoteLinearData(
       {required this.id,
       required this.strokeWidth,
       required this.colorHex,
       required this.noteId,
-      this.dxPositions,
-      this.dyPositions});
+      required this.dxPosition,
+      required this.dyPosition});
   @override
   Map<String, Expression> toColumns(bool nullToAbsent) {
     final map = <String, Expression>{};
     map['id'] = Variable<int>(id);
-    map['stroke_width'] = Variable<int>(strokeWidth);
+    map['stroke_width'] = Variable<double>(strokeWidth);
     map['color_hex'] = Variable<String>(colorHex);
     map['note_id'] = Variable<int>(noteId);
-    if (!nullToAbsent || dxPositions != null) {
-      map['dx_positions'] = Variable<String>(dxPositions);
-    }
-    if (!nullToAbsent || dyPositions != null) {
-      map['dy_positions'] = Variable<String>(dyPositions);
-    }
+    map['dx_position'] = Variable<double>(dxPosition);
+    map['dy_position'] = Variable<double>(dyPosition);
     return map;
   }
 
@@ -1307,12 +1387,8 @@ class NoteLinearData extends DataClass implements Insertable<NoteLinearData> {
       strokeWidth: Value(strokeWidth),
       colorHex: Value(colorHex),
       noteId: Value(noteId),
-      dxPositions: dxPositions == null && nullToAbsent
-          ? const Value.absent()
-          : Value(dxPositions),
-      dyPositions: dyPositions == null && nullToAbsent
-          ? const Value.absent()
-          : Value(dyPositions),
+      dxPosition: Value(dxPosition),
+      dyPosition: Value(dyPosition),
     );
   }
 
@@ -1321,11 +1397,11 @@ class NoteLinearData extends DataClass implements Insertable<NoteLinearData> {
     serializer ??= driftRuntimeOptions.defaultSerializer;
     return NoteLinearData(
       id: serializer.fromJson<int>(json['id']),
-      strokeWidth: serializer.fromJson<int>(json['strokeWidth']),
+      strokeWidth: serializer.fromJson<double>(json['strokeWidth']),
       colorHex: serializer.fromJson<String>(json['colorHex']),
       noteId: serializer.fromJson<int>(json['noteId']),
-      dxPositions: serializer.fromJson<String?>(json['dxPositions']),
-      dyPositions: serializer.fromJson<String?>(json['dyPositions']),
+      dxPosition: serializer.fromJson<double>(json['dxPosition']),
+      dyPosition: serializer.fromJson<double>(json['dyPosition']),
     );
   }
   @override
@@ -1333,28 +1409,28 @@ class NoteLinearData extends DataClass implements Insertable<NoteLinearData> {
     serializer ??= driftRuntimeOptions.defaultSerializer;
     return <String, dynamic>{
       'id': serializer.toJson<int>(id),
-      'strokeWidth': serializer.toJson<int>(strokeWidth),
+      'strokeWidth': serializer.toJson<double>(strokeWidth),
       'colorHex': serializer.toJson<String>(colorHex),
       'noteId': serializer.toJson<int>(noteId),
-      'dxPositions': serializer.toJson<String?>(dxPositions),
-      'dyPositions': serializer.toJson<String?>(dyPositions),
+      'dxPosition': serializer.toJson<double>(dxPosition),
+      'dyPosition': serializer.toJson<double>(dyPosition),
     };
   }
 
   NoteLinearData copyWith(
           {int? id,
-          int? strokeWidth,
+          double? strokeWidth,
           String? colorHex,
           int? noteId,
-          Value<String?> dxPositions = const Value.absent(),
-          Value<String?> dyPositions = const Value.absent()}) =>
+          double? dxPosition,
+          double? dyPosition}) =>
       NoteLinearData(
         id: id ?? this.id,
         strokeWidth: strokeWidth ?? this.strokeWidth,
         colorHex: colorHex ?? this.colorHex,
         noteId: noteId ?? this.noteId,
-        dxPositions: dxPositions.present ? dxPositions.value : this.dxPositions,
-        dyPositions: dyPositions.present ? dyPositions.value : this.dyPositions,
+        dxPosition: dxPosition ?? this.dxPosition,
+        dyPosition: dyPosition ?? this.dyPosition,
       );
   NoteLinearData copyWithCompanion(NoteLinearCompanion data) {
     return NoteLinearData(
@@ -1363,10 +1439,10 @@ class NoteLinearData extends DataClass implements Insertable<NoteLinearData> {
           data.strokeWidth.present ? data.strokeWidth.value : this.strokeWidth,
       colorHex: data.colorHex.present ? data.colorHex.value : this.colorHex,
       noteId: data.noteId.present ? data.noteId.value : this.noteId,
-      dxPositions:
-          data.dxPositions.present ? data.dxPositions.value : this.dxPositions,
-      dyPositions:
-          data.dyPositions.present ? data.dyPositions.value : this.dyPositions,
+      dxPosition:
+          data.dxPosition.present ? data.dxPosition.value : this.dxPosition,
+      dyPosition:
+          data.dyPosition.present ? data.dyPosition.value : this.dyPosition,
     );
   }
 
@@ -1377,15 +1453,15 @@ class NoteLinearData extends DataClass implements Insertable<NoteLinearData> {
           ..write('strokeWidth: $strokeWidth, ')
           ..write('colorHex: $colorHex, ')
           ..write('noteId: $noteId, ')
-          ..write('dxPositions: $dxPositions, ')
-          ..write('dyPositions: $dyPositions')
+          ..write('dxPosition: $dxPosition, ')
+          ..write('dyPosition: $dyPosition')
           ..write(')'))
         .toString();
   }
 
   @override
   int get hashCode =>
-      Object.hash(id, strokeWidth, colorHex, noteId, dxPositions, dyPositions);
+      Object.hash(id, strokeWidth, colorHex, noteId, dxPosition, dyPosition);
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
@@ -1394,67 +1470,69 @@ class NoteLinearData extends DataClass implements Insertable<NoteLinearData> {
           other.strokeWidth == this.strokeWidth &&
           other.colorHex == this.colorHex &&
           other.noteId == this.noteId &&
-          other.dxPositions == this.dxPositions &&
-          other.dyPositions == this.dyPositions);
+          other.dxPosition == this.dxPosition &&
+          other.dyPosition == this.dyPosition);
 }
 
 class NoteLinearCompanion extends UpdateCompanion<NoteLinearData> {
   final Value<int> id;
-  final Value<int> strokeWidth;
+  final Value<double> strokeWidth;
   final Value<String> colorHex;
   final Value<int> noteId;
-  final Value<String?> dxPositions;
-  final Value<String?> dyPositions;
+  final Value<double> dxPosition;
+  final Value<double> dyPosition;
   const NoteLinearCompanion({
     this.id = const Value.absent(),
     this.strokeWidth = const Value.absent(),
     this.colorHex = const Value.absent(),
     this.noteId = const Value.absent(),
-    this.dxPositions = const Value.absent(),
-    this.dyPositions = const Value.absent(),
+    this.dxPosition = const Value.absent(),
+    this.dyPosition = const Value.absent(),
   });
   NoteLinearCompanion.insert({
     this.id = const Value.absent(),
-    required int strokeWidth,
+    required double strokeWidth,
     required String colorHex,
     required int noteId,
-    this.dxPositions = const Value.absent(),
-    this.dyPositions = const Value.absent(),
+    required double dxPosition,
+    required double dyPosition,
   })  : strokeWidth = Value(strokeWidth),
         colorHex = Value(colorHex),
-        noteId = Value(noteId);
+        noteId = Value(noteId),
+        dxPosition = Value(dxPosition),
+        dyPosition = Value(dyPosition);
   static Insertable<NoteLinearData> custom({
     Expression<int>? id,
-    Expression<int>? strokeWidth,
+    Expression<double>? strokeWidth,
     Expression<String>? colorHex,
     Expression<int>? noteId,
-    Expression<String>? dxPositions,
-    Expression<String>? dyPositions,
+    Expression<double>? dxPosition,
+    Expression<double>? dyPosition,
   }) {
     return RawValuesInsertable({
       if (id != null) 'id': id,
       if (strokeWidth != null) 'stroke_width': strokeWidth,
       if (colorHex != null) 'color_hex': colorHex,
       if (noteId != null) 'note_id': noteId,
-      if (dxPositions != null) 'dx_positions': dxPositions,
-      if (dyPositions != null) 'dy_positions': dyPositions,
+      if (dxPosition != null) 'dx_position': dxPosition,
+      if (dyPosition != null) 'dy_position': dyPosition,
     });
   }
 
   NoteLinearCompanion copyWith(
       {Value<int>? id,
-      Value<int>? strokeWidth,
+      Value<double>? strokeWidth,
       Value<String>? colorHex,
       Value<int>? noteId,
-      Value<String?>? dxPositions,
-      Value<String?>? dyPositions}) {
+      Value<double>? dxPosition,
+      Value<double>? dyPosition}) {
     return NoteLinearCompanion(
       id: id ?? this.id,
       strokeWidth: strokeWidth ?? this.strokeWidth,
       colorHex: colorHex ?? this.colorHex,
       noteId: noteId ?? this.noteId,
-      dxPositions: dxPositions ?? this.dxPositions,
-      dyPositions: dyPositions ?? this.dyPositions,
+      dxPosition: dxPosition ?? this.dxPosition,
+      dyPosition: dyPosition ?? this.dyPosition,
     );
   }
 
@@ -1465,7 +1543,7 @@ class NoteLinearCompanion extends UpdateCompanion<NoteLinearData> {
       map['id'] = Variable<int>(id.value);
     }
     if (strokeWidth.present) {
-      map['stroke_width'] = Variable<int>(strokeWidth.value);
+      map['stroke_width'] = Variable<double>(strokeWidth.value);
     }
     if (colorHex.present) {
       map['color_hex'] = Variable<String>(colorHex.value);
@@ -1473,11 +1551,11 @@ class NoteLinearCompanion extends UpdateCompanion<NoteLinearData> {
     if (noteId.present) {
       map['note_id'] = Variable<int>(noteId.value);
     }
-    if (dxPositions.present) {
-      map['dx_positions'] = Variable<String>(dxPositions.value);
+    if (dxPosition.present) {
+      map['dx_position'] = Variable<double>(dxPosition.value);
     }
-    if (dyPositions.present) {
-      map['dy_positions'] = Variable<String>(dyPositions.value);
+    if (dyPosition.present) {
+      map['dy_position'] = Variable<double>(dyPosition.value);
     }
     return map;
   }
@@ -1489,8 +1567,8 @@ class NoteLinearCompanion extends UpdateCompanion<NoteLinearData> {
           ..write('strokeWidth: $strokeWidth, ')
           ..write('colorHex: $colorHex, ')
           ..write('noteId: $noteId, ')
-          ..write('dxPositions: $dxPositions, ')
-          ..write('dyPositions: $dyPositions')
+          ..write('dxPosition: $dxPosition, ')
+          ..write('dyPosition: $dyPosition')
           ..write(')'))
         .toString();
   }
@@ -2731,16 +2809,20 @@ typedef $$SubNotesTableProcessedTableManager = ProcessedTableManager<
 typedef $$NoteTextsTableCreateCompanionBuilder = NoteTextsCompanion Function({
   Value<int> id,
   required int noteId,
-  required String description,
-  required int textStyle,
+  required String textValue,
+  Value<int?> weightValue,
   required String colorHex,
+  required bool isCursiv,
+  Value<double?> textSize,
 });
 typedef $$NoteTextsTableUpdateCompanionBuilder = NoteTextsCompanion Function({
   Value<int> id,
   Value<int> noteId,
-  Value<String> description,
-  Value<int> textStyle,
+  Value<String> textValue,
+  Value<int?> weightValue,
   Value<String> colorHex,
+  Value<bool> isCursiv,
+  Value<double?> textSize,
 });
 
 class $$NoteTextsTableFilterComposer
@@ -2758,14 +2840,20 @@ class $$NoteTextsTableFilterComposer
   ColumnFilters<int> get noteId => $composableBuilder(
       column: $table.noteId, builder: (column) => ColumnFilters(column));
 
-  ColumnFilters<String> get description => $composableBuilder(
-      column: $table.description, builder: (column) => ColumnFilters(column));
+  ColumnFilters<String> get textValue => $composableBuilder(
+      column: $table.textValue, builder: (column) => ColumnFilters(column));
 
-  ColumnFilters<int> get textStyle => $composableBuilder(
-      column: $table.textStyle, builder: (column) => ColumnFilters(column));
+  ColumnFilters<int> get weightValue => $composableBuilder(
+      column: $table.weightValue, builder: (column) => ColumnFilters(column));
 
   ColumnFilters<String> get colorHex => $composableBuilder(
       column: $table.colorHex, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<bool> get isCursiv => $composableBuilder(
+      column: $table.isCursiv, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<double> get textSize => $composableBuilder(
+      column: $table.textSize, builder: (column) => ColumnFilters(column));
 }
 
 class $$NoteTextsTableOrderingComposer
@@ -2783,14 +2871,20 @@ class $$NoteTextsTableOrderingComposer
   ColumnOrderings<int> get noteId => $composableBuilder(
       column: $table.noteId, builder: (column) => ColumnOrderings(column));
 
-  ColumnOrderings<String> get description => $composableBuilder(
-      column: $table.description, builder: (column) => ColumnOrderings(column));
+  ColumnOrderings<String> get textValue => $composableBuilder(
+      column: $table.textValue, builder: (column) => ColumnOrderings(column));
 
-  ColumnOrderings<int> get textStyle => $composableBuilder(
-      column: $table.textStyle, builder: (column) => ColumnOrderings(column));
+  ColumnOrderings<int> get weightValue => $composableBuilder(
+      column: $table.weightValue, builder: (column) => ColumnOrderings(column));
 
   ColumnOrderings<String> get colorHex => $composableBuilder(
       column: $table.colorHex, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<bool> get isCursiv => $composableBuilder(
+      column: $table.isCursiv, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<double> get textSize => $composableBuilder(
+      column: $table.textSize, builder: (column) => ColumnOrderings(column));
 }
 
 class $$NoteTextsTableAnnotationComposer
@@ -2808,14 +2902,20 @@ class $$NoteTextsTableAnnotationComposer
   GeneratedColumn<int> get noteId =>
       $composableBuilder(column: $table.noteId, builder: (column) => column);
 
-  GeneratedColumn<String> get description => $composableBuilder(
-      column: $table.description, builder: (column) => column);
+  GeneratedColumn<String> get textValue =>
+      $composableBuilder(column: $table.textValue, builder: (column) => column);
 
-  GeneratedColumn<int> get textStyle =>
-      $composableBuilder(column: $table.textStyle, builder: (column) => column);
+  GeneratedColumn<int> get weightValue => $composableBuilder(
+      column: $table.weightValue, builder: (column) => column);
 
   GeneratedColumn<String> get colorHex =>
       $composableBuilder(column: $table.colorHex, builder: (column) => column);
+
+  GeneratedColumn<bool> get isCursiv =>
+      $composableBuilder(column: $table.isCursiv, builder: (column) => column);
+
+  GeneratedColumn<double> get textSize =>
+      $composableBuilder(column: $table.textSize, builder: (column) => column);
 }
 
 class $$NoteTextsTableTableManager extends RootTableManager<
@@ -2843,30 +2943,38 @@ class $$NoteTextsTableTableManager extends RootTableManager<
           updateCompanionCallback: ({
             Value<int> id = const Value.absent(),
             Value<int> noteId = const Value.absent(),
-            Value<String> description = const Value.absent(),
-            Value<int> textStyle = const Value.absent(),
+            Value<String> textValue = const Value.absent(),
+            Value<int?> weightValue = const Value.absent(),
             Value<String> colorHex = const Value.absent(),
+            Value<bool> isCursiv = const Value.absent(),
+            Value<double?> textSize = const Value.absent(),
           }) =>
               NoteTextsCompanion(
             id: id,
             noteId: noteId,
-            description: description,
-            textStyle: textStyle,
+            textValue: textValue,
+            weightValue: weightValue,
             colorHex: colorHex,
+            isCursiv: isCursiv,
+            textSize: textSize,
           ),
           createCompanionCallback: ({
             Value<int> id = const Value.absent(),
             required int noteId,
-            required String description,
-            required int textStyle,
+            required String textValue,
+            Value<int?> weightValue = const Value.absent(),
             required String colorHex,
+            required bool isCursiv,
+            Value<double?> textSize = const Value.absent(),
           }) =>
               NoteTextsCompanion.insert(
             id: id,
             noteId: noteId,
-            description: description,
-            textStyle: textStyle,
+            textValue: textValue,
+            weightValue: weightValue,
             colorHex: colorHex,
+            isCursiv: isCursiv,
+            textSize: textSize,
           ),
           withReferenceMapper: (p0) => p0
               .map((e) => (e.readTable(table), BaseReferences(db, table, e)))
@@ -2889,19 +2997,19 @@ typedef $$NoteTextsTableProcessedTableManager = ProcessedTableManager<
     PrefetchHooks Function()>;
 typedef $$NoteLinearTableCreateCompanionBuilder = NoteLinearCompanion Function({
   Value<int> id,
-  required int strokeWidth,
+  required double strokeWidth,
   required String colorHex,
   required int noteId,
-  Value<String?> dxPositions,
-  Value<String?> dyPositions,
+  required double dxPosition,
+  required double dyPosition,
 });
 typedef $$NoteLinearTableUpdateCompanionBuilder = NoteLinearCompanion Function({
   Value<int> id,
-  Value<int> strokeWidth,
+  Value<double> strokeWidth,
   Value<String> colorHex,
   Value<int> noteId,
-  Value<String?> dxPositions,
-  Value<String?> dyPositions,
+  Value<double> dxPosition,
+  Value<double> dyPosition,
 });
 
 class $$NoteLinearTableFilterComposer
@@ -2916,7 +3024,7 @@ class $$NoteLinearTableFilterComposer
   ColumnFilters<int> get id => $composableBuilder(
       column: $table.id, builder: (column) => ColumnFilters(column));
 
-  ColumnFilters<int> get strokeWidth => $composableBuilder(
+  ColumnFilters<double> get strokeWidth => $composableBuilder(
       column: $table.strokeWidth, builder: (column) => ColumnFilters(column));
 
   ColumnFilters<String> get colorHex => $composableBuilder(
@@ -2925,11 +3033,11 @@ class $$NoteLinearTableFilterComposer
   ColumnFilters<int> get noteId => $composableBuilder(
       column: $table.noteId, builder: (column) => ColumnFilters(column));
 
-  ColumnFilters<String> get dxPositions => $composableBuilder(
-      column: $table.dxPositions, builder: (column) => ColumnFilters(column));
+  ColumnFilters<double> get dxPosition => $composableBuilder(
+      column: $table.dxPosition, builder: (column) => ColumnFilters(column));
 
-  ColumnFilters<String> get dyPositions => $composableBuilder(
-      column: $table.dyPositions, builder: (column) => ColumnFilters(column));
+  ColumnFilters<double> get dyPosition => $composableBuilder(
+      column: $table.dyPosition, builder: (column) => ColumnFilters(column));
 }
 
 class $$NoteLinearTableOrderingComposer
@@ -2944,7 +3052,7 @@ class $$NoteLinearTableOrderingComposer
   ColumnOrderings<int> get id => $composableBuilder(
       column: $table.id, builder: (column) => ColumnOrderings(column));
 
-  ColumnOrderings<int> get strokeWidth => $composableBuilder(
+  ColumnOrderings<double> get strokeWidth => $composableBuilder(
       column: $table.strokeWidth, builder: (column) => ColumnOrderings(column));
 
   ColumnOrderings<String> get colorHex => $composableBuilder(
@@ -2953,11 +3061,11 @@ class $$NoteLinearTableOrderingComposer
   ColumnOrderings<int> get noteId => $composableBuilder(
       column: $table.noteId, builder: (column) => ColumnOrderings(column));
 
-  ColumnOrderings<String> get dxPositions => $composableBuilder(
-      column: $table.dxPositions, builder: (column) => ColumnOrderings(column));
+  ColumnOrderings<double> get dxPosition => $composableBuilder(
+      column: $table.dxPosition, builder: (column) => ColumnOrderings(column));
 
-  ColumnOrderings<String> get dyPositions => $composableBuilder(
-      column: $table.dyPositions, builder: (column) => ColumnOrderings(column));
+  ColumnOrderings<double> get dyPosition => $composableBuilder(
+      column: $table.dyPosition, builder: (column) => ColumnOrderings(column));
 }
 
 class $$NoteLinearTableAnnotationComposer
@@ -2972,7 +3080,7 @@ class $$NoteLinearTableAnnotationComposer
   GeneratedColumn<int> get id =>
       $composableBuilder(column: $table.id, builder: (column) => column);
 
-  GeneratedColumn<int> get strokeWidth => $composableBuilder(
+  GeneratedColumn<double> get strokeWidth => $composableBuilder(
       column: $table.strokeWidth, builder: (column) => column);
 
   GeneratedColumn<String> get colorHex =>
@@ -2981,11 +3089,11 @@ class $$NoteLinearTableAnnotationComposer
   GeneratedColumn<int> get noteId =>
       $composableBuilder(column: $table.noteId, builder: (column) => column);
 
-  GeneratedColumn<String> get dxPositions => $composableBuilder(
-      column: $table.dxPositions, builder: (column) => column);
+  GeneratedColumn<double> get dxPosition => $composableBuilder(
+      column: $table.dxPosition, builder: (column) => column);
 
-  GeneratedColumn<String> get dyPositions => $composableBuilder(
-      column: $table.dyPositions, builder: (column) => column);
+  GeneratedColumn<double> get dyPosition => $composableBuilder(
+      column: $table.dyPosition, builder: (column) => column);
 }
 
 class $$NoteLinearTableTableManager extends RootTableManager<
@@ -3015,35 +3123,35 @@ class $$NoteLinearTableTableManager extends RootTableManager<
               $$NoteLinearTableAnnotationComposer($db: db, $table: table),
           updateCompanionCallback: ({
             Value<int> id = const Value.absent(),
-            Value<int> strokeWidth = const Value.absent(),
+            Value<double> strokeWidth = const Value.absent(),
             Value<String> colorHex = const Value.absent(),
             Value<int> noteId = const Value.absent(),
-            Value<String?> dxPositions = const Value.absent(),
-            Value<String?> dyPositions = const Value.absent(),
+            Value<double> dxPosition = const Value.absent(),
+            Value<double> dyPosition = const Value.absent(),
           }) =>
               NoteLinearCompanion(
             id: id,
             strokeWidth: strokeWidth,
             colorHex: colorHex,
             noteId: noteId,
-            dxPositions: dxPositions,
-            dyPositions: dyPositions,
+            dxPosition: dxPosition,
+            dyPosition: dyPosition,
           ),
           createCompanionCallback: ({
             Value<int> id = const Value.absent(),
-            required int strokeWidth,
+            required double strokeWidth,
             required String colorHex,
             required int noteId,
-            Value<String?> dxPositions = const Value.absent(),
-            Value<String?> dyPositions = const Value.absent(),
+            required double dxPosition,
+            required double dyPosition,
           }) =>
               NoteLinearCompanion.insert(
             id: id,
             strokeWidth: strokeWidth,
             colorHex: colorHex,
             noteId: noteId,
-            dxPositions: dxPositions,
-            dyPositions: dyPositions,
+            dxPosition: dxPosition,
+            dyPosition: dyPosition,
           ),
           withReferenceMapper: (p0) => p0
               .map((e) => (e.readTable(table), BaseReferences(db, table, e)))

@@ -10,6 +10,8 @@ import 'package:to_do/domain/model/linear_model.dart';
 import 'package:to_do/domain/model/note.dart';
 import 'package:to_do/domain/model/note_text_model.dart';
 import 'package:to_do/domain/model/position_model.dart';
+import 'package:to_do/future/custom_painter/drawing_points_model.dart';
+import 'package:to_do/future/note_screens/note_screen/domain/add_note_text_field_notifier.dart';
 
 class SaveNoteRepo {
   final NoteTextRepository noteTextRepository;
@@ -25,40 +27,32 @@ class SaveNoteRepo {
   });
 
   Future<void> saveNote(
-      {required List<Offset> textPositions,
-      required List<String> texts,
+      {required List<NoteTextFieldModel> textController,
       required bool isFavourite,
-      required List<List<Offset>> linearPositions,
-      required List<String> linearColors}) async {
-    if (textPositions.length != texts.length) {
-      throw ArgumentError(
-        'Length of textPositions (${textPositions.length}) does not match length of text (${texts.length})',
-      );
-    }
+      required List<DrawingPoints?> points}) async {
+   
     try {
       final noteId = await noteRepository.createNoteForDB(
           NoteModel(id: 0, category: 'NO', isFavourite: isFavourite));
       if (noteId != null) {
-        for (var i = 0; i < textPositions.length; i++) {
+        for (var i = 0; i < textController.length; i++) {
           final id = await noteTextRepository.saveNoteTexts(
-              text: texts[i], noteId: noteId);
+              noteTextFieldModel: textController[i], noteId: noteId);
           if (id != null) {
             await notePositionsRepository.savePosition(
-                dx: textPositions[i].dx,
-                dy: textPositions[i].dy,
+                dx: textController[i].position.dx,
+                dy: textController[i].position.dy,
                 parentId: id,
                 positionType: PositionType.text);
           }
         }
 
-        for (var i = 0; i < linearPositions.length; i++) {
-           await noteLinearRepository.saveLinearModel(LinearModel(
+        for (var i = 0; i < points.length; i++) {
+          await noteLinearRepository.saveLinearModel(LinearModel(
             noteId: noteId,
-            id: 0,
-            strokeWidth: 2,
-            colorHex: Colors.blue.toHexString(),
-            dxPositions: linearPositions[i].map((e) => e.dx).toList(),
-            dyPositions: linearPositions[i].map((e) => e.dy).toList(),
+            strokeWidth: points[i]?.paint.strokeWidth ?? 0,
+            colorHex: points[i]?.paint.color.toHexString() ?? '',
+            position: points[i]?.points ?? Offset.zero,
           ));
         }
       }

@@ -5,8 +5,9 @@ import 'package:to_do/data/drift_datebase_providers/note_linear_repository.dart'
 import 'package:to_do/data/drift_datebase_providers/note_positions_repository.dart';
 import 'package:to_do/data/drift_datebase_providers/note_repository.dart';
 import 'package:to_do/data/drift_datebase_providers/note_text_repository.dart';
+import 'package:to_do/future/draw_screen/bloc/draw_bloc.dart';
 
-import 'package:to_do/future/custom_painter/app_custom_painter.dart';
+import 'package:to_do/future/draw_screen/draw_screen.dart';
 import 'package:to_do/future/note_screens/note_screen/bloc/note_screen_bloc.dart';
 import 'package:to_do/future/note_screens/note_screen/data/save_note_repo.dart';
 import 'package:to_do/future/note_screens/note_screen/domain/add_note_text_field_notifier.dart';
@@ -14,6 +15,7 @@ import 'package:to_do/future/note_screens/note_screen/domain/draw_note_notifier.
 import 'package:to_do/future/note_screens/note_screen/ui/widgets/add_note_text_field.dart';
 import 'package:to_do/future/note_screens/note_screen/ui/widgets/draggable_widget.dart';
 import 'package:to_do/future/note_screens/note_screen/ui/widgets/note_nav_bar.dart';
+import 'package:to_do/future/note_screens/notes_screen/notes_screen_model_view.dart';
 
 class NoteScreen extends StatelessWidget {
   final int? noteId;
@@ -23,6 +25,10 @@ class NoteScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return BlocProvider(
       create: (context) => NoteScreenBloc(
+          notesScreenModelView:
+              Provider.of<NotesScreenModelView>(context, listen: false),
+          drawNoteNotifier:
+              Provider.of<DrawNoteNotifier>(context, listen: false),
           saveNoteRepo: SaveNoteRepo(
               noteTextRepository:
                   Provider.of<NoteTextRepository>(context, listen: false),
@@ -32,8 +38,8 @@ class NoteScreen extends StatelessWidget {
                   Provider.of<NotePositionsRepository>(context, listen: false),
               noteLinearRepository:
                   Provider.of<NoteLinearRepository>(context, listen: false)),
-          drawNoteNotifier: DrawNoteNotifier(),
-          addNoteTextFieldNotifier: AddNoteTextFieldNotifier(),
+          addNoteTextFieldNotifier:
+              Provider.of<AddNoteTextFieldNotifier>(context, listen: false),
           noteId: noteId)
         ..add(FetchData(noteId: noteId)),
       child: const _NoteScreen(),
@@ -50,6 +56,47 @@ class _NoteScreen extends StatefulWidget {
 
 class _NoteScreenState extends State<_NoteScreen> {
   final scrollController = ScrollController();
+
+  @override
+  void deactivate() {
+    super.deactivate();
+    context.read<DrawBloc>().add(const ClearDrawing());
+    Provider.of<AddNoteTextFieldNotifier>(context, listen: false).clearData();
+  }
+
+  void onPanEnd(NoteScreenState state, BuildContext context) {
+    Provider.of<DrawNoteNotifier>(context, listen: false).onPanEnd(
+        state.noteScreenStatus,
+        () => context.read<DrawBloc>().add(const OnPanEnd()));
+  }
+
+  void onPanStart(
+      NoteScreenState state, BuildContext context, DragStartDetails details) {
+    Provider.of<DrawNoteNotifier>(context, listen: false).onPanStart(
+        noteScreenStatus: state.noteScreenStatus,
+        blockFunction: (data) => context.read<DrawBloc>().add(OnPanStart(data)),
+        pointPosition: Offset(details.localPosition.dx,
+            details.localPosition.dy + scrollController.offset),
+        strokeCap: context.read<DrawBloc>().state.strokeCap,
+        currentColor: context.read<DrawBloc>().state.currentColor,
+        currentStrokeWidth: context.read<DrawBloc>().state.currentStrokeWidth);
+  }
+
+  void onPanUpdate(
+      NoteScreenState state, BuildContext context, DragUpdateDetails details) {
+    // final renderBox = context.findRenderObject()! as RenderBox;
+
+    Provider.of<DrawNoteNotifier>(context, listen: false).onPanUpdate(
+        noteScreenStatus: state.noteScreenStatus,
+        blockFunction: (data) =>
+            context.read<DrawBloc>().add(OnPanUpdate(data)),
+        pointPosition: Offset(details.localPosition.dx,
+            details.localPosition.dy + scrollController.offset),
+        strokeCap: context.read<DrawBloc>().state.strokeCap,
+        currentColor: context.read<DrawBloc>().state.currentColor,
+        currentStrokeWidth: context.read<DrawBloc>().state.currentStrokeWidth);
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -59,117 +106,115 @@ class _NoteScreenState extends State<_NoteScreen> {
         actions: [
           TextButton(
               onPressed: () {
-                if (context
-                        .read<NoteScreenBloc>()
-                        .addNoteTextFieldNotifier
-                        .controllers
-                        .isNotEmpty ||
-                    context
-                        .read<NoteScreenBloc>()
-                        .drawNoteNotifier
-                        .points
-                        .isNotEmpty) {
-                  context.read<NoteScreenBloc>().add(SaveNote());
-                }
+                context.read<NoteScreenBloc>().add(SaveNote(
+                    drawingPoints: context.read<DrawBloc>().state.points));
               },
               child: const Text('OK'))
         ],
       ),
       floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
       floatingActionButton: const NoteNavBar(),
-      body: BlocBuilder<NoteScreenBloc, NoteScreenState>(
-        builder: (context, state) {
-          final blocValue = context.read<NoteScreenBloc>();
-          return GestureDetector(
-              onPanUpdate: (details) =>
-                  (state.noteScreenStatus == NoteScreenStatus.drawing)
-                      ? blocValue.drawNoteNotifier.onPanUpdate(details,
-                          currentScrollOffset: scrollController.offset)
-                      : null,
-              onPanEnd: (details) {
-                if (state.noteScreenStatus == NoteScreenStatus.drawing) {
-                  blocValue.drawNoteNotifier.finishLine();
-                }
-              },
-              onTapUp: (details) =>
-                  (state.noteScreenStatus != NoteScreenStatus.drawing)
-                      ? blocValue.addNoteTextFieldNotifier.onTapUp(details,
-                          currentScrollOffset: scrollController.offset)
-                      : null,
-              child: SingleChildScrollView(
-                controller: scrollController,
-                physics: state.noteScreenStatus == NoteScreenStatus.drawing
-                    ? const NeverScrollableScrollPhysics()
-                    : const AlwaysScrollableScrollPhysics(),
-                child: Container(
-                  constraints: BoxConstraints(
-                      minHeight: MediaQuery.of(context).size.height,
-                      maxHeight: double.maxFinite),
-                  child: StreamBuilder<List<Offset>>(
-                    stream: blocValue.addNoteTextFieldNotifier.positionsStream,
-                    builder: (context, snapshot) => Stack(
-                      children: [
-                        Container(
-                          color: Colors.white, // Фон экрана
-                        ),
-                        StreamBuilder<List<List<Offset>>>(
-                            stream: context
-                                .read<NoteScreenBloc>()
-                                .drawNoteNotifier
-                                .positionsStreamController
-                                .stream,
-                            builder: (context, snapshot) {
-                              return CustomPaint(
-                                painter: AppCustomPainter(
-                                    snapshot.data ?? []), // Для рисования
-                                size: Size.infinite,
-                              );
-                            }),
-                        ...(snapshot.data ?? []).asMap().entries.map((entry) {
-                          final index = entry.key;
-                          final position = entry.value;
-                          final screenWidth = MediaQuery.of(context).size.width;
-                          return Positioned(
-                            left: position.dx,
-                            top: position.dy,
-                            child: SizedBox(
-                              width: screenWidth - position.dx,
-                              child: Padding(
-                                padding: const EdgeInsets.only(right: 10),
-                                child: DraggableWidget(
-                                  boxConstraints: BoxConstraints(
-                                    maxWidth: screenWidth - position.dx,
-                                  ),
-                                  onDragEnd: (details) {
-                                    final renderBox = context.findRenderObject()
-                                        as RenderBox?;
-                                    if (renderBox == null) {
-                                      return;
-                                    }
-                                    final localOffset =
-                                        renderBox.globalToLocal(details.offset);
-                                    blocValue.addNoteTextFieldNotifier
-                                        .updateTextPosition(localOffset,
-                                            updatedId: index,
-                                            currentScrollOffset:
-                                                scrollController.offset);
-                                  },
-                                  child: AddNoteTextField(
-                                    controller: blocValue
-                                        .addNoteTextFieldNotifier
-                                        .controllers[index],
+      body: BlocListener<NoteScreenBloc, NoteScreenState>(
+        listener: (context, state) {
+          if (context.read<NoteScreenBloc>().noteId != null ||
+              state.noteScreenStatus == NoteScreenStatus.success) {
+            context.read<DrawBloc>().add(GetData(
+                list: Provider.of<DrawNoteNotifier>(context, listen: false)
+                    .drawingPoints));
+          }
+        },
+        child: BlocBuilder<NoteScreenBloc, NoteScreenState>(
+          builder: (context, state) {
+            final blocValue = context.read<NoteScreenBloc>();
+
+            return GestureDetector(
+                onPanUpdate: (details) {
+                  onPanUpdate(state, context, details);
+                },
+                onPanStart: (details) {
+                  onPanStart(state, context, details);
+                },
+                onPanEnd: (details) {
+                  onPanEnd(state, context);
+                },
+                onTapUp: (details) async {
+                  if (state.noteScreenStatus != NoteScreenStatus.drawing) {
+                    final index = await Provider.of<AddNoteTextFieldNotifier>(
+                            context,
+                            listen: false)
+                        .onTapUp(details,
+                            currentScrollOffset: scrollController.offset);
+                    blocValue.add(SetCurrentTextFieldIndex(index: index));
+                  }
+                },
+                child: SingleChildScrollView(
+                  controller: scrollController,
+                  physics: state.noteScreenStatus == NoteScreenStatus.drawing
+                      ? const NeverScrollableScrollPhysics()
+                      : const AlwaysScrollableScrollPhysics(),
+                  child: Container(
+                    constraints: BoxConstraints(
+                        minHeight: MediaQuery.of(context).size.height,
+                        maxHeight: double.maxFinite),
+                    child: StreamBuilder<List<NoteTextFieldModel>>(
+                      stream: Provider.of<AddNoteTextFieldNotifier>(context,
+                              listen: false)
+                          .textController,
+                      builder: (context, snapshot) => Stack(
+                        children: [
+                          Container(
+                            color: Colors.white, // Фон экрана
+                          ),
+                          const DrawScreen(),
+                          ...(snapshot.data ?? []).asMap().entries.map((entry) {
+                            final index = entry.key;
+                            final position = entry.value;
+                            final screenWidth =
+                                MediaQuery.of(context).size.width;
+                            return Positioned(
+                              left: position.position.dx,
+                              top: position.position.dy,
+                              child: SizedBox(
+                                width: screenWidth - position.position.dx,
+                                child: Padding(
+                                  padding: const EdgeInsets.only(right: 10),
+                                  child: DraggableWidget(
+                                    boxConstraints: BoxConstraints(
+                                      maxWidth:
+                                          screenWidth - position.position.dx,
+                                    ),
+                                    onDragEnd: (details) {
+                                      final renderBox = context
+                                          .findRenderObject() as RenderBox?;
+                                      if (renderBox == null) {
+                                        return;
+                                      }
+                                      final localOffset = renderBox
+                                          .globalToLocal(details.offset);
+                                      Provider.of<AddNoteTextFieldNotifier>(
+                                              context,
+                                              listen: false)
+                                          .updateTextPosition(localOffset,
+                                              updatedId: index,
+                                              currentScrollOffset:
+                                                  scrollController.offset);
+                                    },
+                                    child: AddNoteTextField(
+                                      controller: position.textController,
+                                      textStyle: position.textStyle,
+                                    ),
                                   ),
                                 ),
                               ),
-                            ),
-                          );
-                        }),
-                      ],
+                            );
+                          }),
+                        ],
+                      ),
                     ),
                   ),
-                ),
-              ));
-        },
+                ));
+          },
+        ),
       ),
     );
   }

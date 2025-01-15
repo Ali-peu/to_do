@@ -1,8 +1,14 @@
+import 'dart:math';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_colorpicker/flutter_colorpicker.dart';
 import 'package:flutter_svg/svg.dart';
+import 'package:provider/provider.dart';
 import 'package:to_do/configuration/assets/icon_assets.dart';
+import 'package:to_do/future/draw_screen/bloc/draw_bloc.dart';
 import 'package:to_do/future/note_screens/note_screen/bloc/note_screen_bloc.dart';
+import 'package:to_do/future/note_screens/note_screen/domain/add_note_text_field_notifier.dart';
 import 'package:to_do/future/note_screens/note_screen/ui/widgets/add_favourite.dart';
 
 class NoteNavBar extends StatelessWidget {
@@ -10,7 +16,8 @@ class NoteNavBar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return BlocBuilder<NoteScreenBloc, NoteScreenState>(builder: (context, state) {
+    return BlocBuilder<NoteScreenBloc, NoteScreenState>(
+        builder: (context, state) {
       return Padding(
         padding: const EdgeInsets.symmetric(horizontal: 25),
         child: Container(
@@ -24,69 +31,59 @@ class NoteNavBar extends StatelessWidget {
                 onTap: () {
                   context.read<NoteScreenBloc>().add(DrawLines());
                 },
-                child: DecoratedBox(
+                child: Container(
+                    width: 30,
+                    height: 30,
                     decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(20),
                         color:
-                            state.noteScreenStatus == NoteScreenStatus.drawing ? Colors.red : null),
-                    child: SvgPicture.asset(IconAssets.pen))),
+                            state.noteScreenStatus == NoteScreenStatus.drawing
+                                ? Colors.yellow.shade500
+                                : null),
+                    child: SizedBox(
+                      height: 20,
+                      width: 10,
+                      child: SvgPicture.asset(
+                        IconAssets.pen,
+                      ),
+                    ))),
             GestureDetector(
-                onTap: () {},
-                child: Text(
-                  'Ж',
-                  style: Theme.of(context)
-                      .textTheme
-                      .bodyMedium
-                      ?.copyWith(fontWeight: FontWeight.w900),
-                )),
-            GestureDetector(
-                onTap: () {},
-                child: Text(
-                  'К',
-                  style: Theme.of(context)
-                      .textTheme
-                      .bodyMedium
-                      ?.copyWith(fontStyle: FontStyle.italic),
-                )),
-            GestureDetector(
-              onPanDown: (details) {
-                // final overlay = Overlay.of(context);
-                // final boxPosition = details.globalPosition;
-
-                // if (overlay != null) {
-                //   final overlayEntry = OverlayEntry(
-                //     builder: (context) => Positioned(
-                //       top: boxPosition.dy, // Центрируем квадрат
-                //       left: boxPosition.dx,
-                //       child: const SizedBox(
-                //         height: 100,
-                //         width: 100,
-                //         child: ColoredBox(color: Colors.red),
-                //       ),
-                //     ),
-                //   );
-
-                //   overlay.insert(overlayEntry);
-
-                //   // Убираем квадрат через 2 секунды
-                //   Future.delayed(const Duration(seconds: 2), () {
-                //     overlayEntry.remove();
-                //   });
-                // }
+              onTap: () {
+                showDialog(
+                    context: context,
+                    builder: (context) {
+                      return AlertDialog(
+                        title: const Text('Pick a color!'),
+                        content: SingleChildScrollView(
+                          child: ColorPicker(
+                            pickerColor:
+                                context.read<DrawBloc>().state.currentColor,
+                            onColorChanged: (color) {
+                              context.read<DrawBloc>().add(SetColor(color));
+                            },
+                            pickerAreaHeightPercent: 0.8,
+                          ),
+                        ),
+                        actions: <Widget>[
+                          TextButton(
+                            child: const Text('Save'),
+                            onPressed: () {
+                              Navigator.of(context).pop();
+                            },
+                          ),
+                        ],
+                      );
+                    });
               },
               child: Container(
                 width: 25,
                 height: 25,
                 decoration: BoxDecoration(
-                    color: Colors.yellow.shade300,
+                    gradient: const LinearGradient(colors: [
+                      Colors.yellow,
+                      Colors.red,
+                    ], end: Alignment.bottomRight),
                     borderRadius: BorderRadius.circular(100)),
-              ),
-            ),
-            const Padding(
-              padding: EdgeInsets.symmetric(horizontal: 8),
-              child: SizedBox(
-                height: 25,
-                width: 1,
-                child: ColoredBox(color: Colors.black),
               ),
             ),
             GestureDetector(
@@ -96,6 +93,18 @@ class NoteNavBar extends StatelessWidget {
                   // value.drawNoteNotifier.clearDrawing();
                 },
                 child: SvgPicture.asset(IconAssets.audio)),
+            GestureDetector(
+                onTap: () {
+                  Provider.of<AddNoteTextFieldNotifier>(context, listen: false)
+                      .increaseSize(index: state.currentTextFieldIndex);
+                },
+                child: const Icon(Icons.text_increase)),
+            GestureDetector(
+                onTap: () {
+                  Provider.of<AddNoteTextFieldNotifier>(context, listen: false)
+                      .decreaseSize(index: state.currentTextFieldIndex);
+                },
+                child: const Icon(Icons.text_decrease)),
             GestureDetector(
                 onTap: () {
                   // value.isFavor = !value.isFavor;

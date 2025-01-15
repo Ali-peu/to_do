@@ -1,8 +1,8 @@
-import 'dart:ui';
-
-import 'package:to_do/data/drift/drift_tables/note_linear_drift_table.dart';
+import 'package:flutter/material.dart';
+import 'package:to_do/configuration/extension/color_extension.dart';
 import 'package:to_do/data/drift/drift_tables/note_text_drift_table.dart';
 import 'package:to_do/domain/model/note_text_model.dart';
+import 'package:to_do/future/note_screens/note_screen/domain/add_note_text_field_notifier.dart';
 
 class NoteTextRepository {
   final NoteTextDriftTable noteTextDriftTable;
@@ -10,9 +10,17 @@ class NoteTextRepository {
   NoteTextRepository({required this.noteTextDriftTable});
 
   Future<int?> saveNoteTexts(
-      {required String text, required int noteId}) async {
+      {required NoteTextFieldModel noteTextFieldModel,
+      required int noteId}) async {
     final id = await noteTextDriftTable.saveNoteTexts(NoteTextModel(
-        id: 0, description: text, noteId: noteId, textStyle: 0, colorHex: '0'));
+        id: 0,
+        text: noteTextFieldModel.textController.text,
+        noteId: noteId,
+        weightValue: noteTextFieldModel.textStyle.fontWeight?.value,
+        colorHex:
+            (noteTextFieldModel.textStyle.color ?? Colors.black).toHexString(),
+        isCursiv: false,
+        textSize: noteTextFieldModel.textStyle.fontSize));
     return id;
   }
 

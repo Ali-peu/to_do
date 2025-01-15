@@ -5,20 +5,25 @@ enum NoteScreenStatus { initial, loading, failure, drawing, success }
 class NoteScreenState extends Equatable {
   final NoteScreenStatus noteScreenStatus;
   final bool isFavourite;
+  final int currentTextFieldIndex;
 
   const NoteScreenState(
-      {this.isFavourite = false,
+      {this.currentTextFieldIndex = 0,
+      this.isFavourite = false,
       this.noteScreenStatus = NoteScreenStatus.initial});
 
-  NoteScreenState copyWith({
-    NoteScreenStatus? noteScreenStatus,
-    bool? isFavourite,
-  }) {
+  NoteScreenState copyWith(
+      {NoteScreenStatus? noteScreenStatus,
+      bool? isFavourite,
+      int? currentTextFieldIndex}) {
     return NoteScreenState(
         noteScreenStatus: noteScreenStatus ?? this.noteScreenStatus,
-        isFavourite: isFavourite ?? this.isFavourite);
+        isFavourite: isFavourite ?? this.isFavourite,
+        currentTextFieldIndex:
+            currentTextFieldIndex ?? this.currentTextFieldIndex);
   }
 
   @override
-  List<Object?> get props => [noteScreenStatus, isFavourite];
+  List<Object?> get props =>
+      [noteScreenStatus, isFavourite, currentTextFieldIndex];
 }

@@ -25,18 +25,21 @@ class SubNotes extends Table {
 class NoteTexts extends Table {
   IntColumn get id => integer().autoIncrement()();
   IntColumn get noteId => integer()(); // ID родительской заметки
-  TextColumn get description => text()();
-  IntColumn get textStyle => integer()(); // 1=курсив, 2=жирный и т.д.
+  TextColumn get textValue => text()();
+  IntColumn get weightValue =>
+      integer().nullable()(); // 1=курсив, 2=жирный и т.д.
   TextColumn get colorHex => text()(); // HEX цвет текста
+  BoolColumn get isCursiv => boolean()();
+  RealColumn get textSize => real().nullable()();
 }
 
 class NoteLinear extends Table {
   IntColumn get id => integer().autoIncrement()();
-  IntColumn get strokeWidth => integer()(); // Толщина линии
+  RealColumn get strokeWidth => real()(); // Толщина линии
   TextColumn get colorHex => text()(); // HEX цвет линии
   IntColumn get noteId => integer()(); // ID родительской заметки
-  TextColumn get dxPositions => text().nullable()(); // Сериализованный список dx
-  TextColumn get dyPositions => text().nullable()(); // Сериализованный список dy
+  RealColumn get dxPosition => real()();
+  RealColumn get dyPosition => real()();
 }
 
 class Images extends Table {
@@ -89,7 +92,6 @@ class AppDatabase extends _$AppDatabase {
     return driftDatabase(name: 'my_database');
   }
 }
-
 
 void logError(Object e, String name) {
   log(e.toString(), name: name);
