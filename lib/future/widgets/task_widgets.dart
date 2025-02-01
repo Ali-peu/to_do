@@ -1,10 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:go_router/go_router.dart';
 import 'package:to_do/data/router/app_router.dart';
 import 'package:to_do/domain/model/note.dart';
-import 'package:to_do/future/widgets/timer_frame.dart';
 
 class TaskWidget extends StatefulWidget {
   final NoteModel note;
@@ -23,44 +21,8 @@ class _TaskWidgetState extends State<TaskWidget> {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 2.0, horizontal: 8.0),
-      child: Slidable(
-          endActionPane: ActionPane(
-            motion: const ScrollMotion(),
-            children: [
-              SlidableAction(
-                onPressed: (context) => (showAlert()),
-                backgroundColor: const Color(0xFFFE4A49),
-                foregroundColor: Colors.white,
-                icon: Icons.delete,
-                label: 'Delete',
-              ),
-              SlidableAction(
-                onPressed: (context) async {
-                  DateTime? selectedTime =
-                      await MyCustomCalendar().showCustomDatePickerPac(context);
-                  // HiveDataBase().updateDatetime(widget.note, selectedTime ?? DateTime.now());
-                },
-                backgroundColor: const Color.fromARGB(255, 66, 141, 232),
-                foregroundColor: Colors.white,
-                icon: Icons.date_range_rounded,
-                label: 'Data',
-              ),
-              SlidableAction(
-                onPressed: (context) => () {},
-                //  (HiveDataBase().starNote(
-                // widget.note,
-                // widget.note.isThisStar,
-                // )),
-
-                backgroundColor: const Color.fromARGB(255, 233, 242, 61),
-                foregroundColor: Colors.white,
-                label: 'Star',
-              )
-            ],
-          ),
-          child: noteListTile()),
-    );
+        padding: const EdgeInsets.symmetric(vertical: 2, horizontal: 8),
+        child: noteListTile());
   }
 
   Widget noteListTile() {
@@ -107,7 +69,7 @@ class _TaskWidgetState extends State<TaskWidget> {
     ));
   }
 
-  void showAlert() async {
+  Future<void> showAlert() async {
     showDialog(
         context: context,
         builder: (context) {

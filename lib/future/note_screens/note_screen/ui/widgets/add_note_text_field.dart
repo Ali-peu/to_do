@@ -4,9 +4,13 @@ class AddNoteTextField extends StatelessWidget {
   final TextEditingController controller;
   final String? hintext;
   final TextStyle? textStyle;
+  final void Function(String?) onChanged;
+  final void Function() onTap;
+
   const AddNoteTextField(
       {required this.controller,
-      super.key,
+      required this.onChanged,
+      required this.onTap, super.key,
       this.hintext = 'Текст...',
       this.textStyle});
 
@@ -14,6 +18,8 @@ class AddNoteTextField extends StatelessWidget {
   Widget build(BuildContext context) {
     return TextField(
         controller: controller,
+        onChanged: onChanged,
+        onTap: onTap,
         maxLines: null,
         autofocus: true,
         style: textStyle,

@@ -30,21 +30,29 @@ class SaveNoteRepo {
       {required List<NoteTextFieldModel> textController,
       required bool isFavourite,
       required List<DrawingPoints?> points}) async {
-   
     try {
       final noteId = await noteRepository.createNoteForDB(
           NoteModel(id: 0, category: 'NO', isFavourite: isFavourite));
-      if (noteId != null) {
-        for (var i = 0; i < textController.length; i++) {
-          final id = await noteTextRepository.saveNoteTexts(
-              noteTextFieldModel: textController[i], noteId: noteId);
-          if (id != null) {
-            await notePositionsRepository.savePosition(
-                dx: textController[i].position.dx,
-                dy: textController[i].position.dy,
-                parentId: id,
-                positionType: PositionType.text);
+      if (noteId != null) { 
+        try {
+          if (textController.isNotEmpty) {// TODO какой то баг если не проверять на емпти 
+            for (final element in textController) {
+              final id = await noteTextRepository.saveNoteTexts(
+                  noteTextFieldModel: element, noteId: noteId);
+              if (id != null) {
+                final dx = element.position.dx;
+                final dy = element.position.dy;
+
+                await notePositionsRepository.savePosition(
+                    dx: dx,
+                    dy: dy,
+                    parentId: id,
+                    positionType: PositionType.text);
+              }
+            }
           }
+        } on Exception catch (e) {
+          log(e.toString());
         }
 
         for (var i = 0; i < points.length; i++) {

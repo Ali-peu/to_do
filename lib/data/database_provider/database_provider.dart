@@ -1,4 +1,3 @@
-import 'package:to_do/domain/model/note.dart';
 
 abstract class DatabaseProvider<T> {
   Future<int?> createNoteForDB(T model);

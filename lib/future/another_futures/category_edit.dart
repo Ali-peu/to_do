@@ -1,7 +1,5 @@
-import 'dart:async';
 
 import 'package:flutter/material.dart';
-import 'package:to_do/data/drift_datebase_providers/note_category_data.dart';
 import 'package:to_do/domain/model/category_note.dart';
 
 class Editcategory extends StatefulWidget {
@@ -48,8 +46,8 @@ class _EditcategoryState extends State<Editcategory> {
     );
   }
 
-  void showAlert(CategoryNote categoryNote) async {
-    showDialog(
+  Future<void> showAlert(CategoryNote categoryNote) async {
+    await showDialog(
         context: context,
         builder: (context) {
           return AlertDialog(
@@ -63,7 +61,7 @@ class _EditcategoryState extends State<Editcategory> {
                           builder: (context) {
                             return AlertDialog(
                               title: const Text(
-                                  "Вы не можете удалить так как есть экзапляр категории"),
+                                  'Вы не можете удалить так как есть экзапляр категории'),
                               actions: [
                                 TextButton(
                                     onPressed: () {

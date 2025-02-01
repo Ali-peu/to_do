@@ -4,7 +4,7 @@
     
         android:label="To-Do List"
         android:name="${applicationName}"
-        android:icon="@mipmap/launcher_icon">
+        android:icon="@mipmap/ic_launcher">
         <!--<receiver android:exported="false" android:name="com.dexterous.flutterlocalnotifications.ScheduledNotificationReceiver" /> Удалить если все сломается-->
         <!--<receiver android:exported="false" android:name="com.dexterous.flutterlocalnotifications.ScheduledNotificationBootReceiver"> Удалить если все сломается-->
         <activity

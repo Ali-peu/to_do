@@ -35,6 +35,78 @@ class NoteScreenBloc extends Bloc<NoteScreenEvent, NoteScreenState> {
         emit(state.copyWith(noteScreenStatus: NoteScreenStatus.drawing));
       }
     });
+
+    on<AddTextField>((event, emit) async {
+      await _addNoteTextFieldNotifier.onTapUp(
+          localPositionDx: event.localPositionDx,
+          localPositionDy: event.localPositionDy,
+          currentScrollOffset: event.currentScrollOffset);
+
+      final list = _addNoteTextFieldNotifier.noteTextFieldModel;
+
+      emit(state.copyWith(
+          noteTextFieldModel: list,
+          isFavourite: !state.isFavourite)); // TODO state не видит изменение
+      // в листе поэтому меняю булевое значение тоже
+    });
+
+    on<UpdateTextPosition>((event, emit) async {
+      _addNoteTextFieldNotifier.updateTextPosition(event.position,
+          updatedId: event.updatedId,
+          currentScrollOffset: event.currentScrollOffset);
+      final list = _addNoteTextFieldNotifier.noteTextFieldModel;
+      emit(state.copyWith(
+          noteTextFieldModel: list, isFavourite: !state.isFavourite));
+    });
+
+    on<SaveTextFieldValue>((event, emit) {
+      _addNoteTextFieldNotifier.addTextFieldValue(
+          value: event.value, index: event.index);
+    });
+
+    on<IncreaseTextSize>((event, emit) {
+      if (state.currentTextFieldIndex < 0 ||
+          state.currentTextFieldIndex >=
+              _addNoteTextFieldNotifier.noteTextFieldModel.length) {
+        throw IndexError.withLength(state.currentTextFieldIndex,
+            _addNoteTextFieldNotifier.noteTextFieldModel.length);
+      }
+
+      final currentModel = _addNoteTextFieldNotifier
+          .noteTextFieldModel[state.currentTextFieldIndex];
+      final currentFontSize = currentModel.textStyle.fontSize ?? 15;
+
+      final list = _addNoteTextFieldNotifier.noteTextFieldModel;
+      list[state.currentTextFieldIndex] = currentModel.copyWith(
+        textStyle: currentModel.textStyle.copyWith(
+          fontSize: currentFontSize + 1,
+        ),
+      );
+      emit(state.copyWith(
+          noteTextFieldModel: list, isFavourite: !state.isFavourite));
+    });
+    on<DecreaseTextSize>((event, emit) {
+      if (state.currentTextFieldIndex < 0 ||
+          state.currentTextFieldIndex >=
+              _addNoteTextFieldNotifier.noteTextFieldModel.length) {
+        throw IndexError.withLength(state.currentTextFieldIndex,
+            _addNoteTextFieldNotifier.noteTextFieldModel.length);
+      }
+
+      final currentModel = _addNoteTextFieldNotifier
+          .noteTextFieldModel[state.currentTextFieldIndex];
+      final currentFontSize = currentModel.textStyle.fontSize ?? 15;
+
+      final list = _addNoteTextFieldNotifier.noteTextFieldModel;
+      list[state.currentTextFieldIndex] = currentModel.copyWith(
+        textStyle: currentModel.textStyle.copyWith(
+          fontSize: currentFontSize - 1,
+        ),
+      );
+      emit(state.copyWith(
+          noteTextFieldModel: list, isFavourite: !state.isFavourite));
+    });
+
     on<SaveNote>((event, emit) {
       _saveNoteRepo
           .saveNote(
@@ -73,7 +145,9 @@ class NoteScreenBloc extends Bloc<NoteScreenEvent, NoteScreenState> {
 
         await _addNoteTextFieldNotifier.addTextListForStream(
             textsList.map((e) => e).toList(), textPositionsList);
-        emit(state.copyWith(noteScreenStatus: NoteScreenStatus.success));
+        emit(state.copyWith(
+            noteScreenStatus: NoteScreenStatus.success,
+            noteTextFieldModel: _addNoteTextFieldNotifier.noteTextFieldModel));
       }
     });
   }

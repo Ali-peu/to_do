@@ -1,7 +1,6 @@
 import 'dart:async';
 
 import 'package:to_do/data/database_provider/database_provider.dart';
-import 'package:to_do/data/drift/drift_db.dart';
 import 'package:to_do/data/drift/drift_tables/sub_note_drift_table.dart';
 import 'package:to_do/domain/model/sub_note_model.dart';
 
@@ -29,7 +28,6 @@ class DriftDatebaseProviderForSubNote extends DatabaseProvider<SubNoteModel> {
 
   @override
   Future<void> clearDB() async {
-    // TODO: implement clearDB
     // await noteDriftProvider.
     // throw UnimplementedError();
   }

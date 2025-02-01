@@ -10,12 +10,10 @@ class DrawScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return BlocBuilder<DrawBloc, DrawState>(
       builder: (context, state) {
-        return GestureDetector(
-          child: CustomPaint(
-            size: Size.infinite,
-            painter: DrawingPainter(
-              pointsList: state.points,
-            ),
+        return CustomPaint(
+          size: Size.infinite,
+          painter: DrawingPainter(
+            pointsList: state.points,
           ),
         );
       },

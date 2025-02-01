@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:to_do/configuration/validators/validador_text.dart';
 // import 'package:syncfusion_flutter_charts/charts.dart';
 
 class AccountPage extends StatefulWidget {

@@ -10,7 +10,7 @@ class MyCustomCalendar extends ChangeNotifier {
   DateTime _selectedTime = DateTime.now();
   DateTime? replayTime;
 
-  get selectedTime => _selectedTime;
+  DateTime get selectedTime => _selectedTime;
 
   DateTime saturdayOf(DateTime time) => weekdayOf(time, 5);
 
@@ -32,9 +32,9 @@ class MyCustomCalendar extends ChangeNotifier {
                 children: <Widget>[
                   CalendarDatePicker(
                     initialDate: _selectedTime,
-                    firstDate: DateTime(2023, 1, 1),
+                    firstDate: DateTime(2023),
                     lastDate: DateTime(2025),
-                    onDateChanged: (DateTime date) {
+                    onDateChanged: (date) {
                       _selectedTime = date;
                     },
                   ),
@@ -44,7 +44,7 @@ class MyCustomCalendar extends ChangeNotifier {
                       // Добавьте свои кнопки здесь
                       calendartextButton(
                         'Сегодня',
-                        const Duration(days: 0),
+                        Duration.zero,
                       ),
 
                       calendartextButton(
@@ -80,7 +80,7 @@ class MyCustomCalendar extends ChangeNotifier {
                   ),
                   InkWell(
                     onTap: () async {
-                      TimeOfDay? timeToPick = await showTimePicker(
+                      final timeToPick = await showTimePicker(
                           context: context,
                           initialTime: timeOfDay,
                           initialEntryMode: TimePickerEntryMode.dialOnly);
@@ -108,7 +108,7 @@ class MyCustomCalendar extends ChangeNotifier {
             ),
             actions: <Widget>[
               TextButton(
-                child: Text('ОТМЕНА', style: TextStyle(color: Colors.red)),
+                child: const Text('ОТМЕНА', style: TextStyle(color: Colors.red)),
                 onPressed: () {
                   Navigator.of(context).pop();
                 },

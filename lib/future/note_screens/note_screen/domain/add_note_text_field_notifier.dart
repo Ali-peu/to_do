@@ -1,10 +1,11 @@
 import 'dart:async';
+import 'package:equatable/equatable.dart';
 import 'package:flutter/material.dart';
 import 'package:to_do/configuration/extension/color_extension.dart';
 import 'package:to_do/domain/model/note_text_model.dart';
 import 'package:to_do/domain/model/position_model.dart';
 
-class NoteTextFieldModel {
+class NoteTextFieldModel extends Equatable {
   final Offset position;
   final TextEditingController textController;
   final TextStyle textStyle;
@@ -27,13 +28,14 @@ class NoteTextFieldModel {
       : position = newPosition,
         textController = TextEditingController(),
         textStyle = const TextStyle();
+
+  @override
+  List<Object?> get props => [position, textController.text];
 }
 
 class AddNoteTextFieldNotifier extends ChangeNotifier {
   AddNoteTextFieldNotifier();
 
-  final _textController =
-      StreamController<List<NoteTextFieldModel>>.broadcast();
   List<NoteTextFieldModel> _noteTextFieldModelList = [];
 
   List<NoteTextFieldModel> get noteTextFieldModel => _noteTextFieldModelList;
@@ -45,22 +47,19 @@ class AddNoteTextFieldNotifier extends ChangeNotifier {
 
   int currentTextField = 0;
 
-  Stream<List<NoteTextFieldModel>> get textController => _textController.stream;
-
   Future<void> increaseSize({required int index}) async {
     if (index < 0 || index >= _noteTextFieldModelList.length) {
       throw IndexError.withLength(index, _noteTextFieldModelList.length);
     }
 
     final currentModel = _noteTextFieldModelList[index];
-    final currentFontSize = currentModel.textStyle.fontSize ?? 8;
+    final currentFontSize = currentModel.textStyle.fontSize ?? 15;
 
     _noteTextFieldModelList[index] = currentModel.copyWith(
       textStyle: currentModel.textStyle.copyWith(
         fontSize: currentFontSize + 1,
       ),
     );
-    _textController.add(List.from(_noteTextFieldModelList));
     notifyListeners();
   }
 
@@ -70,14 +69,13 @@ class AddNoteTextFieldNotifier extends ChangeNotifier {
     }
 
     final currentModel = _noteTextFieldModelList[index];
-    final currentFontSize = currentModel.textStyle.fontSize ?? 8;
+    final currentFontSize = currentModel.textStyle.fontSize ?? 15;
 
     _noteTextFieldModelList[index] = currentModel.copyWith(
       textStyle: currentModel.textStyle.copyWith(
         fontSize: currentFontSize - 1,
       ),
     );
-    _textController.add(List.from(_noteTextFieldModelList));
 
     notifyListeners();
   }
@@ -100,7 +98,7 @@ class AddNoteTextFieldNotifier extends ChangeNotifier {
               color: e.colorHex.toColor(),
             )))
         .toList();
-    _textController.add(_noteTextFieldModelList);
+    notifyListeners();
   }
 
   void updateTextPosition(Offset position,
@@ -111,7 +109,15 @@ class AddNoteTextFieldNotifier extends ChangeNotifier {
     );
     _noteTextFieldModelList[updatedId] =
         _noteTextFieldModelList[updatedId].copyWith(position: adjustedPosition);
-    _textController.add(List.from(_noteTextFieldModelList));
+    notifyListeners();
+  }
+
+  Future<void> addTextFieldValue(
+      {required int index, required String? value}) async {
+    _noteTextFieldModelList[index] = _noteTextFieldModelList[index].copyWith(
+        textController: _noteTextFieldModelList[index].textController
+          ..text = value ?? '');
+    notifyListeners();
   }
 
   Future<int> addNewTextField(Offset position) async {
@@ -120,29 +126,23 @@ class AddNoteTextFieldNotifier extends ChangeNotifier {
       _noteTextFieldModelList.removeLast();
     }
     _noteTextFieldModelList.add(NoteTextFieldModel.newValue(position));
-    _textController.add(List.from(_noteTextFieldModelList));
     return _noteTextFieldModelList.indexOf(_noteTextFieldModelList.last);
   }
 
-  Future<int> onTapUp(TapUpDetails? details,
-      {required double currentScrollOffset}) async {
-    if (details == null) return 0;
-
+  Future<int> onTapUp(
+      {required double localPositionDx,
+      required double localPositionDy,
+      required double currentScrollOffset}) async {
     final adjustedPosition = Offset(
-      details.localPosition.dx,
-      details.localPosition.dy + currentScrollOffset,
+      localPositionDx,
+      localPositionDy + currentScrollOffset,
     );
     final index = await addNewTextField(adjustedPosition);
+    notifyListeners();
     return index;
   }
 
   void clearData() {
     _noteTextFieldModelList.clear();
-  }
-
-  @override
-  void dispose() {
-    super.dispose();
-    _textController.close();
   }
 }

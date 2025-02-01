@@ -1,5 +1,8 @@
+import 'dart:developer';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 import 'package:to_do/data/drift_datebase_providers/note_linear_repository.dart';
 import 'package:to_do/data/drift_datebase_providers/note_positions_repository.dart';
@@ -108,6 +111,7 @@ class _NoteScreenState extends State<_NoteScreen> {
               onPressed: () {
                 context.read<NoteScreenBloc>().add(SaveNote(
                     drawingPoints: context.read<DrawBloc>().state.points));
+                context.pop();
               },
               child: const Text('OK'))
         ],
@@ -122,6 +126,7 @@ class _NoteScreenState extends State<_NoteScreen> {
                 list: Provider.of<DrawNoteNotifier>(context, listen: false)
                     .drawingPoints));
           }
+          log('message');
         },
         child: BlocBuilder<NoteScreenBloc, NoteScreenState>(
           builder: (context, state) {
@@ -139,12 +144,11 @@ class _NoteScreenState extends State<_NoteScreen> {
                 },
                 onTapUp: (details) async {
                   if (state.noteScreenStatus != NoteScreenStatus.drawing) {
-                    final index = await Provider.of<AddNoteTextFieldNotifier>(
-                            context,
-                            listen: false)
-                        .onTapUp(details,
-                            currentScrollOffset: scrollController.offset);
-                    blocValue.add(SetCurrentTextFieldIndex(index: index));
+                    blocValue.add(AddTextField(
+                        localPositionDx: details.localPosition.dx,
+                        localPositionDy: details.localPosition.dy,
+                        currentScrollOffset: scrollController.offset));
+                    // blocValue.add(SetCurrentTextFieldIndex(index: index));
                   }
                 },
                 child: SingleChildScrollView(
@@ -156,60 +160,60 @@ class _NoteScreenState extends State<_NoteScreen> {
                     constraints: BoxConstraints(
                         minHeight: MediaQuery.of(context).size.height,
                         maxHeight: double.maxFinite),
-                    child: StreamBuilder<List<NoteTextFieldModel>>(
-                      stream: Provider.of<AddNoteTextFieldNotifier>(context,
-                              listen: false)
-                          .textController,
-                      builder: (context, snapshot) => Stack(
-                        children: [
-                          Container(
-                            color: Colors.white, // Фон экрана
-                          ),
-                          const DrawScreen(),
-                          ...(snapshot.data ?? []).asMap().entries.map((entry) {
-                            final index = entry.key;
-                            final position = entry.value;
-                            final screenWidth =
-                                MediaQuery.of(context).size.width;
-                            return Positioned(
-                              left: position.position.dx,
-                              top: position.position.dy,
-                              child: SizedBox(
-                                width: screenWidth - position.position.dx,
-                                child: Padding(
-                                  padding: const EdgeInsets.only(right: 10),
-                                  child: DraggableWidget(
-                                    boxConstraints: BoxConstraints(
-                                      maxWidth:
-                                          screenWidth - position.position.dx,
-                                    ),
-                                    onDragEnd: (details) {
-                                      final renderBox = context
-                                          .findRenderObject() as RenderBox?;
-                                      if (renderBox == null) {
-                                        return;
-                                      }
-                                      final localOffset = renderBox
-                                          .globalToLocal(details.offset);
-                                      Provider.of<AddNoteTextFieldNotifier>(
-                                              context,
-                                              listen: false)
-                                          .updateTextPosition(localOffset,
-                                              updatedId: index,
-                                              currentScrollOffset:
-                                                  scrollController.offset);
-                                    },
-                                    child: AddNoteTextField(
-                                      controller: position.textController,
-                                      textStyle: position.textStyle,
-                                    ),
+                    child: Stack(
+                      children: [
+                        Container(
+                          color: Colors.white, // Фон экрана
+                        ),
+                        const DrawScreen(),
+                        for (int i = 0;
+                            i < state.noteTextFieldModel.length;
+                            i++)
+                          Positioned(
+                            left: state.noteTextFieldModel[i].position.dx,
+                            top: state.noteTextFieldModel[i].position.dy,
+                            child: SizedBox(
+                              width: MediaQuery.of(context).size.width -
+                                  state.noteTextFieldModel[i].position.dx,
+                              child: Padding(
+                                padding: const EdgeInsets.only(right: 10),
+                                child: DraggableWidget(
+                                  boxConstraints: BoxConstraints(
+                                    maxWidth: MediaQuery.of(context)
+                                            .size
+                                            .width -
+                                        state.noteTextFieldModel[i].position.dx,
+                                  ),
+                                  onDragEnd: (details) {
+                                    final renderBox = context.findRenderObject()
+                                        as RenderBox?;
+                                    if (renderBox == null) {
+                                      return;
+                                    }
+                                    final localOffset =
+                                        renderBox.globalToLocal(details.offset);
+                                    blocValue.add(UpdateTextPosition(
+                                        position: localOffset,
+                                        updatedId: i,
+                                        currentScrollOffset:
+                                            scrollController.offset));
+                                  },
+                                  child: AddNoteTextField(
+                                    onTap: () => blocValue.add(
+                                        SetCurrentTextFieldIndex(index: i)),
+                                    controller: state
+                                        .noteTextFieldModel[i].textController,
+                                    textStyle:
+                                        state.noteTextFieldModel[i].textStyle,
+                                    onChanged: (value) => blocValue.add(
+                                        SaveTextFieldValue(
+                                            value: value, index: i)),
                                   ),
                                 ),
                               ),
-                            );
-                          }),
-                        ],
-                      ),
+                            ),
+                          )
+                      ],
                     ),
                   ),
                 ));
