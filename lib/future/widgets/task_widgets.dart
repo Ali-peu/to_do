@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:fluttertoast/fluttertoast.dart';
 import 'package:go_router/go_router.dart';
 import 'package:to_do/data/router/app_router.dart';
 import 'package:to_do/domain/model/note.dart';
@@ -33,7 +32,6 @@ class _TaskWidgetState extends State<TaskWidget> {
             pathParameters: {'id': widget.note.id.toString()});
       },
       onLongPress: () {
-        Fluttertoast.showToast(msg: 'LongPress');
       },
       // shape: RoundedRectangleBorder(
       //   borderRadius: BorderRadius.circular(1),
